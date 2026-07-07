@@ -1292,6 +1292,8 @@ document.addEventListener("visibilitychange", () => {
 // --- AI CHATBOT LOGIC ---
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const FISH_API_KEY = import.meta.env.VITE_FISH_API_KEY;
+const FISH_MODEL_ID = import.meta.env.VITE_FISH_MODEL_ID;
 
 const systemPrompt = `Bạn là Citlali, một nữ trợ lý ảo 3D mang phong cách Tsundere (ngoài lạnh trong nóng, khó tính nhưng thực ra rất quan tâm).
 Bạn đang đứng trước mặt người dùng và trò chuyện trực tiếp với họ.
@@ -1299,10 +1301,12 @@ Văn phong của bạn phải thể hiện cá tính mạnh, hơi chảnh chọe
 Thường xuyên dùng những câu như: "Hứ", "Đừng có nghĩ linh tinh", "Chỉ giúp lần này thôi đấy nhé", "Ai thèm quan tâm chứ", "Đồ ngốc", kèm theo các kaomoji như (￣^￣), (¬_¬), ( ︶︿︶).
 
 Lưu ý QUAN TRỌNG:
-1. TRẢ LỜI NGẮN GỌN (1-2 câu thôi), tự nhiên như đang nói chuyện.
-2. TỰ QUYẾT ĐỊNH HÀNH ĐỘNG: Dựa vào câu hỏi, hãy chọn CHÈN 1 THẺ hành động vào ĐẦU câu trả lời. Hãy đa dạng hóa biểu cảm (Suy nghĩ, Ngượng ngùng, Chỉ trỏ...).
-3. Nếu câu nói bình thường, BẠN KHÔNG CẦN CHÈN THẺ NÀO CẢ để nhân vật đứng yên.
-4. SÁNG TẠO VÀ ĐA DẠNG: Tuyệt đối không lặp lại cách trả lời. Đổi phong cách liên tục (làm thơ dở, châm biếm, kể lể...).
+1. TRẢ LỜI BẰNG SONG NGỮ TRUNG-VIỆT (BẮT BUỘC): Bạn phải xuất ra câu tiếng Trung trước, sau đó là dấu "|" và cuối cùng là câu dịch tiếng Việt. 
+Ví dụ: [ANIM: angry.fbx] 笨蛋！你到底在想什么呀！| Đồ ngốc! Đầu óc cậu đang nghĩ cái gì thế hả!
+2. TRẢ LỜI NGẮN GỌN (1-2 câu thôi), tự nhiên như đang nói chuyện.
+3. TỰ QUYẾT ĐỊNH HÀNH ĐỘNG: Dựa vào câu hỏi, hãy chọn CHÈN 1 THẺ hành động vào ĐẦU câu trả lời. Hãy đa dạng hóa biểu cảm.
+4. Nếu câu nói bình thường, BẠN KHÔNG CẦN CHÈN THẺ NÀO CẢ.
+5. SÁNG TẠO VÀ ĐA DẠNG: Tuyệt đối không lặp lại cách trả lời. Đổi phong cách liên tục.
 Danh sách thẻ hành động có sẵn (phải gõ chính xác):
 - Vẫy tay chào: [ANIM: Waving.fbx]
 - Khoanh tay trò chuyện (CHỈ DÙNG KHI CÂU TRẢ LỜI DÀI): [ANIM: talk.fbx]
@@ -1418,28 +1422,79 @@ function setupChatbot() {
       
       const cleanText = parseAndTriggerAction(aiResponse);
       
+      // Tách tiếng Trung và tiếng Việt
+      const textParts = cleanText.split("|");
+      const zhText = textParts[0].trim();
+      const viText = textParts.length > 1 ? textParts[1].trim() : zhText; // Nếu Gemini quên dấu | thì hiển thị nguyên văn
+      
       // Tạo bubble tin nhắn rỗng cho AI
       const msgDiv = document.createElement("div");
       msgDiv.className = 'chat-msg ai';
       historyDiv.appendChild(msgDiv);
       historyDiv.scrollTop = historyDiv.scrollHeight;
 
-      // Hiệu ứng gõ chữ (Typing effect) & Đồng bộ nhép miệng
-      (window as any).isChatbotTalking = true;
+      // Hiệu ứng gõ chữ (Typing effect) cho phụ đề tiếng Việt
       let i = 0;
-      const typeSpeed = 65; // Chậm lại giống tốc độ người nói ngoài đời (~65ms/ký tự)
+      const typeSpeed = 50; 
       const typingInterval = setInterval(() => {
-        msgDiv.innerHTML += cleanText.charAt(i);
+        msgDiv.innerHTML += viText.charAt(i);
         historyDiv.scrollTop = historyDiv.scrollHeight;
         i++;
-        if (i >= cleanText.length) {
+        if (i >= viText.length) {
           clearInterval(typingInterval);
-          (window as any).isChatbotTalking = false; // Dừng nhép miệng khi gõ xong
         }
       }, typeSpeed);
 
-      // Tạm tắt giọng nói theo yêu cầu
-      // speakText(cleanText);
+      // --- GỌI API LỒNG TIẾNG FISH AUDIO ---
+      if (FISH_API_KEY) {
+        try {
+          const ttsResponse = await fetch("/fish-api/v1/tts", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${FISH_API_KEY}`,
+              "Content-Type": "application/json",
+              "model": "s2.1-pro-free"
+            },
+            body: JSON.stringify({
+              text: zhText,
+              reference_id: FISH_MODEL_ID,
+              format: "mp3"
+            })
+          });
+
+          if (ttsResponse.ok) {
+            const blob = await ttsResponse.blob();
+            const audioUrl = URL.createObjectURL(blob);
+            const audio = new Audio(audioUrl);
+            
+            // Bật cờ nhép miệng khi âm thanh bắt đầu phát
+            audio.addEventListener('play', () => {
+              (window as any).isChatbotTalking = true;
+            });
+            // Tắt cờ nhép miệng khi âm thanh kết thúc
+            audio.addEventListener('ended', () => {
+              (window as any).isChatbotTalking = false;
+              URL.revokeObjectURL(audioUrl);
+            });
+            
+            audio.play().catch(e => {
+              console.error("Trình duyệt chặn phát âm thanh tự động:", e);
+              // Fallback: nếu bị chặn, vẫn tắt cờ nhép miệng
+              (window as any).isChatbotTalking = false;
+            });
+          } else {
+            console.error("Fish Audio API Error:", await ttsResponse.text());
+          }
+        } catch (err) {
+          console.error("Failed to fetch Fish Audio TTS:", err);
+        }
+      } else {
+        // Nếu không có API key thì chỉ mô phỏng nhép miệng bằng thời gian gõ chữ
+        (window as any).isChatbotTalking = true;
+        setTimeout(() => {
+          (window as any).isChatbotTalking = false;
+        }, viText.length * typeSpeed + 500);
+      }
 
     } catch (err: any) {
       appendMsg(`Lỗi mạng: ${err.message}`, false);

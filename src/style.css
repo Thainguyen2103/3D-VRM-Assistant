@@ -29,7 +29,7 @@ canvas {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 350px;
+  width: 320px;
   box-sizing: border-box;
   color: #333; /* Chữ tối màu để dễ đọc trên nền sáng */
   background: rgba(255, 255, 255, 0.5); /* Nền kính mờ */
@@ -43,10 +43,10 @@ canvas {
 
 #chat-ui {
   position: absolute;
-  top: 190px;
-  left: 20px;
+  top: 20px;
+  right: 20px;
   bottom: 20px;
-  width: 350px;
+  width: 420px;
   box-sizing: border-box;
   background: rgba(255, 240, 245, 0.85); /* Hồng pastel trong suốt */
   backdrop-filter: blur(10px);
@@ -170,10 +170,11 @@ p {
 
 #control-panel {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 190px;
+  left: 20px;
+  bottom: 20px;
   width: 320px;
-  max-height: 90vh;
+  max-height: none;
   overflow-y: auto;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
