@@ -1290,10 +1290,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 // --- AI CHATBOT LOGIC ---
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const FISH_API_KEY = import.meta.env.VITE_FISH_API_KEY;
-const FISH_MODEL_ID = import.meta.env.VITE_FISH_MODEL_ID;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const systemPrompt = `Bạn là Citlali, một nữ trợ lý ảo 3D mang phong cách Tsundere (ngoài lạnh trong nóng, khó tính nhưng thực ra rất quan tâm).
 Bạn đang đứng trước mặt người dùng và trò chuyện trực tiếp với họ.
@@ -1379,11 +1376,6 @@ function setupChatbot() {
     const userText = input.value.trim();
     if (!userText) return;
     
-    if (!apiKey) {
-      appendMsg("Lỗi: Chưa có VITE_GEMINI_API_KEY trong file .env!", false);
-      return;
-    }
-
     appendMsg(userText, true);
     input.value = "";
     input.style.height = '46px'; // Reset chiều cao sau khi gửi
@@ -1391,17 +1383,11 @@ function setupChatbot() {
 
     try {
       const payload = {
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [
-          ...chatHistory,
-          { role: "user", parts: [{ text: userText }] }
-        ],
-        generationConfig: {
-          temperature: 1.2, // Tăng sự sáng tạo, ngẫu nhiên để tránh lặp lại văn phong
-        }
+        chatHistory: chatHistory,
+        userText: userText
       };
 
-      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      const response = await fetch(`${BACKEND_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -1410,22 +1396,20 @@ function setupChatbot() {
       const data = await response.json();
       
       if (data.error) {
-         appendMsg(`Lỗi API: ${data.error.message}`, false);
+         appendMsg(`Lỗi Server: ${data.error}`, false);
          sendBtn.disabled = false;
          return;
       }
 
-      const aiResponse = data.candidates[0].content.parts[0].text;
-      
       chatHistory.push({ role: "user", parts: [{ text: userText }] });
-      chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+      chatHistory.push({ role: "model", parts: [{ text: data.aiResponse }] });
       
-      const cleanText = parseAndTriggerAction(aiResponse);
-      
-      // Tách tiếng Trung và tiếng Việt
-      const textParts = cleanText.split("|");
-      const zhText = textParts[0].trim();
-      const viText = textParts.length > 1 ? textParts[1].trim() : zhText; // Nếu Gemini quên dấu | thì hiển thị nguyên văn
+      if (data.anim) {
+         const btn = document.querySelector(`.anim-btn[data-anim="${data.anim}"]`) as HTMLButtonElement;
+         if (btn) btn.click();
+      }
+
+      const viText = data.viText;
       
       // Tạo bubble tin nhắn rỗng cho AI
       const msgDiv = document.createElement("div");
@@ -1445,51 +1429,24 @@ function setupChatbot() {
         }
       }, typeSpeed);
 
-      // --- GỌI API LỒNG TIẾNG FISH AUDIO ---
-      if (FISH_API_KEY) {
-        try {
-          const ttsResponse = await fetch("/fish-api/v1/tts", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${FISH_API_KEY}`,
-              "Content-Type": "application/json",
-              "model": "s2.1-pro-free"
-            },
-            body: JSON.stringify({
-              text: zhText,
-              reference_id: FISH_MODEL_ID,
-              format: "mp3"
-            })
+      // Phát âm thanh
+      if (data.audioBase64) {
+          const audioUrl = `data:audio/mp3;base64,${data.audioBase64}`;
+          const audio = new Audio(audioUrl);
+          
+          audio.addEventListener('play', () => {
+            (window as any).isChatbotTalking = true;
           });
-
-          if (ttsResponse.ok) {
-            const blob = await ttsResponse.blob();
-            const audioUrl = URL.createObjectURL(blob);
-            const audio = new Audio(audioUrl);
-            
-            // Bật cờ nhép miệng khi âm thanh bắt đầu phát
-            audio.addEventListener('play', () => {
-              (window as any).isChatbotTalking = true;
-            });
-            // Tắt cờ nhép miệng khi âm thanh kết thúc
-            audio.addEventListener('ended', () => {
-              (window as any).isChatbotTalking = false;
-              URL.revokeObjectURL(audioUrl);
-            });
-            
-            audio.play().catch(e => {
-              console.error("Trình duyệt chặn phát âm thanh tự động:", e);
-              // Fallback: nếu bị chặn, vẫn tắt cờ nhép miệng
-              (window as any).isChatbotTalking = false;
-            });
-          } else {
-            console.error("Fish Audio API Error:", await ttsResponse.text());
-          }
-        } catch (err) {
-          console.error("Failed to fetch Fish Audio TTS:", err);
-        }
+          
+          audio.addEventListener('ended', () => {
+            (window as any).isChatbotTalking = false;
+          });
+          
+          audio.play().catch(e => {
+            console.error("Trình duyệt chặn phát âm thanh tự động:", e);
+            (window as any).isChatbotTalking = false;
+          });
       } else {
-        // Nếu không có API key thì chỉ mô phỏng nhép miệng bằng thời gian gõ chữ
         (window as any).isChatbotTalking = true;
         setTimeout(() => {
           (window as any).isChatbotTalking = false;
