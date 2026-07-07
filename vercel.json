@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/fish-api/:path*",
+      "destination": "https://api.fish.audio/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
