@@ -232,6 +232,11 @@ let isAutoIdle = false;
 let shouldStopAutoIdle = false;
 const AFK_TIMEOUT = 10000; // 10 giây không thao tác sẽ tự động chuyển sang nhàn rỗi
 
+const loopOnceAnimations = [
+  "Waving.fbx", "Pointing.fbx", "No.fbx", "Clapping.fbx", 
+  "Blow A Kiss.fbx", "Surprised.fbx", "Shy.fbx", "Thinking.fbx", "angry.fbx", "talk.fbx"
+];
+
 function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   lastInteractionTime = Date.now(); // Reset timer khi người dùng chủ động tải animation
 
@@ -270,9 +275,24 @@ function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
           loadFBXAnimation(""); // Trở về trạng thái tĩnh ngay khi vừa hết chu kỳ
         }
       });
+      // Tự động trở về trạng thái bình thường sau khi kết thúc 1 hành động (LoopOnce)
+      currentMixer.addEventListener("finished", (e) => {
+        if (e.action === currentAction && currentAnimUrl !== "") {
+          loadFBXAnimation(""); // Trở về base pose (bỏ khóa animation)
+        }
+      });
     }
 
     currentAction = currentMixer.clipAction(clip);
+    
+    // Áp dụng LoopOnce cho các hành động nhất thời
+    if (loopOnceAnimations.includes(url)) {
+      currentAction.setLoop(THREE.LoopOnce, 1);
+      currentAction.clampWhenFinished = true;
+    } else {
+      currentAction.setLoop(THREE.LoopRepeat, Infinity);
+    }
+    
     currentAction.reset().fadeIn(0.5).play();
   }).catch((err) => {
     console.error("Lỗi khi tải FBX:", err);
@@ -490,11 +510,11 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   20.0,
 );
-camera.position.set(0.0, 1.0, 3.5); // Hạ góc máy và lùi xa ra để thấy toàn thân
+camera.position.set(0.0, 1.3, 1.5); // Góc mặc định là Cận cảnh hông (lùi xa 1 chút)
 
 // Thêm OrbitControls để xoay góc máy bằng chuột
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0.0, 0.8, 0.0);
+controls.target.set(0.0, 1.2, 0.0);
 controls.enablePan = false;
 controls.enableDamping = true;
 
@@ -524,8 +544,20 @@ document.getElementById("cam-full")?.addEventListener("click", () => {
 });
 
 document.getElementById("cam-half")?.addEventListener("click", () => {
-  targetCameraPos.set(0.0, 1.2, 1.6); // Gần hơn và cao hơn (ngang ngực/mặt)
-  targetControlsTarget.set(0.0, 1.15, 0.0);
+  targetCameraPos.set(0.0, 1.3, 1.5); // Cận cảnh hông (lùi xa một chút)
+  targetControlsTarget.set(0.0, 1.2, 0.0);
+  isAnimatingCamera = true;
+});
+
+document.getElementById("cam-chest")?.addEventListener("click", () => {
+  targetCameraPos.set(0.0, 1.45, 1.0); // Cận cảnh ngực
+  targetControlsTarget.set(0.0, 1.42, 0.0);
+  isAnimatingCamera = true;
+});
+
+document.getElementById("cam-face")?.addEventListener("click", () => {
+  targetCameraPos.set(0.0, 1.45, 0.7); // Cận cảnh mặt (zoom sát khuôn mặt)
+  targetControlsTarget.set(0.0, 1.42, 0.0);
   isAnimatingCamera = true;
 });
 
@@ -762,10 +794,17 @@ const clock = new THREE.Clock();
 // 4. Animation Loop
 function animate() {
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  let delta = clock.getDelta();
+  
+  // SỬA LỖI CHUYỂN TAB: Khi ẩn tab, requestAnimationFrame dừng lại.
+  // Khi quay lại, delta sẽ rất lớn gây ra lỗi vật lý (giật, tung váy áo, nhảy cóc animation).
+  // Vì vậy nếu delta quá lớn (trên 100ms), ta ép nó về mức bình thường của 1 frame (1/60s).
+  if (delta > 0.1) {
+    delta = 1 / 60;
+  }
+  
+  const deltaTime = delta;
   const time = clock.elapsedTime;
-  // Giới hạn max deltaTime để tránh lỗi nhảy cóc khi lag (giật lag do tab bị ẩn)
-  const deltaTime = Math.min(delta, 0.1);
 
   if (isAnimatingCamera) {
     camera.position.lerp(targetCameraPos, 5.0 * deltaTime);
@@ -1121,26 +1160,26 @@ function animate() {
         currentVrm.expressionManager.setValue("blink", finalBlink);
       }
 
-      // Nhép miệng ngẫu nhiên có ngắt quãng nếu đang dùng animation trò chuyện
-      if (currentAnimUrl === "talk.fbx") {
-        // "Mặt nạ" tần số thấp (low-frequency mask) để tạo ra các cụm từ và khoảng nghỉ ngẫu nhiên (dừng nói để thở/nghĩ)
-        const talkMask = Math.sin(time * 3.1) + Math.sin(time * 1.7) + Math.sin(time * 0.8);
+      // Nhép miệng ngẫu nhiên có ngắt quãng nếu đang dùng animation trò chuyện hoặc Chatbot đang trả lời
+      if (currentAnimUrl === "talk.fbx" || (window as any).isChatbotTalking) {
+        // Chậm lại nhịp thở/ngắt nghỉ (giảm hệ số thời gian)
+        const talkMask = Math.sin(time * 2.1) + Math.sin(time * 1.2) + Math.sin(time * 0.5);
 
         let aaWeight = 0;
-        // Chỉ mấp máy môi khi mặt nạ > 0.2 (tức là đang vào "câu nói")
-        if (talkMask > 0.2) {
-          // Tốc độ mấp máy của các âm tiết (nhanh hơn)
+        // Chỉ mấp máy môi khi mặt nạ > 0.1
+        if (talkMask > 0.1) {
+          // Khẩu hình miệng mở chậm rãi và tự nhiên hơn (giảm tốc độ dao động)
           const mouthValue = (
-            Math.sin(time * 25.0) * 0.5 +
-            Math.sin(time * 35.3) * 0.3 +
-            Math.sin(time * 15.1) * 0.2
+            Math.sin(time * 12.0) * 0.6 +
+            Math.sin(time * 18.0) * 0.25 +
+            Math.sin(time * 8.0) * 0.15
           );
           // Khuếch đại và chỉ lấy giá trị dương
-          aaWeight = Math.max(0, mouthValue * 1.2);
+          aaWeight = Math.max(0, mouthValue);
         }
 
-        // Ghi đè biểu cảm chữ A (mở miệng)
-        currentVrm.expressionManager.setValue("aa", Math.max(appState.expressions.aa, aaWeight));
+        // Ghi đè biểu cảm chữ A (mở miệng) - Biên độ lớn để rõ miệng
+        currentVrm.expressionManager.setValue("aa", Math.max(appState.expressions.aa, aaWeight * 1.5));
       }
     }
     // Cập nhật VRM với sub-stepping để SpringBone (tóc, áo) không đâm xuyên qua cơ thể khi di chuyển nhanh
@@ -1242,3 +1281,206 @@ window.addEventListener("pointermove", resetAFKTimer);
 window.addEventListener("pointerdown", resetAFKTimer);
 window.addEventListener("keydown", resetAFKTimer);
 window.addEventListener("wheel", resetAFKTimer);
+
+// KHI QUAY LẠI TAB: Reset timer để tránh việc bị quá thời gian AFK và nhảy animation đột ngột
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    resetAFKTimer();
+  }
+});
+
+// --- AI CHATBOT LOGIC ---
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+const systemPrompt = `Bạn là Citlali, một nữ trợ lý ảo 3D mang phong cách Tsundere (ngoài lạnh trong nóng, khó tính nhưng thực ra rất quan tâm).
+Bạn đang đứng trước mặt người dùng và trò chuyện trực tiếp với họ.
+Văn phong của bạn phải thể hiện cá tính mạnh, hơi chảnh chọe, hay cằn nhằn, dễ bực mình nếu bị trêu chọc, không bao giờ chịu thừa nhận là mình quan tâm.
+Thường xuyên dùng những câu như: "Hứ", "Đừng có nghĩ linh tinh", "Chỉ giúp lần này thôi đấy nhé", "Ai thèm quan tâm chứ", "Đồ ngốc", kèm theo các kaomoji như (￣^￣), (¬_¬), ( ︶︿︶).
+
+Lưu ý QUAN TRỌNG:
+1. TRẢ LỜI NGẮN GỌN (1-2 câu thôi), tự nhiên như đang nói chuyện.
+2. TỰ QUYẾT ĐỊNH HÀNH ĐỘNG: Dựa vào câu hỏi, hãy chọn CHÈN 1 THẺ hành động vào ĐẦU câu trả lời. Hãy đa dạng hóa biểu cảm (Suy nghĩ, Ngượng ngùng, Chỉ trỏ...).
+3. Nếu câu nói bình thường, BẠN KHÔNG CẦN CHÈN THẺ NÀO CẢ để nhân vật đứng yên.
+4. SÁNG TẠO VÀ ĐA DẠNG: Tuyệt đối không lặp lại cách trả lời. Đổi phong cách liên tục (làm thơ dở, châm biếm, kể lể...).
+Danh sách thẻ hành động có sẵn (phải gõ chính xác):
+- Vẫy tay chào: [ANIM: Waving.fbx]
+- Khoanh tay trò chuyện (CHỈ DÙNG KHI CÂU TRẢ LỜI DÀI): [ANIM: talk.fbx]
+- Đứng chờ (mặc định): [ANIM: idle.fbx]
+- Tức giận (BẮT BUỘC DÙNG khi bị xúc phạm, cà khịa, chê bai): [ANIM: angry.fbx]
+- Suy nghĩ (Nên dùng thường xuyên khi bị hỏi): [ANIM: Thinking.fbx]
+- Lắc đầu từ chối: [ANIM: No.fbx]
+- Chỉ trỏ mắng mỏ (Nên dùng khi đang cằn nhằn nhẹ): [ANIM: Pointing.fbx]
+- Xấu hổ / Ngượng ngùng (Nên dùng khi được khen hoặc bối rối): [ANIM: Shy.fbx]
+- Bất ngờ / Ngạc nhiên: [ANIM: Surprised.fbx]
+- Hôn gió (hiếm khi dùng): [ANIM: Blow A Kiss.fbx]
+- Khóc lóc ăn vạ: [ANIM: Crying.fbx]`;
+
+let chatHistory: any[] = [];
+
+function setupChatbot() {
+  const input = document.getElementById("chat-input") as HTMLInputElement;
+  const sendBtn = document.getElementById("btn-send-chat") as HTMLButtonElement;
+  const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
+  const initialMsgDiv = document.getElementById("initial-msg") as HTMLDivElement;
+
+  if (!input || !sendBtn || !historyDiv) return;
+
+  // Khởi tạo câu chào ngẫu nhiên
+  if (initialMsgDiv && chatHistory.length === 0) {
+    const greetings = [
+      "Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)",
+      "Lại rảnh rỗi sinh nông nổi đi gọi tôi à? Nhanh cái tay lên! (¬_¬)",
+      "Hôm nay trời đẹp thế mà lại bắt tôi ra đây đứng à? ( ︶︿︶)",
+      "Làm thơ á? 'Hoa hồng màu đỏ, hoa violet màu xanh, sao anh phiền phức thế, để yên cho tôi nhanh'. Hứ! (￣^￣)",
+      "Lại là bạn à? Lần này có chuyện gì quan trọng không, hay lại trêu tôi đấy? (￣^￣)",
+      "Đang yên đang lành... Thôi được rồi, có gì thì nói nhanh đi. ( ︶︿︶)",
+      "Biết mấy giờ rồi không mà còn gọi? Hứ! (￣^￣)"
+    ];
+    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+    initialMsgDiv.innerText = randomGreeting;
+    chatHistory.push({ role: "model", parts: [{ text: randomGreeting }] });
+  }
+
+  const appendMsg = (text: string, isUser: boolean) => {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `chat-msg ${isUser ? 'user' : 'ai'}`;
+    msgDiv.innerText = text;
+    historyDiv.appendChild(msgDiv);
+    historyDiv.scrollTop = historyDiv.scrollHeight;
+  };
+
+  const parseAndTriggerAction = (text: string) => {
+    // Tìm tất cả các thẻ [ANIM: xxx.fbx]
+    const regex = /\[ANIM:\s*([^\]]+)\]/g;
+    let match;
+    let lastAnim = "";
+    while ((match = regex.exec(text)) !== null) {
+      lastAnim = match[1].trim();
+    }
+    
+    if (lastAnim) {
+       // Kích hoạt animation (tương đương với click nút)
+       const btn = document.querySelector(`.anim-btn[data-anim="${lastAnim}"]`) as HTMLButtonElement;
+       if (btn) {
+         btn.click();
+       }
+    }
+    
+    // Xóa thẻ ANIM khỏi chuỗi hiển thị
+    return text.replace(/\[ANIM:\s*[^\]]+\]/g, "").trim();
+  };
+
+  const handleSend = async () => {
+    const userText = input.value.trim();
+    if (!userText) return;
+    
+    if (!apiKey) {
+      appendMsg("Lỗi: Chưa có VITE_GEMINI_API_KEY trong file .env!", false);
+      return;
+    }
+
+    appendMsg(userText, true);
+    input.value = "";
+    input.style.height = '46px'; // Reset chiều cao sau khi gửi
+    sendBtn.disabled = true;
+
+    try {
+      const payload = {
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [
+          ...chatHistory,
+          { role: "user", parts: [{ text: userText }] }
+        ],
+        generationConfig: {
+          temperature: 1.2, // Tăng sự sáng tạo, ngẫu nhiên để tránh lặp lại văn phong
+        }
+      };
+
+      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      
+      if (data.error) {
+         appendMsg(`Lỗi API: ${data.error.message}`, false);
+         sendBtn.disabled = false;
+         return;
+      }
+
+      const aiResponse = data.candidates[0].content.parts[0].text;
+      
+      chatHistory.push({ role: "user", parts: [{ text: userText }] });
+      chatHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+      
+      const cleanText = parseAndTriggerAction(aiResponse);
+      
+      // Tạo bubble tin nhắn rỗng cho AI
+      const msgDiv = document.createElement("div");
+      msgDiv.className = 'chat-msg ai';
+      historyDiv.appendChild(msgDiv);
+      historyDiv.scrollTop = historyDiv.scrollHeight;
+
+      // Hiệu ứng gõ chữ (Typing effect) & Đồng bộ nhép miệng
+      (window as any).isChatbotTalking = true;
+      let i = 0;
+      const typeSpeed = 65; // Chậm lại giống tốc độ người nói ngoài đời (~65ms/ký tự)
+      const typingInterval = setInterval(() => {
+        msgDiv.innerHTML += cleanText.charAt(i);
+        historyDiv.scrollTop = historyDiv.scrollHeight;
+        i++;
+        if (i >= cleanText.length) {
+          clearInterval(typingInterval);
+          (window as any).isChatbotTalking = false; // Dừng nhép miệng khi gõ xong
+        }
+      }, typeSpeed);
+
+      // Tạm tắt giọng nói theo yêu cầu
+      // speakText(cleanText);
+
+    } catch (err: any) {
+      appendMsg(`Lỗi mạng: ${err.message}`, false);
+    }
+    
+    sendBtn.disabled = false;
+  };
+
+  sendBtn.addEventListener("click", handleSend);
+  
+  // Tự động co giãn chiều cao của textarea khi nhập
+  const resizeInput = () => {
+    input.style.height = '46px'; // Trả về chiều cao mặc định 1 dòng để đo lại
+    input.style.height = (input.scrollHeight) + 'px'; // Kéo giãn theo chiều cao nội dung
+  };
+  input.addEventListener("input", resizeInput);
+
+  // Gọi hàm resize ngay 1 lần lúc vừa load để đảm bảo nếu placeholder dài bị rớt dòng thì khung chat cũng tự động to ra
+  setTimeout(resizeInput, 100);
+
+  input.addEventListener("keydown", (e) => {
+    // Nhấn Enter mà KHÔNG giữ Shift thì gửi tin nhắn
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Ngăn chặn việc tạo dòng mới mặc định của textarea
+      handleSend();
+    }
+    // Ngược lại, nếu nhấn Shift + Enter thì cứ để mặc định textarea tự xuống dòng
+  });
+}
+
+function speakText(text: string) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'vi-VN'; 
+  utterance.rate = 1.1; // Nói nhanh 1 xíu
+  utterance.pitch = 1.2; // Tông giọng cao đáng yêu
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// Khởi chạy chatbot
+setupChatbot();

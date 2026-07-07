@@ -10,14 +10,30 @@
     <div id="loading">Đang chuẩn bị Scene...</div>
     <div id="ui">
         <h2>Trợ lý ảo 3D</h2>
-        <p>Kéo chuột PHẢI để xoay camera</p>
-        <p>Lăn chuột GIỮA để thu/phóng</p>
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
+        <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <button id="cam-full" class="bone-btn" style="background: #e94560;">Toàn Cảnh</button>
-            <button id="cam-half" class="bone-btn" style="background: #e94560;">Cận Cảnh (Hông)</button>
+            <button id="cam-half" class="bone-btn" style="background: #e94560;">Cận (Hông)</button>
+            <button id="cam-chest" class="bone-btn" style="background: #e94560;">Cận (Ngực)</button>
+            <button id="cam-face" class="bone-btn" style="background: #e94560;">Cận (Mặt)</button>
         </div>
     </div>
     
+    <div id="instruction-text">Kéo chuột PHẢI để xoay camera | Lăn chuột GIỮA để thu/phóng</div>
+    
+    <!-- AI Chatbot Panel -->
+    <div id="chat-ui">
+        <h2 class="chat-title">🌸 Citlali Chat 🌸</h2>
+        
+        <div id="chat-history">
+            <div class="chat-msg ai" id="initial-msg">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>
+        </div>
+
+        <div class="chat-input-area">
+            <textarea id="chat-input" rows="1" placeholder="Nhập nhanh lên, tôi không rảnh đâu..." autocomplete="off"></textarea>
+            <button id="btn-send-chat" class="bone-btn">Gửi</button>
+        </div>
+    </div>
+
     <div id="control-panel">
         <div class="tabs-header">
             <button class="tab-btn active" data-tab="tab-body">Cơ Thể</button>
