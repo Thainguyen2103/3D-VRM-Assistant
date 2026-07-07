@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D VRM Assistant</title>
+  </head>
+  <body>
+    <div id="loading">Đang chuẩn bị Scene...</div>
+    <div id="ui">
+        <h2>Trợ lý ảo 3D</h2>
+        <p>Kéo chuột PHẢI để xoay camera</p>
+        <p>Lăn chuột GIỮA để thu/phóng</p>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button id="cam-full" class="bone-btn" style="background: #e94560;">Toàn Cảnh</button>
+            <button id="cam-half" class="bone-btn" style="background: #e94560;">Cận Cảnh (Hông)</button>
+        </div>
+    </div>
+    
+    <div id="control-panel">
+        <div class="tabs-header">
+            <button class="tab-btn active" data-tab="tab-body">Cơ Thể</button>
+            <button class="tab-btn" data-tab="tab-face">Biểu Cảm & Tay</button>
+        </div>
+
+        <div id="tab-body" class="tab-content active">
+            <div class="panel-section">
+                <h3>Tư thế chung</h3>
+                <div class="control-row">
+                    <label>Tư thế:</label>
+                    <select id="pose-select">
+                        <option value="crossed">Khoanh tay</option>
+                        <option value="relaxed">Thả lỏng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Hoạt hình (Animation FBX)</h3>
+                <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 8px;">
+                    Chép file của bạn vào thư mục <b>public/animations</b>
+                </div>
+                <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="anim-btn bone-btn" data-anim="walk.fbx">Đi bộ</button>
+                    <button class="anim-btn bone-btn" data-anim="run.fbx">Chạy</button>
+                    <button class="anim-btn bone-btn" data-anim="dance.fbx">Nhảy múa</button>
+                    <button class="anim-btn bone-btn" data-anim="idle.fbx">Đứng chờ</button>
+                    <button class="anim-btn bone-btn" data-anim="talk.fbx">Trò chuyện</button>
+                    <button class="anim-btn bone-btn" data-anim="laugh.fbx">Cười lớn</button>
+                    <button class="anim-btn bone-btn" data-anim="angry.fbx">Tức giận</button>
+                    <button class="anim-btn bone-btn" data-anim="Clapping.fbx">Vỗ tay</button>
+                    <button class="anim-btn bone-btn" data-anim="Pointing.fbx">Chỉ trỏ</button>
+                    <button class="anim-btn bone-btn" data-anim="Surprised.fbx">Bất ngờ</button>
+                    <button class="anim-btn bone-btn" data-anim="Waving.fbx">Vẫy tay</button>
+                    <button class="anim-btn bone-btn" data-anim="Sad Idle.fbx">Buồn bã</button>
+                    <button class="anim-btn bone-btn" data-anim="Shy.fbx">Ngượng ngùng</button>
+                    <button class="anim-btn bone-btn" data-anim="Thinking.fbx">Suy nghĩ</button>
+                    <button class="anim-btn bone-btn" style="background: #e94560;" data-anim="">Dừng</button>
+                </div>
+            </div>
+
+        <div class="panel-section">
+            <h3>Thông số Khớp (X, Y, Z)</h3>
+            <div class="xyz-row">
+                <label>X:</label>
+                <input type="number" id="bone-x" step="0.1" value="0">
+            </div>
+            <div class="xyz-row">
+                <label>Y:</label>
+                <input type="number" id="bone-y" step="0.1" value="0">
+            </div>
+            <div class="xyz-row">
+                <label>Z:</label>
+                <input type="number" id="bone-z" step="0.1" value="0">
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <h3>Chọn Khớp Nhanh</h3>
+            <div class="bone-grid">
+                <button class="bone-btn" data-bone="Đầu">Đầu</button>
+                <button class="bone-btn" data-bone="Cổ">Cổ</button>
+                <button class="bone-btn" data-bone="Ngực">Ngực</button>
+                <button class="bone-btn" data-bone="Hông">Hông</button>
+                <button class="bone-btn" data-bone="Tay Trái (Trên)">Vai Trái</button>
+                <button class="bone-btn" data-bone="Tay Phải (Trên)">Vai Phải</button>
+                <button class="bone-btn" data-bone="Khuỷu Trái">Khuỷu Trái</button>
+                <button class="bone-btn" data-bone="Khuỷu Phải">Khuỷu Phải</button>
+                <button class="bone-btn" data-bone="Bàn Tay Trái">Bàn Tay Trái</button>
+                <button class="bone-btn" data-bone="Bàn Tay Phải">Bàn Tay Phải</button>
+                <button class="bone-btn" data-bone="Đùi Trái">Đùi Trái</button>
+                <button class="bone-btn" data-bone="Đùi Phải">Đùi Phải</button>
+                <button class="bone-btn" data-bone="Đầu Gối Trái">Gối Trái</button>
+                <button class="bone-btn" data-bone="Đầu Gối Phải">Gối Phải</button>
+                <button class="bone-btn" data-bone="Bàn Chân Trái">Bàn Chân Trái</button>
+                <button class="bone-btn" data-bone="Bàn Chân Phải">Bàn Chân Phải</button>
+                <button class="bone-btn" style="grid-column: span 2; background: #e94560;" data-bone="none">Bỏ Chọn / Tắt Vòng Xoay</button>
+            </div>
+        </div>
+        </div> <!-- End tab-body -->
+
+        <div id="tab-face" class="tab-content">
+            <div class="panel-section">
+                <h3>Biểu cảm</h3>
+                <div class="control-row">
+                    <label>Khuôn mặt (Cài sẵn):</label>
+                    <select id="expression-select">
+                        <option value="neutral">Bình thường</option>
+                        <option value="happy">Vui vẻ</option>
+                        <option value="angry">Tức giận</option>
+                        <option value="sad">Buồn</option>
+                        <option value="relaxed">Thư giãn</option>
+                        <option value="surprised">Ngạc nhiên</option>
+                        <option value="custom" style="display:none;">Tùy chỉnh</option>
+                    </select>
+                </div>
+                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;">Tinh chỉnh chi tiết:</h4>
+                <div class="slider-grid">
+                    <!-- Biểu cảm -->
+                    <div class="control-row"><label>Vui (Joy):</label><input type="range" class="expr-slider" data-expr="happy" id="slider-happy" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Giận (Angry):</label><input type="range" class="expr-slider" data-expr="angry" id="slider-angry" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Buồn (Sad):</label><input type="range" class="expr-slider" data-expr="sad" id="slider-sad" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Thư giãn:</label><input type="range" class="expr-slider" data-expr="relaxed" id="slider-relaxed" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Ngạc nhiên:</label><input type="range" class="expr-slider" data-expr="surprised" id="slider-surprised" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Khẩu hình A:</label><input type="range" class="expr-slider" data-expr="aa" id="slider-aa" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Khẩu hình I:</label><input type="range" class="expr-slider" data-expr="ih" id="slider-ih" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Khẩu hình U:</label><input type="range" class="expr-slider" data-expr="ou" id="slider-ou" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Khẩu hình E:</label><input type="range" class="expr-slider" data-expr="ee" id="slider-ee" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Khẩu hình O:</label><input type="range" class="expr-slider" data-expr="oh" id="slider-oh" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label>Nhắm mắt:</label><input type="range" class="expr-slider" data-expr="blink" id="slider-blink" min="0" max="1" step="0.01" value="0"></div>
+                </div>
+            </div>
+            <div class="panel-section">
+                <h3>Bàn tay</h3>
+                <div class="control-row" style="flex-direction: column; align-items: stretch; gap: 10px;">
+                    <label>Độ nắm ngón tay (Chung):</label>
+                    <input type="range" id="finger-curl-slider" min="-180" max="180" value="-50">
+                </div>
+                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;">Từng ngón tay (Trái):</h4>
+                <div class="slider-grid">
+                    <div class="control-row"><label>Ngón cái:</label><input type="range" class="finger-slider" data-finger="leftThumb" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón trỏ:</label><input type="range" class="finger-slider" data-finger="leftIndex" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón giữa:</label><input type="range" class="finger-slider" data-finger="leftMiddle" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón áp út:</label><input type="range" class="finger-slider" data-finger="leftRing" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón út:</label><input type="range" class="finger-slider" data-finger="leftLittle" min="-180" max="180" value="-50"></div>
+                </div>
+            </div>
+            <div class="panel-section">
+                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;">Từng ngón tay (Phải):</h4>
+                <div class="slider-grid">
+                    <div class="control-row"><label>Ngón cái:</label><input type="range" class="finger-slider" data-finger="rightThumb" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón trỏ:</label><input type="range" class="finger-slider" data-finger="rightIndex" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón giữa:</label><input type="range" class="finger-slider" data-finger="rightMiddle" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón áp út:</label><input type="range" class="finger-slider" data-finger="rightRing" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label>Ngón út:</label><input type="range" class="finger-slider" data-finger="rightLittle" min="-180" max="180" value="-50"></div>
+                </div>
+            </div>
+        </div> <!-- End tab-face -->
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
