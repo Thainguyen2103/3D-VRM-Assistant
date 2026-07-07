@@ -317,18 +317,18 @@ document
 
     if (val !== "neutral" && val !== "custom") {
       targetExpressions[val as keyof typeof targetExpressions] = 1.0;
-      
+
       // Chỉnh lại biểu cảm tức giận cho cute hơn (dỗi)
       if (val === "angry") {
         targetExpressions["angry"] = 0.75; // Giảm độ cau mày
-        targetExpressions["sad"] = 0.5;    // Miệng mếu/cong xuống
-        targetExpressions["blink"] = 0.3;  // Mắt nhắm lại một chút
+        targetExpressions["sad"] = 0.5;    // Miệng hơi cong xuống (mếu)
+        targetExpressions["blink"] = 0.1;  // Mở mắt to hơn (chỉ nhắm rất nhẹ)
       }
 
       // Chỉnh lại biểu cảm ngạc nhiên tự nhiên hơn
       if (val === "surprised") {
-        targetExpressions["surprised"] = 0.6; // Mắt không mở quá to
-        targetExpressions["oh"] = 0.6;        // Miệng chữ O ngạc nhiên
+        targetExpressions["surprised"] = 1.0; // Tăng lên tối đa 1.0
+        targetExpressions["oh"] = 0.8;        // Miệng chữ O mở to hơn
       }
     }
 
@@ -1052,7 +1052,7 @@ function animate() {
       if (currentAnimUrl === "angry.fbx") {
         currentVrm.expressionManager.setValue("angry", 0.75);
         currentVrm.expressionManager.setValue("sad", Math.max(appState.expressions.sad, 0.5));
-        currentVrm.expressionManager.setValue("blink", Math.max(appState.expressions.blink, 0.3));
+        currentVrm.expressionManager.setValue("blink", Math.max(appState.expressions.blink, 0.1));
       } else if (currentAnimUrl === "laugh.fbx") {
         isHappy = 1.0;
         currentVrm.expressionManager.setValue("happy", 1.0);
@@ -1065,8 +1065,8 @@ function animate() {
           currentVrm.expressionManager.setValue("aa", Math.max(appState.expressions.aa, aaWeight));
         }
       } else if (currentAnimUrl === "Surprised.fbx") {
-        currentVrm.expressionManager.setValue("surprised", 0.6); // Mắt không mở quá to
-        currentVrm.expressionManager.setValue("oh", Math.max(appState.expressions.oh, 0.7)); // Miệng chữ O thay vì chữ A
+        currentVrm.expressionManager.setValue("surprised", 1.0); // Kéo lên tối đa
+        currentVrm.expressionManager.setValue("oh", Math.max(appState.expressions.oh, 0.8)); // Miệng mở to
       } else if (currentAnimUrl === "Clapping.fbx") {
         isHappy = 1.0;
         currentVrm.expressionManager.setValue("happy", 0.8);
@@ -1082,10 +1082,34 @@ function animate() {
       } else if (currentAnimUrl === "Thinking.fbx") {
         currentVrm.expressionManager.setValue("angry", 0.3); // Hơi cau mày
         currentVrm.expressionManager.setValue("relaxed", 0.6);
+      } else if (currentAnimUrl === "Blow A Kiss.fbx") {
+        currentVrm.expressionManager.setValue("relaxed", 0.8); // Biểu cảm thư giãn
+        currentVrm.expressionManager.setValue("ou", Math.max(appState.expressions.ou, 0.8)); // Chu môi hôn gió
+      } else if (currentAnimUrl === "Crying.fbx") {
+        isSad = 1.0;
+        currentVrm.expressionManager.setValue("sad", 1.0); // Mếu
+        currentVrm.expressionManager.setValue("angry", 0.3); // Cau mày
+        currentVrm.expressionManager.setValue("ih", Math.max(appState.expressions.ih, 0.5)); // Răng cắn chặt / mếu máo
+      } else if (currentAnimUrl === "Floating.fbx") {
+        currentVrm.expressionManager.setValue("surprised", 1.0); // Kéo lên tối đa
+        currentVrm.expressionManager.setValue("oh", Math.max(appState.expressions.oh, 0.4)); // Hé miệng ngạc nhiên
+      } else if (currentAnimUrl === "No.fbx") {
+        currentVrm.expressionManager.setValue("sad", 0.5); // Nét mặt hơi ái ngại
+        currentVrm.expressionManager.setValue("oh", Math.max(appState.expressions.oh, 0.3)); // Hé miệng từ chối
       }
 
       // Không khóa chớp mắt đối với biểu cảm buồn (để nhân vật vẫn chớp mắt bình thường)
       const isEyeClosedByExpression = isHappy > 0.5;
+
+      // Mẹo: Khép hờ mắt (0.1) mặc định, để khi ngạc nhiên (0.0) mắt trông to hơn hẳn
+      let baseBlink = 0.1; 
+      if (
+        appState.expressions.surprised > 0.3 ||
+        currentAnimUrl === "Surprised.fbx" ||
+        currentAnimUrl === "Floating.fbx"
+      ) {
+        baseBlink = 0; // Mắt mở to 100%
+      }
 
       if (appState.expressions.blink < 1.0 && !isEyeClosedByExpression) {
         let blinkValue = 0;
@@ -1093,10 +1117,8 @@ function animate() {
         if (cycle < 150) {
           blinkValue = Math.sin(Math.PI * (cycle / 150));
         }
-        currentVrm.expressionManager.setValue(
-          "blink",
-          Math.max(appState.expressions.blink, blinkValue),
-        );
+        const finalBlink = Math.min(1.0, Math.max(appState.expressions.blink + baseBlink, blinkValue + baseBlink));
+        currentVrm.expressionManager.setValue("blink", finalBlink);
       }
 
       // Nhép miệng ngẫu nhiên có ngắt quãng nếu đang dùng animation trò chuyện
