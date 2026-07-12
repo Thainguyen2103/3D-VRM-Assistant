@@ -1140,6 +1140,45 @@ function animate() {
       // Không khóa chớp mắt đối với biểu cảm buồn (để nhân vật vẫn chớp mắt bình thường)
       const isEyeClosedByExpression = isHappy > 0.5;
 
+      // Nhép miệng ngẫu nhiên có ngắt quãng nếu đang dùng animation trò chuyện hoặc Chatbot đang trả lời
+      let aaWeight = 0;
+      if ((window as any).isChatbotTalking && (window as any).chatbotAnalyser) {
+        // Thực hiện Lip-sync thời gian thực dựa vào âm thanh
+        const analyser = (window as any).chatbotAnalyser as AnalyserNode;
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        let avg = sum / dataArray.length; // 0 -> 255
+        
+        // Khuếch đại giá trị lên một chút để miệng mở rõ hơn
+        aaWeight = Math.min(1.0, (avg / 255.0) * 3.0);
+      } else if (currentAnimUrl === "talk.fbx" || (window as any).isChatbotTalking) {
+        // Chậm lại nhịp thở/ngắt nghỉ (giảm hệ số thời gian)
+        const talkMask = Math.sin(time * 2.1) + Math.sin(time * 1.2) + Math.sin(time * 0.5);
+
+        // Chỉ mấp máy môi khi mặt nạ > 0.1
+        if (talkMask > 0.1) {
+          // Khẩu hình miệng mở chậm rãi và tự nhiên hơn (giảm tốc độ dao động)
+          const mouthValue = (
+            Math.sin(time * 12.0) * 0.6 +
+            Math.sin(time * 18.0) * 0.25 +
+            Math.sin(time * 8.0) * 0.15
+          );
+          // Khuếch đại và chỉ lấy giá trị dương
+          aaWeight = Math.max(0, mouthValue);
+        }
+      }
+
+      const finalAa = Math.min(
+        1.0,
+        Math.max(appState.expressions.aa, aaWeight),
+      );
+      currentVrm.expressionManager.setValue("aa", finalAa);
+
       // Mẹo: Khép hờ mắt (0.1) mặc định, để khi ngạc nhiên (0.0) mắt trông to hơn hẳn
       let baseBlink = 0.1; 
       if (
@@ -1432,16 +1471,43 @@ function setupChatbot() {
       // Phát âm thanh
       if (data.audioBase64) {
           const audioUrl = `data:audio/mp3;base64,${data.audioBase64}`;
-          const audio = new Audio(audioUrl);
           
-          audio.addEventListener('play', () => {
-            (window as any).isChatbotTalking = true;
-          });
+          if (!(window as any).chatbotAudio) {
+            const audio = new Audio();
+            audio.crossOrigin = "anonymous";
+            (window as any).chatbotAudio = audio;
+            
+            // Khởi tạo Web Audio API
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+            const audioCtx = new AudioContextClass();
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256;
+            
+            const source = audioCtx.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            
+            (window as any).chatbotAudioCtx = audioCtx;
+            (window as any).chatbotAnalyser = analyser;
+
+            audio.addEventListener('play', () => {
+              (window as any).isChatbotTalking = true;
+            });
+            
+            audio.addEventListener('ended', () => {
+              (window as any).isChatbotTalking = false;
+            });
+          }
+
+          const audio = (window as any).chatbotAudio as HTMLAudioElement;
+          const audioCtx = (window as any).chatbotAudioCtx as AudioContext;
           
-          audio.addEventListener('ended', () => {
-            (window as any).isChatbotTalking = false;
-          });
+          audio.src = audioUrl;
           
+          if (audioCtx.state === 'suspended') {
+             audioCtx.resume();
+          }
+
           audio.play().catch(e => {
             console.error("Trình duyệt chặn phát âm thanh tự động:", e);
             (window as any).isChatbotTalking = false;
