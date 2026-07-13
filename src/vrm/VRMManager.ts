@@ -182,9 +182,8 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false, forceO
       currentMixer.addEventListener("finished", (e: any) => {
         if (e.action !== currentAction || currentAnimUrl === "") return;
         if (isAutoIdle) {
-          // AFK mode: về base pose rồi đầt lịch sau 5s chạy animation tiếp theo
-          currentAnimUrl = "";
-          currentAction = null;
+          // AFK mode: properly fade out action cũ (giữ isAutoIdle=true), sau 5s chạy animation tiếp
+          loadFBXAnimation("", true); // isAfk=true để không xóa isAutoIdle
           scheduleNextAfkAnim();
         } else {
           loadFBXAnimation("");
