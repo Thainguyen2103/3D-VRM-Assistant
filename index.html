@@ -7,7 +7,7 @@
     <title>3D VRM Assistant</title>
   </head>
   <body>
-    <div id="loading">Đang chuẩn bị Scene...</div>
+    <div id="loading" data-i18n="loading">Đang chuẩn bị Scene...</div>
     <button class="floating-icon" id="open-ui" style="display: none; top: 20px; left: 20px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-switch-camera-icon lucide-switch-camera"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/><path d="m18 22-3-3 3-3"/><path d="m6 2 3 3-3 3"/></svg>
     </button>
@@ -15,16 +15,16 @@
         <button class="close-btn" id="close-ui" title="Đóng">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
         </button>
-        <h2>Trợ lý ảo 3D</h2>
+        <h2 data-i18n="ui.title">Trợ lý ảo 3D</h2>
         <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button id="cam-full" class="bone-btn" style="background: #e94560;">Toàn Cảnh</button>
-            <button id="cam-half" class="bone-btn" style="background: #e94560;">Cận (Hông)</button>
-            <button id="cam-chest" class="bone-btn" style="background: #e94560;">Cận (Ngực)</button>
-            <button id="cam-face" class="bone-btn" style="background: #e94560;">Cận (Mặt)</button>
+            <button id="cam-full" class="bone-btn" style="background: #e94560;" data-i18n="cam.full">Toàn Cảnh</button>
+            <button id="cam-half" class="bone-btn" style="background: #e94560;" data-i18n="cam.half">Cận (Hông)</button>
+            <button id="cam-chest" class="bone-btn" style="background: #e94560;" data-i18n="cam.chest">Cận (Ngực)</button>
+            <button id="cam-face" class="bone-btn" style="background: #e94560;" data-i18n="cam.face">Cận (Mặt)</button>
         </div>
     </div>
     
-    <div id="instruction-text">Kéo chuột PHẢI để xoay camera | Lăn chuột GIỮA để thu/phóng</div>
+    <div id="instruction-text" data-i18n="instruction">Kéo chuột PHẢI để xoay camera | Lăn chuột GIỮA để thu/phóng</div>
     
     <!-- AI Chatbot Panel -->
     <button class="floating-icon" id="open-chat" style="display: none; bottom: 20px; right: 20px;">
@@ -34,15 +34,15 @@
         <button class="close-btn" id="close-chat" title="Đóng">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
         </button>
-        <h2 class="chat-title">🌸 Citlali Chat 🌸</h2>
+        <h2 class="chat-title" data-i18n="chat.title">🌸 Citlali Chat 🌸</h2>
         
         <div id="chat-history">
-            <div class="chat-msg ai" id="initial-msg">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>
+            <div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>
         </div>
 
         <div class="chat-input-area">
-            <textarea id="chat-input" rows="1" placeholder="Nhập nhanh lên, tôi không rảnh đâu..." autocomplete="off"></textarea>
-            <button id="btn-send-chat" class="bone-btn">Gửi</button>
+            <textarea id="chat-input" rows="1" placeholder="Nhập nhanh lên, tôi không rảnh đâu..." data-i18n="chat.placeholder" autocomplete="off"></textarea>
+            <button id="btn-send-chat" class="bone-btn" data-i18n="btn.send">Gửi</button>
         </div>
     </div>
 
@@ -54,60 +54,61 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
         </button>
         <div class="tabs-header">
-            <button class="tab-btn active" data-tab="tab-body">Cơ Thể</button>
-            <button class="tab-btn" data-tab="tab-face">Biểu Cảm & Tay</button>
+            <button class="tab-btn active" data-tab="tab-body" data-i18n="tab.body">Cơ Thể</button>
+            <button class="tab-btn" data-tab="tab-face" data-i18n="tab.face">Biểu Cảm & Tay</button>
+            <button class="tab-btn" data-tab="tab-settings" data-i18n="tab.settings">Cấu Hình</button>
         </div>
 
         <div id="tab-body" class="tab-content active">
             <div class="panel-section">
-                <h3>Tư thế chung</h3>
+                <h3 data-i18n="pose.title">Tư thế chung</h3>
                 <div class="control-row">
-                    <label>Tư thế:</label>
+                    <label data-i18n="pose.label">Tư thế:</label>
                     <select id="pose-select">
-                        <option value="crossed">Khoanh tay</option>
-                        <option value="relaxed">Thả lỏng</option>
+                        <option value="crossed" data-i18n="pose.crossed">Khoanh tay</option>
+                        <option value="relaxed" data-i18n="pose.relaxed">Thả lỏng</option>
                     </select>
                 </div>
             </div>
 
             <div class="panel-section">
-                <h3>Hành Động</h3>
+                <h3 data-i18n="action.title">Hành Động</h3>
                 
-                <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px;">🚶 Cơ bản & Di chuyển</h4>
+                <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px;" data-i18n="action.basic">🚶 Cơ bản & Di chuyển</h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                    <button class="anim-btn bone-btn" data-anim="idle.fbx">Đứng chờ</button>
-                    <button class="anim-btn bone-btn" data-anim="Floating.fbx">Lơ lửng</button>
-                    <button class="anim-btn bone-btn" data-anim="walk.fbx">Đi bộ</button>
-                    <button class="anim-btn bone-btn" data-anim="run.fbx">Chạy</button>
+                    <button class="anim-btn bone-btn" data-anim="idle.fbx" data-i18n="action.idle">Đứng chờ</button>
+                    <button class="anim-btn bone-btn" data-anim="Floating.fbx" data-i18n="action.floating">Lơ lửng</button>
+                    <button class="anim-btn bone-btn" data-anim="walk.fbx" data-i18n="action.walk">Đi bộ</button>
+                    <button class="anim-btn bone-btn" data-anim="run.fbx" data-i18n="action.run">Chạy</button>
                 </div>
 
-                <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px;">💬 Giao tiếp & Tương tác</h4>
+                <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px;" data-i18n="action.comm">💬 Giao tiếp & Tương tác</h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                    <button class="anim-btn bone-btn" data-anim="talk.fbx">Trò chuyện</button>
-                    <button class="anim-btn bone-btn" data-anim="Waving.fbx">Vẫy tay</button>
-                    <button class="anim-btn bone-btn" data-anim="Pointing.fbx">Chỉ trỏ</button>
-                    <button class="anim-btn bone-btn" data-anim="No.fbx">Từ chối</button>
-                    <button class="anim-btn bone-btn" data-anim="Clapping.fbx">Vỗ tay</button>
-                    <button class="anim-btn bone-btn" data-anim="dance.fbx">Nhảy múa</button>
+                    <button class="anim-btn bone-btn" data-anim="talk.fbx" data-i18n="action.talk">Trò chuyện</button>
+                    <button class="anim-btn bone-btn" data-anim="Waving.fbx" data-i18n="action.wave">Vẫy tay</button>
+                    <button class="anim-btn bone-btn" data-anim="Pointing.fbx" data-i18n="action.point">Chỉ trỏ</button>
+                    <button class="anim-btn bone-btn" data-anim="No.fbx" data-i18n="action.no">Từ chối</button>
+                    <button class="anim-btn bone-btn" data-anim="Clapping.fbx" data-i18n="action.clap">Vỗ tay</button>
+                    <button class="anim-btn bone-btn" data-anim="dance.fbx" data-i18n="action.dance">Nhảy múa</button>
                 </div>
 
-                <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px;">🎭 Biểu cảm & Cảm xúc</h4>
+                <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px;" data-i18n="action.emo">🎭 Biểu cảm & Cảm xúc</h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                    <button class="anim-btn bone-btn" data-anim="laugh.fbx">Cười lớn</button>
-                    <button class="anim-btn bone-btn" data-anim="Blow A Kiss.fbx">Hôn gió</button>
-                    <button class="anim-btn bone-btn" data-anim="Surprised.fbx">Bất ngờ</button>
-                    <button class="anim-btn bone-btn" data-anim="Shy.fbx">Ngượng ngùng</button>
-                    <button class="anim-btn bone-btn" data-anim="Thinking.fbx">Suy nghĩ</button>
-                    <button class="anim-btn bone-btn" data-anim="angry.fbx">Tức giận</button>
-                    <button class="anim-btn bone-btn" data-anim="Sad Idle.fbx">Buồn bã</button>
-                    <button class="anim-btn bone-btn" data-anim="Crying.fbx">Khóc lóc</button>
+                    <button class="anim-btn bone-btn" data-anim="laugh.fbx" data-i18n="action.laugh">Cười lớn</button>
+                    <button class="anim-btn bone-btn" data-anim="Blow A Kiss.fbx" data-i18n="action.kiss">Hôn gió</button>
+                    <button class="anim-btn bone-btn" data-anim="Surprised.fbx" data-i18n="action.surprise">Bất ngờ</button>
+                    <button class="anim-btn bone-btn" data-anim="Shy.fbx" data-i18n="action.shy">Ngượng ngùng</button>
+                    <button class="anim-btn bone-btn" data-anim="Thinking.fbx" data-i18n="action.think">Suy nghĩ</button>
+                    <button class="anim-btn bone-btn" data-anim="angry.fbx" data-i18n="action.angry">Tức giận</button>
+                    <button class="anim-btn bone-btn" data-anim="Sad Idle.fbx" data-i18n="action.sad">Buồn bã</button>
+                    <button class="anim-btn bone-btn" data-anim="Crying.fbx" data-i18n="action.cry">Khóc lóc</button>
                 </div>
 
-                <button class="anim-btn bone-btn" style="background: #e94560; width: 100%; margin-top: 5px;" data-anim="">⏹️ Dừng Mọi Hành Động</button>
+                <button class="anim-btn bone-btn" style="background: #e94560; width: 100%; margin-top: 5px;" data-anim="" data-i18n="btn.stop_anim">⏹️ Dừng Mọi Hành Động</button>
             </div>
 
         <div class="panel-section">
-            <h3>Thông số Khớp (X, Y, Z)</h3>
+            <h3 data-i18n="bone.params">Thông số Khớp (X, Y, Z)</h3>
             <div class="xyz-row">
                 <label>X:</label>
                 <input type="number" id="bone-x" step="0.1" value="0">
@@ -123,83 +124,137 @@
         </div>
 
         <div class="panel-section">
-            <h3>Chọn Khớp Nhanh</h3>
+            <h3 data-i18n="bone.quick">Chọn Khớp Nhanh</h3>
             <div class="bone-grid">
-                <button class="bone-btn" data-bone="Đầu">Đầu</button>
-                <button class="bone-btn" data-bone="Cổ">Cổ</button>
-                <button class="bone-btn" data-bone="Ngực">Ngực</button>
-                <button class="bone-btn" data-bone="Hông">Hông</button>
-                <button class="bone-btn" data-bone="Tay Trái (Trên)">Vai Trái</button>
-                <button class="bone-btn" data-bone="Tay Phải (Trên)">Vai Phải</button>
-                <button class="bone-btn" data-bone="Khuỷu Trái">Khuỷu Trái</button>
-                <button class="bone-btn" data-bone="Khuỷu Phải">Khuỷu Phải</button>
-                <button class="bone-btn" data-bone="Bàn Tay Trái">Bàn Tay Trái</button>
-                <button class="bone-btn" data-bone="Bàn Tay Phải">Bàn Tay Phải</button>
-                <button class="bone-btn" data-bone="Đùi Trái">Đùi Trái</button>
-                <button class="bone-btn" data-bone="Đùi Phải">Đùi Phải</button>
-                <button class="bone-btn" data-bone="Đầu Gối Trái">Gối Trái</button>
-                <button class="bone-btn" data-bone="Đầu Gối Phải">Gối Phải</button>
-                <button class="bone-btn" data-bone="Bàn Chân Trái">Bàn Chân Trái</button>
-                <button class="bone-btn" data-bone="Bàn Chân Phải">Bàn Chân Phải</button>
-                <button class="bone-btn" style="grid-column: span 2; background: #e94560;" data-bone="none">Bỏ Chọn / Tắt Vòng Xoay</button>
+                <button class="bone-btn" data-bone="Đầu" data-i18n="bone.head">Đầu</button>
+                <button class="bone-btn" data-bone="Cổ" data-i18n="bone.neck">Cổ</button>
+                <button class="bone-btn" data-bone="Ngực" data-i18n="bone.chest">Ngực</button>
+                <button class="bone-btn" data-bone="Hông" data-i18n="bone.hips">Hông</button>
+                <button class="bone-btn" data-bone="Tay Trái (Trên)" data-i18n="bone.l_shoulder">Vai Trái</button>
+                <button class="bone-btn" data-bone="Tay Phải (Trên)" data-i18n="bone.r_shoulder">Vai Phải</button>
+                <button class="bone-btn" data-bone="Khuỷu Trái" data-i18n="bone.l_elbow">Khuỷu Trái</button>
+                <button class="bone-btn" data-bone="Khuỷu Phải" data-i18n="bone.r_elbow">Khuỷu Phải</button>
+                <button class="bone-btn" data-bone="Bàn Tay Trái" data-i18n="bone.l_hand">Bàn Tay Trái</button>
+                <button class="bone-btn" data-bone="Bàn Tay Phải" data-i18n="bone.r_hand">Bàn Tay Phải</button>
+                <button class="bone-btn" data-bone="Đùi Trái" data-i18n="bone.l_thigh">Đùi Trái</button>
+                <button class="bone-btn" data-bone="Đùi Phải" data-i18n="bone.r_thigh">Đùi Phải</button>
+                <button class="bone-btn" data-bone="Đầu Gối Trái" data-i18n="bone.l_knee">Gối Trái</button>
+                <button class="bone-btn" data-bone="Đầu Gối Phải" data-i18n="bone.r_knee">Gối Phải</button>
+                <button class="bone-btn" data-bone="Bàn Chân Trái" data-i18n="bone.l_foot">Bàn Chân Trái</button>
+                <button class="bone-btn" data-bone="Bàn Chân Phải" data-i18n="bone.r_foot">Bàn Chân Phải</button>
+                <button class="bone-btn" style="grid-column: span 2; background: #e94560;" data-bone="none" data-i18n="btn.deselect">Bỏ Chọn / Tắt Vòng Xoay</button>
             </div>
         </div>
         </div> <!-- End tab-body -->
 
+        <div id="tab-settings" class="tab-content">
+            <div class="panel-section">
+                <h3 data-i18n="settings.ui">Giao Diện</h3>
+                <div class="control-row">
+                    <label data-i18n="settings.lang">Ngôn Ngữ:</label>
+                    <select id="setting-language">
+                        <option value="vi" selected>Tiếng Việt</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
+                        <option value="zh">中文</option>
+                        <option value="ko">한국어</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3 data-i18n="settings.gfx">Đồ Họa & Hiệu Suất</h3>
+                <div class="control-row">
+                    <label title="Độ phân giải bóng đổ. Càng cao bóng càng nét nhưng tốn FPS" data-i18n="settings.shadow">Bóng đổ (Shadow):</label>
+                    <select id="setting-shadow">
+                        <option value="4k" selected data-i18n="shadow.4k">Siêu nét (4K + Bóng Lá Cây)</option>
+                        <option value="2k" data-i18n="shadow.2k">Cao (2K)</option>
+                        <option value="1k" data-i18n="shadow.1k">Trung bình (1K)</option>
+                        <option value="720p" data-i18n="shadow.720p">Thấp (720p)</option>
+                        <option value="off" data-i18n="shadow.off">Tắt bóng đổ</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <label title="Độ phân giải render của toàn bộ khung hình" data-i18n="settings.res">Độ phân giải (Resolution):</label>
+                    <select id="setting-pixel-ratio">
+                        <option value="4k" selected data-i18n="res.4k">4K (Siêu nét)</option>
+                        <option value="2k" data-i18n="res.2k">2K (Cao)</option>
+                        <option value="1k" data-i18n="res.1k">1080p (Tiêu chuẩn)</option>
+                        <option value="720p" data-i18n="res.720p">720p (Chống Lag)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3 data-i18n="settings.env">Môi Trường & Hiệu Ứng</h3>
+                <div class="control-row" style="flex-direction: column; align-items: stretch; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label data-i18n="settings.petals">Hoa Anh Đào rơi:</label>
+                        <select id="setting-petals-toggle" style="width: 100px;">
+                            <option value="on" selected data-i18n="petals.on">Bật</option>
+                            <option value="off" data-i18n="petals.off">Tắt</option>
+                        </select>
+                    </div>
+                    <label style="margin-top: 5px; color: #555; font-size: 0.85rem;"><span data-i18n="settings.petal_density">Mật độ hoa:</span> <strong id="petal-count-display">80</strong> <span data-i18n="settings.petal_unit">cánh</span></label>
+                    <input type="range" id="setting-petals-count" min="10" max="300" value="80" step="10">
+                </div>
+            </div>
+        </div> <!-- End tab-settings -->
+
         <div id="tab-face" class="tab-content">
             <div class="panel-section">
-                <h3>Biểu cảm</h3>
+                <h3 data-i18n="face.title">Biểu cảm</h3>
                 <div class="control-row">
-                    <label>Khuôn mặt (Cài sẵn):</label>
+                    <label data-i18n="face.preset">Khuôn mặt (Cài sẵn):</label>
                     <select id="expression-select">
-                        <option value="neutral">Bình thường</option>
-                        <option value="happy">Vui vẻ</option>
-                        <option value="angry">Tức giận</option>
-                        <option value="sad">Buồn</option>
-                        <option value="relaxed">Thư giãn</option>
+                        <option value="neutral" data-i18n="face.neutral">Bình thường</option>
+                        <option value="happy" data-i18n="face.happy">Vui vẻ</option>
+                        <option value="angry" data-i18n="face.angry">Tức giận</option>
+                        <option value="sad" data-i18n="face.sad">Buồn</option>
+                        <option value="relaxed" data-i18n="face.relaxed">Thư giãn</option>
                         <option value="surprised">Ngạc nhiên</option>
                         <option value="custom" style="display:none;">Tùy chỉnh</option>
                     </select>
                 </div>
-                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;">Tinh chỉnh chi tiết:</h4>
+                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;" data-i18n="face.details">Tinh chỉnh chi tiết:</h4>
                 <div class="slider-grid">
                     <!-- Biểu cảm -->
-                    <div class="control-row"><label>Vui (Joy):</label><input type="range" class="expr-slider" data-expr="happy" id="slider-happy" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Giận (Angry):</label><input type="range" class="expr-slider" data-expr="angry" id="slider-angry" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Buồn (Sad):</label><input type="range" class="expr-slider" data-expr="sad" id="slider-sad" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Thư giãn:</label><input type="range" class="expr-slider" data-expr="relaxed" id="slider-relaxed" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Ngạc nhiên:</label><input type="range" class="expr-slider" data-expr="surprised" id="slider-surprised" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Khẩu hình A:</label><input type="range" class="expr-slider" data-expr="aa" id="slider-aa" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Khẩu hình I:</label><input type="range" class="expr-slider" data-expr="ih" id="slider-ih" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Khẩu hình U:</label><input type="range" class="expr-slider" data-expr="ou" id="slider-ou" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Khẩu hình E:</label><input type="range" class="expr-slider" data-expr="ee" id="slider-ee" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Khẩu hình O:</label><input type="range" class="expr-slider" data-expr="oh" id="slider-oh" min="0" max="1" step="0.01" value="0"></div>
-                    <div class="control-row"><label>Nhắm mắt:</label><input type="range" class="expr-slider" data-expr="blink" id="slider-blink" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.joy_slider">Vui (Joy):</label><input type="range" class="expr-slider" data-expr="happy" id="slider-happy" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.angry_slider">Giận (Angry):</label><input type="range" class="expr-slider" data-expr="angry" id="slider-angry" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.sad_slider">Buồn (Sad):</label><input type="range" class="expr-slider" data-expr="sad" id="slider-sad" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.relaxed_slider">Thư giãn:</label><input type="range" class="expr-slider" data-expr="relaxed" id="slider-relaxed" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.surprised_slider">Ngạc nhiên:</label><input type="range" class="expr-slider" data-expr="surprised" id="slider-surprised" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.aa">Khẩu hình A:</label><input type="range" class="expr-slider" data-expr="aa" id="slider-aa" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.ih">Khẩu hình I:</label><input type="range" class="expr-slider" data-expr="ih" id="slider-ih" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.ou">Khẩu hình U:</label><input type="range" class="expr-slider" data-expr="ou" id="slider-ou" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.ee">Khẩu hình E:</label><input type="range" class="expr-slider" data-expr="ee" id="slider-ee" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.oh">Khẩu hình O:</label><input type="range" class="expr-slider" data-expr="oh" id="slider-oh" min="0" max="1" step="0.01" value="0"></div>
+                    <div class="control-row"><label data-i18n="face.blink">Nhắm mắt:</label><input type="range" class="expr-slider" data-expr="blink" id="slider-blink" min="0" max="1" step="0.01" value="0"></div>
                 </div>
             </div>
             <div class="panel-section">
-                <h3>Bàn tay</h3>
+                <h3 data-i18n="hand.title">Bàn tay</h3>
                 <div class="control-row" style="flex-direction: column; align-items: stretch; gap: 10px;">
-                    <label>Độ nắm ngón tay (Chung):</label>
+                    <label data-i18n="hand.curl">Độ nắm ngón tay (Chung):</label>
                     <input type="range" id="finger-curl-slider" min="-180" max="180" value="-50">
                 </div>
-                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;">Từng ngón tay (Trái):</h4>
+                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;" data-i18n="hand.left_title">Từng ngón tay (Trái):</h4>
                 <div class="slider-grid">
-                    <div class="control-row"><label>Ngón cái:</label><input type="range" class="finger-slider" data-finger="leftThumb" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón trỏ:</label><input type="range" class="finger-slider" data-finger="leftIndex" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón giữa:</label><input type="range" class="finger-slider" data-finger="leftMiddle" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón áp út:</label><input type="range" class="finger-slider" data-finger="leftRing" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón út:</label><input type="range" class="finger-slider" data-finger="leftLittle" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.thumb">Ngón cái:</label><input type="range" class="finger-slider" data-finger="leftThumb" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.index">Ngón trỏ:</label><input type="range" class="finger-slider" data-finger="leftIndex" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.middle">Ngón giữa:</label><input type="range" class="finger-slider" data-finger="leftMiddle" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.ring">Ngón áp út:</label><input type="range" class="finger-slider" data-finger="leftRing" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.little">Ngón út:</label><input type="range" class="finger-slider" data-finger="leftLittle" min="-180" max="180" value="-50"></div>
                 </div>
             </div>
             <div class="panel-section">
-                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;">Từng ngón tay (Phải):</h4>
+                <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;" data-i18n="hand.right_title">Từng ngón tay (Phải):</h4>
                 <div class="slider-grid">
-                    <div class="control-row"><label>Ngón cái:</label><input type="range" class="finger-slider" data-finger="rightThumb" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón trỏ:</label><input type="range" class="finger-slider" data-finger="rightIndex" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón giữa:</label><input type="range" class="finger-slider" data-finger="rightMiddle" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón áp út:</label><input type="range" class="finger-slider" data-finger="rightRing" min="-180" max="180" value="-50"></div>
-                    <div class="control-row"><label>Ngón út:</label><input type="range" class="finger-slider" data-finger="rightLittle" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.thumb">Ngón cái:</label><input type="range" class="finger-slider" data-finger="rightThumb" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.index">Ngón trỏ:</label><input type="range" class="finger-slider" data-finger="rightIndex" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.middle">Ngón giữa:</label><input type="range" class="finger-slider" data-finger="rightMiddle" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.ring">Ngón áp út:</label><input type="range" class="finger-slider" data-finger="rightRing" min="-180" max="180" value="-50"></div>
+                    <div class="control-row"><label data-i18n="hand.little">Ngón út:</label><input type="range" class="finger-slider" data-finger="rightLittle" min="-180" max="180" value="-50"></div>
                 </div>
             </div>
         </div> <!-- End tab-face -->

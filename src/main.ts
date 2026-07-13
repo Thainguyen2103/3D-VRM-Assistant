@@ -4,6 +4,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
 import { VRMLoaderPlugin, VRMUtils, VRM } from "@pixiv/three-vrm";
 import { loadMixamoAnimation } from "./loadMixamoAnimation";
+import { translations } from "./i18n";
+import { initCustomSelects } from "./customSelect";
 // import GUI from 'lil-gui'; // Sẽ xóa sau khi dọn dẹp xong code bên dưới
 import "./style.css";
 
@@ -495,8 +497,8 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
-// Tăng pixel ratio lên tối thiểu 2.0 để khử răng cưa (supersampling) cho nét mượt hơn
-renderer.setPixelRatio(Math.max(window.devicePixelRatio, 2.0));
+// Tối ưu hóa: Giới hạn pixel ratio tối đa là 2.0, không ép máy yếu phải chạy 2.0 (Gây giật lag cực mạnh)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -676,8 +678,8 @@ document.querySelectorAll(".bone-btn").forEach((btn) => {
 const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0); // Tăng cường độ sáng
 directionalLight.position.set(1.0, 2.0, 2.0); // Chếch lên và sang bên để đổ bóng đẹp hơn
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 2048;
-directionalLight.shadow.mapSize.height = 2048;
+directionalLight.shadow.mapSize.width = 4096; // Mặc định Siêu Cao (4K)
+directionalLight.shadow.mapSize.height = 4096;
 directionalLight.shadow.camera.near = 0.5;
 directionalLight.shadow.camera.far = 50;
 directionalLight.shadow.camera.left = -15;
@@ -710,13 +712,15 @@ envLoader.load(
   "/Map/sakura.glb",
   (gltf) => {
     const originalTree = gltf.scene;
-    // Bật lại đổ bóng theo ý muốn
+    // Tối ưu hóa Bóng đổ (Shadow) cho cây
     originalTree.traverse((child: any) => {
       if (child.isMesh) {
-        child.castShadow = true; // Bật lại bóng đổ
-        child.receiveShadow = true;
+        // Mặc định là cấu hình Siêu Cao: Bật bóng đổ cho mọi thứ (kể cả lá cây trong suốt)
+        child.castShadow = true;
+        
+        child.receiveShadow = false; // Tắt luôn nhận bóng để nhẹ máy
 
-        // Fix lỗi bóng đổ bị hình khối vuông (do lá cây dùng ảnh PNG trong suốt)
+        // Fix lỗi bóng đổ bị hình khối vuông (nếu có dùng alphaTest)
         if (child.material) {
           child.material.alphaTest = 0.5;
           child.material.needsUpdate = true;
@@ -860,7 +864,8 @@ let currentHeadPitch = 0;
 const clock = new THREE.Clock();
 
 // --- PARTICLE SYSTEM: Hiệu ứng hoa anh đào rơi (InstancedMesh cho xoay 3D chân thực) ---
-const petalCount = 80; // Giảm số lượng để bớt spam
+const MAX_PETALS = 300; // Số lượng cánh hoa tối đa lưu trong bộ nhớ
+let currentPetalCount = 80; // Số lượng hiển thị thực tế (mặc định)
 const petalGeometry = new THREE.PlaneGeometry(0.12, 0.12); // Kích thước nhỏ lại cho vừa mắt
 const petalData: any[] = [];
 
@@ -871,7 +876,7 @@ const treeZones = [
   { x: 2.5, z: 1.5, radius: 1.5, height: 2.6 },  // Cây bên phải (Thấp hơn nữa)
 ];
 
-for (let i = 0; i < petalCount; i++) {
+for (let i = 0; i < MAX_PETALS; i++) {
   const zone = treeZones[Math.floor(Math.random() * treeZones.length)];
   const r = Math.random() * zone.radius;
   const theta = Math.random() * Math.PI * 2;
@@ -908,7 +913,8 @@ const petalMaterial = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide // Để ảnh hiển thị khi lật xoay mặt sau
 });
 
-const petalSystem = new THREE.InstancedMesh(petalGeometry, petalMaterial, petalCount);
+const petalSystem = new THREE.InstancedMesh(petalGeometry, petalMaterial, MAX_PETALS);
+petalSystem.count = currentPetalCount; // Chỉ render số lượng theo cài đặt
 const dummy = new THREE.Object3D(); // Dùng để tính toán ma trận xoay
 scene.add(petalSystem);
 // --- END PARTICLE SYSTEM ---
@@ -929,7 +935,7 @@ function animate() {
   const time = clock.elapsedTime;
 
   // --- CẬP NHẬT HIỆU ỨNG HOA RƠI ---
-  for (let i = 0; i < petalCount; i++) {
+  for (let i = 0; i < currentPetalCount; i++) {
     const data = petalData[i];
 
     // Rơi xuống
@@ -1729,6 +1735,75 @@ function speakText(text: string) {
 // Khởi chạy chatbot
 setupChatbot();
 
+// --- CÀI ĐẶT ĐỒ HỌA & HIỆU SUẤT ---
+document.getElementById("setting-shadow")?.addEventListener("change", (e) => {
+  const val = (e.target as HTMLSelectElement).value;
+  if (val === "off") {
+    directionalLight.castShadow = false;
+  } else {
+    directionalLight.castShadow = true;
+    if (val === "4k") {
+      directionalLight.shadow.mapSize.width = 4096; // Siêu chi tiết (4K)
+      directionalLight.shadow.mapSize.height = 4096;
+    } else if (val === "2k") {
+      directionalLight.shadow.mapSize.width = 2048;
+      directionalLight.shadow.mapSize.height = 2048;
+    } else if (val === "1k") {
+      directionalLight.shadow.mapSize.width = 1024;
+      directionalLight.shadow.mapSize.height = 1024;
+    } else {
+      directionalLight.shadow.mapSize.width = 512;
+      directionalLight.shadow.mapSize.height = 512;
+    }
+    // Ép WebGL xóa Shadow Map cũ và tạo lại với độ phân giải mới
+    if (directionalLight.shadow.map) {
+      directionalLight.shadow.map.dispose();
+      directionalLight.shadow.map = null as any;
+    }
+  }
+
+  // Cập nhật tính năng Đổ bóng của Lá cây (Chỉ kích hoạt ở mức 4K)
+  scene.traverse((child: any) => {
+    if (child.isMesh && child.material && (child.material.transparent || child.material.alphaTest > 0)) {
+      if (val === "4k") {
+        child.castShadow = true; // Bật bóng đổ cho từng chiếc lá
+      } else {
+        child.castShadow = false; // Tắt bóng đổ lá để cứu FPS
+      }
+    }
+  });
+});
+
+document.getElementById("setting-pixel-ratio")?.addEventListener("change", (e) => {
+  const val = (e.target as HTMLSelectElement).value;
+  if (val === "4k") {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0)); // Siêu nét
+  } else if (val === "2k") {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Cao
+  } else if (val === "1k") {
+    renderer.setPixelRatio(1.0); // 1080p
+  } else {
+    renderer.setPixelRatio(0.75); // 720p (Giảm sắc nét để cứu FPS trên máy siêu yếu)
+  }
+});
+
+document.getElementById("setting-petals-toggle")?.addEventListener("change", (e) => {
+  const val = (e.target as HTMLSelectElement).value;
+  if (petalSystem) {
+    petalSystem.visible = (val === "on");
+  }
+});
+
+document.getElementById("setting-petals-count")?.addEventListener("input", (e) => {
+  const val = parseInt((e.target as HTMLInputElement).value);
+  currentPetalCount = val;
+  if (petalSystem) {
+    petalSystem.count = val; // Giới hạn số lượng cánh hoa được Render
+  }
+  const display = document.getElementById("petal-count-display");
+  if (display) display.textContent = val.toString();
+});
+
 // --- BINDING SỰ KIỆN ĐÓNG/MỞ PANEL BẰNG ICON ---
 function setupPanelToggle(panelId: string, closeBtnId: string, openBtnId: string) {
   const panel = document.getElementById(panelId);
@@ -1751,3 +1826,39 @@ function setupPanelToggle(panelId: string, closeBtnId: string, openBtnId: string
 setupPanelToggle('ui', 'close-ui', 'open-ui');
 setupPanelToggle('chat-ui', 'close-chat', 'open-chat');
 setupPanelToggle('control-panel', 'close-control', 'open-control');
+
+// --- I18N ĐA NGÔN NGỮ ---
+let currentLang = 'vi';
+
+function applyLanguage(lang: string) {
+  const t = translations[lang];
+  if (!t) return;
+
+  // Cập nhật tất cả các thẻ có chứa data-i18n
+  const elements = document.querySelectorAll('[data-i18n]');
+  elements.forEach((el) => {
+    const key = el.getAttribute('data-i18n');
+    if (key && t[key]) {
+      // Xử lý các tag input placeholder, hoặc textContent
+      if (el.tagName.toLowerCase() === 'textarea' || el.tagName.toLowerCase() === 'input') {
+        (el as HTMLInputElement).placeholder = t[key];
+      } else {
+        el.textContent = t[key];
+      }
+    }
+  });
+
+  // Cập nhật giá trị hiển thị đặc biệt cho xương (VD: nếu đang hiển thị tên xương ở vòng xoay)
+  // Tính năng này có thể mở rộng sau. Hiện tại cập nhật trực tiếp UI html là đủ.
+}
+
+document.getElementById('setting-language')?.addEventListener('change', (e) => {
+  currentLang = (e.target as HTMLSelectElement).value;
+  applyLanguage(currentLang);
+});
+
+// Gọi mặc định lúc khởi tạo
+applyLanguage(currentLang);
+
+// Khởi tạo UI Dropdown Select Đẹp mắt
+initCustomSelects();
