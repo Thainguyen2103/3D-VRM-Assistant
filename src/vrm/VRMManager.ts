@@ -25,39 +25,61 @@ let currentHeadPitch = 0;
 // --- AFK Auto-Idle System ---
 let lastInteractionTime = Date.now();
 export let isAutoIdle = false;
-let shouldStopAutoIdle = false;
-const AFK_TIMEOUT = 10000; // 10 giây không có tương tác camera -> bắt đầu idle
+const AFK_TIMEOUT = 10000; // 10 giây không tương tác camera -> bắt đầu idle
+const AFK_NEXT_DELAY = 5000; // 5s nghỉ giữa các animation nhàn rỗi
 
-// Pool animation nhàn rỗi - bao gồm các animation lặp vòng và một lần
-const afkLoopAnims = ["idle.fbx", "Floating.fbx", "dance.fbx", "laugh.fbx"];
-const afkOnceAnims = ["angry.fbx", "Sad Idle.fbx", "Shy.fbx", "Thinking.fbx", "Look Around.fbx", "Looking.fbx", "No.fbx", "Blow A Kiss.fbx"];
+// Pool animation nhàn rỗi (tất cả sẽ chạy 1 lần rồi nghỉ 5s rồi xoay sang cái khác)
+const afkAnimPool = [
+  "idle.fbx", "Floating.fbx", "dance.fbx", "laugh.fbx",
+  "angry.fbx", "Sad Idle.fbx", "Shy.fbx", "Thinking.fbx",
+  "Look Around.fbx", "Looking.fbx", "No.fbx", "Blow A Kiss.fbx"
+];
+let lastAfkAnim = "";
+let afkNextTimer: ReturnType<typeof setTimeout> | null = null;
 
-// Reset timer tương tác (Dùng khi camera thay đổi góc/zoom)
-export function resetAFKTimer() {
-  lastInteractionTime = Date.now();
-  if (isAutoIdle) {
-    // Đánh dấu để chờ đến khi hết vòng lặp animation thì mới dừng (tránh giật cục)
-    shouldStopAutoIdle = true;
-  }
+// Đặt lịch chạy animation AFK tiếp theo sau 5s
+function scheduleNextAfkAnim() {
+  if (afkNextTimer) clearTimeout(afkNextTimer);
+  afkNextTimer = setTimeout(() => {
+    if (isAutoIdle) playNextAfkAnimation();
+  }, AFK_NEXT_DELAY);
 }
 
-// Dừng idle người dùng thay đổi góc camera (reset cả timer lẫn dừng idle ngay)
+// Chọn và phát animation AFK tiếp theo (tránh trùng animation vừa rồi)
+function playNextAfkAnimation() {
+  if (!isAutoIdle) return;
+  const candidates = afkAnimPool.filter(a => a !== lastAfkAnim);
+  const next = candidates[Math.floor(Math.random() * candidates.length)];
+  lastAfkAnim = next;
+  loadFBXAnimation(next, true, true); // isAfk=true, forceOnce=true
+}
+
+// Reset timer - chỉ đặt lại timer, không dừng animation đang chạy
+export function resetAFKTimer() {
+  lastInteractionTime = Date.now();
+}
+
+// Dừng idle khi camera thay đổi góc/zoom - dừng ngưng và clear timer
 export function stopIdleOnCameraMove() {
   lastInteractionTime = Date.now();
-  if (isAutoIdle) {
-    shouldStopAutoIdle = true; // Chờ hết chu kỳ hiện tại
+  if (!isAutoIdle) return;
+  isAutoIdle = false;
+  lastAfkAnim = "";
+  if (afkNextTimer) {
+    clearTimeout(afkNextTimer);
+    afkNextTimer = null;
+  }
+  // Dừng animation đang phát nếu có
+  if (currentAnimUrl !== "") {
+    loadFBXAnimation("");
   }
 }
 
 export function checkAFK() {
-  if (Date.now() - lastInteractionTime > AFK_TIMEOUT) {
+  if (!isAutoIdle && Date.now() - lastInteractionTime > AFK_TIMEOUT) {
     if (currentAnimUrl === "") {
       isAutoIdle = true;
-      // 50% xác suất chọn animation lặp vòng, 50% chọn animation 1 lần
-      const useLoop = Math.random() < 0.5;
-      const pool = useLoop ? afkLoopAnims : afkOnceAnims;
-      const randomAnim = pool[Math.floor(Math.random() * pool.length)];
-      loadFBXAnimation(randomAnim, true);
+      playNextAfkAnimation();
     }
   }
 }
@@ -124,12 +146,15 @@ export function initVRM() {
   );
 }
 
-export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
-  lastInteractionTime = Date.now(); // Reset timer khi người dùng chủ động tải animation
-
+export function loadFBXAnimation(url: string, isAfkCall: boolean = false, forceOnce: boolean = false) {
+  // Khi người dùng chủ động phát animation, dừng AFK
   if (!isAfkCall) {
     isAutoIdle = false;
-    shouldStopAutoIdle = false;
+    lastAfkAnim = "";
+    if (afkNextTimer) {
+      clearTimeout(afkNextTimer);
+      afkNextTimer = null;
+    }
   }
 
   if (!currentVrm) return;
@@ -153,24 +178,24 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (!clip) return;
     if (!currentMixer) {
       currentMixer = new THREE.AnimationMixer(currentVrm!.scene);
-      currentMixer.addEventListener("loop", (e: any) => {
-        // Nếu người dùng đã thao tác lại và đang đợi hết khủng hình của auto-idle
-        if (shouldStopAutoIdle && e.action === currentAction) {
-          shouldStopAutoIdle = false;
-          isAutoIdle = false;
-          loadFBXAnimation(""); // Trở về trạng thái tĩnh ngay khi vừa hết chu kỳ
-        }
-      });
+      // Khi animation kết thúc (LoopOnce)
       currentMixer.addEventListener("finished", (e: any) => {
-        if (e.action === currentAction && currentAnimUrl !== "") {
-          loadFBXAnimation(""); 
+        if (e.action !== currentAction || currentAnimUrl === "") return;
+        if (isAutoIdle) {
+          // AFK mode: về base pose rồi đầt lịch sau 5s chạy animation tiếp theo
+          currentAnimUrl = "";
+          currentAction = null;
+          scheduleNextAfkAnim();
+        } else {
+          loadFBXAnimation("");
         }
       });
     }
 
     currentAction = currentMixer.clipAction(clip);
 
-    if (loopOnceAnimations.includes(url)) {
+    // AFK forceOnce hoặc nằm trong danh sách LoopOnce -> chạy 1 lần
+    if (loopOnceAnimations.includes(url) || forceOnce) {
       currentAction.setLoop(THREE.LoopOnce, 1);
       currentAction.clampWhenFinished = true;
     } else {
