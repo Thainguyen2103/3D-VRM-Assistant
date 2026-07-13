@@ -505,8 +505,8 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.localClippingEnabled = true; // Bật chế độ cắt gọt mô hình
 
-// Mặt phẳng cắt gọt: Cắt bỏ mọi thứ nằm dưới tọa độ Y = 0.02 (Giấu triệt để các vệt đất tàn dư dưới sàn)
-const groundClipPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.02);
+// Mặt phẳng cắt gọt: Cắt bỏ mọi thứ nằm dưới tọa độ Y = -0.05 (Khớp với mặt đất mới)
+const groundClipPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.05);
 
 const scene = new THREE.Scene();
 // Thêm sương mù mờ ảo hòa quyện với màu chân trời (Màu trắng cam nhạt của CSS Gradient)
@@ -747,9 +747,9 @@ function updateTimeOfDay() {
     body.style.background = 'linear-gradient(to bottom, #ffb28b 0%, #d47e8c 100%)';
   } else if (timeMode === 'night') {
     (scene.fog as THREE.FogExp2).color.set('#101230');
-    ambientLight.color.set('#5a5a8a'); 
+    ambientLight.color.set('#5a5a8a');
     ambientLight.intensity = 0.3; // Giảm tối đa ánh sáng môi trường để màn đêm sâu hơn
-    directionalLight.color.set('#b0b0ff'); 
+    directionalLight.color.set('#b0b0ff');
     directionalLight.intensity = 0.2; // Ánh trăng cực kì mờ nhạt (nhường chỗ cho lồng đèn đổ bóng)
     hemiLight.intensity = 0.1;
     body.style.background = 'linear-gradient(to bottom, #101230 0%, #202040 100%)';
@@ -813,7 +813,7 @@ envLoader.load(
 
     treePositions.forEach((pos) => {
       const treeClone = originalTree.clone();
-      treeClone.position.set(pos.x, 0, pos.z);
+      treeClone.position.set(pos.x, -0.07, pos.z); // Hạ cây xuống -0.07
       treeClone.scale.set(pos.scale, pos.scale, pos.scale);
       treeClone.rotation.y = Math.random() * Math.PI * 2; // Xoay ngẫu nhiên hướng
       scene.add(treeClone);
@@ -845,7 +845,7 @@ envLoader.load(
     });
 
     // Đặt chiếc xe ở bên phải nhân vật, chếch lên phía trước một chút
-    yatai.position.set(0.4, 0, -2.1);
+    yatai.position.set(0.4, -0.07, -2.1); // Hạ y xuống -0.07
     yatai.scale.set(0.2, 0.2, 0.2); // Tỷ lệ mặc định, nếu to quá hay nhỏ quá sẽ sửa sau
     yatai.rotation.y = 18.8; // Xoay nhẹ đầu xe về phía Camera
 
@@ -876,8 +876,8 @@ envLoader.load(
     });
 
     const lanternPositions = [
-      { x: -2, y: -0.15, z: -1.35, scale: 1.2 }, // Phía trước bên trái
-      { x: -1.5, y: -0.15, z: 1.2, scale: 1.2 },  // Phía trước bên phải
+      { x: -2, y: -0.22, z: -1.35, scale: 1.2 }, // Phía trước bên trái (Hạ thêm -0.07)
+      { x: -1.5, y: -0.22, z: 1.2, scale: 1.2 },  // Phía trước bên phải
     ];
 
     lanternPositions.forEach((pos) => {
@@ -929,7 +929,7 @@ envLoader.load(
     });
 
     // Đặt tỷ lệ to lên một chút để cần ít mảnh ghép hơn
-    originalGround.scale.set(0.3, 0.3, 0.3); 
+    originalGround.scale.set(0.3, 0.3, 0.3);
 
     // Tính toán kích thước thật của 1 ô đất sau khi scale
     const bbox = new THREE.Box3().setFromObject(originalGround);
@@ -944,8 +944,8 @@ envLoader.load(
     for (const i of offsets) {
       for (const j of offsets) {
         const tile = originalGround.clone();
-        // Xếp các viên gạch khít vào nhau
-        tile.position.set(i * tileWidth, 0, j * tileDepth);
+        // Xếp các viên gạch khít vào nhau và hạ Y xuống một chút để giày không bị lún vào đá
+        tile.position.set(i * tileWidth, -0.07, j * tileDepth);
         scene.add(tile);
       }
     }
@@ -1596,6 +1596,9 @@ function animate() {
       } else if (currentAnimUrl === "No.fbx") {
         currentVrm.expressionManager.setValue("sad", 0.5); // Nét mặt hơi ái ngại
         currentVrm.expressionManager.setValue("oh", Math.max(appState.expressions.oh, 0.3)); // Hé miệng từ chối
+      } else if (currentAnimUrl === "Looking.fbx" || currentAnimUrl === "Look Around.fbx") {
+        currentVrm.expressionManager.setValue("relaxed", 0.6); // Mặt giãn ra tò mò
+        currentVrm.expressionManager.setValue("oh", Math.max(appState.expressions.oh, 0.2)); // Mở hé miệng nhỏ
       }
 
       // Không khóa chớp mắt đối với biểu cảm buồn (để nhân vật vẫn chớp mắt bình thường)
