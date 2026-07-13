@@ -743,6 +743,31 @@ envLoader.load(
   (error) => console.error("Lỗi khi load cây Sakura:", error)
 );
 
+// Load xe bán hàng kiểu Nhật (Yatai)
+envLoader.load(
+  "/Map/yatai.glb",
+  (gltf) => {
+    const yatai = gltf.scene;
+
+    // Bật bóng đổ cho chiếc xe
+    yatai.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
+    // Đặt chiếc xe ở bên phải nhân vật, chếch lên phía trước một chút
+    yatai.position.set(0.4, 0, -2.1);
+    yatai.scale.set(0.2, 0.2, 0.2); // Tỷ lệ mặc định, nếu to quá hay nhỏ quá sẽ sửa sau
+    yatai.rotation.y = 18.8; // Xoay nhẹ đầu xe về phía Camera
+
+    scene.add(yatai);
+  },
+  undefined,
+  (error) => console.error("Lỗi khi load xe Yatai:", error)
+);
+
 
 // 2. Load VRM
 let currentVrm: VRM | undefined;
