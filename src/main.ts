@@ -233,7 +233,7 @@ let shouldStopAutoIdle = false;
 const AFK_TIMEOUT = 10000; // 10 giây không thao tác sẽ tự động chuyển sang nhàn rỗi
 
 const loopOnceAnimations = [
-  "Waving.fbx", "Pointing.fbx", "No.fbx", "Clapping.fbx", 
+  "Waving.fbx", "Pointing.fbx", "No.fbx", "Clapping.fbx",
   "Blow A Kiss.fbx", "Surprised.fbx", "Shy.fbx", "Thinking.fbx", "angry.fbx", "talk.fbx"
 ];
 
@@ -284,7 +284,7 @@ function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     }
 
     currentAction = currentMixer.clipAction(clip);
-    
+
     // Áp dụng LoopOnce cho các hành động nhất thời
     if (loopOnceAnimations.includes(url)) {
       currentAction.setLoop(THREE.LoopOnce, 1);
@@ -292,7 +292,7 @@ function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     } else {
       currentAction.setLoop(THREE.LoopRepeat, Infinity);
     }
-    
+
     currentAction.reset().fadeIn(0.5).play();
   }).catch((err) => {
     console.error("Lỗi khi tải FBX:", err);
@@ -502,13 +502,16 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const scene = new THREE.Scene();
+// Thêm sương mù mờ ảo hòa quyện với màu chân trời (Màu trắng cam nhạt của CSS Gradient)
+// Điều này giúp tạo chiều sâu vô tận và xóa đi ranh giới sắc nét của sàn nhà
+scene.fog = new THREE.FogExp2('#fff1eb', 0.045);
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
   35.0,
   window.innerWidth / window.innerHeight,
   0.1,
-  20.0,
+  100.0, // Tăng tầm nhìn xa lên 100 mét (trước là 20m) để không bị biến mất
 );
 camera.position.set(0.0, 1.3, 1.5); // Góc mặc định là Cận cảnh hông (lùi xa 1 chút)
 
@@ -676,11 +679,11 @@ directionalLight.castShadow = true;
 directionalLight.shadow.mapSize.width = 2048;
 directionalLight.shadow.mapSize.height = 2048;
 directionalLight.shadow.camera.near = 0.5;
-directionalLight.shadow.camera.far = 10;
-directionalLight.shadow.camera.left = -2;
-directionalLight.shadow.camera.right = 2;
-directionalLight.shadow.camera.top = 2;
-directionalLight.shadow.camera.bottom = -2;
+directionalLight.shadow.camera.far = 50;
+directionalLight.shadow.camera.left = -15;
+directionalLight.shadow.camera.right = 15;
+directionalLight.shadow.camera.top = 15;
+directionalLight.shadow.camera.bottom = -15;
 directionalLight.shadow.bias = -0.001;
 scene.add(directionalLight);
 
@@ -693,13 +696,53 @@ hemiLight.position.set(0, 20, 0);
 scene.add(hemiLight);
 
 // Mặt sàn vô hình để hứng bóng đổ
-const floorGeometry = new THREE.PlaneGeometry(10, 10);
+const floorGeometry = new THREE.PlaneGeometry(50, 50);
 const floorMaterial = new THREE.ShadowMaterial({ opacity: 0.15 });
 const floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = 0; // Thay đổi tùy theo vị trí chân model
 floor.receiveShadow = true;
 scene.add(floor);
+
+// Load bối cảnh phụ (Cây anh đào)
+const envLoader = new GLTFLoader();
+envLoader.load(
+  "/Map/sakura.glb",
+  (gltf) => {
+    const originalTree = gltf.scene;
+    // Bật lại đổ bóng theo ý muốn
+    originalTree.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true; // Bật lại bóng đổ
+        child.receiveShadow = true;
+
+        // Fix lỗi bóng đổ bị hình khối vuông (do lá cây dùng ảnh PNG trong suốt)
+        if (child.material) {
+          child.material.alphaTest = 0.5;
+          child.material.needsUpdate = true;
+        }
+      }
+    });
+
+    // Rải các cây sát bao xung quanh nhân vật
+    const treePositions = [
+      { x: -1, z: -1.5, scale: 12 },     // Sau trái
+      { x: -2, z: 0.5, scale: 9 },      // Chếch trái (gần hơn)
+      { x: 1.5, z: -0.5, scale: 7 },    // Chếch phải (gần hơn)
+    ];
+
+    treePositions.forEach((pos) => {
+      const treeClone = originalTree.clone();
+      treeClone.position.set(pos.x, 0, pos.z);
+      treeClone.scale.set(pos.scale, pos.scale, pos.scale);
+      treeClone.rotation.y = Math.random() * Math.PI * 2; // Xoay ngẫu nhiên hướng
+      scene.add(treeClone);
+    });
+  },
+  undefined,
+  (error) => console.error("Lỗi khi load cây Sakura:", error)
+);
+
 
 // 2. Load VRM
 let currentVrm: VRM | undefined;
@@ -791,20 +834,118 @@ let currentHeadPitch = 0;
 
 const clock = new THREE.Clock();
 
+// --- PARTICLE SYSTEM: Hiệu ứng hoa anh đào rơi (InstancedMesh cho xoay 3D chân thực) ---
+const petalCount = 80; // Giảm số lượng để bớt spam
+const petalGeometry = new THREE.PlaneGeometry(0.12, 0.12); // Kích thước nhỏ lại cho vừa mắt
+const petalData: any[] = [];
+
+// Khai báo các khu vực tán cây để hoa chỉ rơi từ bên TRONG tán lá xuống
+const treeZones = [
+  { x: -1, z: -1.5, radius: 2.5, height: 4.2 },   // Cây to bên trái (Thấp hơn nữa)
+  { x: -2, z: 0.5, radius: 2.0, height: 3.2 },    // Cây nhỏ bên trái (Thấp hơn nữa)
+  { x: 2.5, z: 1.5, radius: 1.5, height: 2.6 },  // Cây bên phải (Thấp hơn nữa)
+];
+
+for (let i = 0; i < petalCount; i++) {
+  const zone = treeZones[Math.floor(Math.random() * treeZones.length)];
+  const r = Math.random() * zone.radius;
+  const theta = Math.random() * Math.PI * 2;
+
+  petalData.push({
+    x: zone.x + r * Math.cos(theta),
+    y: (zone.height / 2) + Math.random() * (zone.height / 2),
+    z: zone.z + r * Math.sin(theta),
+    rotX: Math.random() * Math.PI * 2,
+    rotY: Math.random() * Math.PI * 2,
+    rotZ: Math.random() * Math.PI * 2,
+    velY: 0.15 + Math.random() * 0.3, // Rơi lơ lửng chậm
+    velX: (Math.random() - 0.5) * 0.8,
+    velZ: (Math.random() - 0.5) * 0.8,
+    rotSpeedX: (Math.random() - 0.5) * 3, // Tốc độ xoay (lật mặt)
+    rotSpeedY: (Math.random() - 0.5) * 3,
+    rotSpeedZ: (Math.random() - 0.5) * 3,
+    oscillationSpeed: 0.5 + Math.random() * 1.5,
+    oscillationWidth: 0.2 + Math.random() * 0.5
+  });
+}
+
+// Sử dụng ảnh 2D cánh hoa anh đào do người dùng cung cấp
+const textureLoader = new THREE.TextureLoader();
+const petalTexture = textureLoader.load('/Map/sakura_leaves.png');
+petalTexture.colorSpace = THREE.SRGBColorSpace;
+
+const petalMaterial = new THREE.MeshBasicMaterial({
+  map: petalTexture,
+  transparent: true,
+  opacity: 1.0,
+  alphaTest: 0.05,
+  depthWrite: false,
+  side: THREE.DoubleSide // Để ảnh hiển thị khi lật xoay mặt sau
+});
+
+const petalSystem = new THREE.InstancedMesh(petalGeometry, petalMaterial, petalCount);
+const dummy = new THREE.Object3D(); // Dùng để tính toán ma trận xoay
+scene.add(petalSystem);
+// --- END PARTICLE SYSTEM ---
+
 // 4. Animation Loop
 function animate() {
   requestAnimationFrame(animate);
   let delta = clock.getDelta();
-  
+
   // SỬA LỖI CHUYỂN TAB: Khi ẩn tab, requestAnimationFrame dừng lại.
   // Khi quay lại, delta sẽ rất lớn gây ra lỗi vật lý (giật, tung váy áo, nhảy cóc animation).
   // Vì vậy nếu delta quá lớn (trên 100ms), ta ép nó về mức bình thường của 1 frame (1/60s).
   if (delta > 0.1) {
     delta = 1 / 60;
   }
-  
+
   const deltaTime = delta;
   const time = clock.elapsedTime;
+
+  // --- CẬP NHẬT HIỆU ỨNG HOA RƠI ---
+  for (let i = 0; i < petalCount; i++) {
+    const data = petalData[i];
+
+    // Rơi xuống
+    data.y -= data.velY * deltaTime;
+
+    // Lắc lư ngẫu nhiên theo hàm Sin & Cos kết hợp gió tạt
+    data.x += (Math.sin(time * data.oscillationSpeed) * data.oscillationWidth * deltaTime) + (data.velX * deltaTime);
+    data.z += (Math.cos(time * data.oscillationSpeed) * data.oscillationWidth * deltaTime) + (data.velZ * deltaTime);
+
+    // Xoay cánh hoa 3D (hiệu ứng lật cuộn)
+    data.rotX += data.rotSpeedX * deltaTime;
+    data.rotY += data.rotSpeedY * deltaTime;
+    data.rotZ += data.rotSpeedZ * deltaTime;
+
+    // Nếu rớt xuống dưới sàn mặt đất thì ném lại vào trong tán cây
+    if (data.y < 0) {
+      const zone = treeZones[Math.floor(Math.random() * treeZones.length)];
+      const r = Math.random() * zone.radius;
+      const theta = Math.random() * Math.PI * 2;
+
+      // Hồi sinh cánh hoa ngẫu nhiên ở 1/3 phần ngọn của tán cây (không bị lòi lên trên ngọn)
+      data.y = zone.height - Math.random() * (zone.height * 0.3);
+      data.x = zone.x + r * Math.cos(theta);
+      data.z = zone.z + r * Math.sin(theta);
+    }
+
+    // Tính toán Scale: Khi sắp chạm đất (y < 0.8) thì sẽ thu nhỏ dần (tạo cảm giác tan biến mất)
+    let scale = 1.0;
+    if (data.y < 0.8) {
+      scale = Math.max(0, data.y / 0.8);
+    }
+
+    // Cập nhật vị trí, góc xoay và kích thước (scale) cho từng cánh hoa
+    dummy.position.set(data.x, data.y, data.z);
+    dummy.rotation.set(data.rotX, data.rotY, data.rotZ);
+    dummy.scale.set(scale, scale, scale);
+    dummy.updateMatrix();
+    petalSystem.setMatrixAt(i, dummy.matrix);
+  }
+  petalSystem.instanceMatrix.needsUpdate = true;
+  // --- END CẬP NHẬT HOA RƠI ---
 
   if (isAnimatingCamera) {
     camera.position.lerp(targetCameraPos, 5.0 * deltaTime);
@@ -1147,13 +1288,13 @@ function animate() {
         const analyser = (window as any).chatbotAnalyser as AnalyserNode;
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(dataArray);
-        
+
         let sum = 0;
         for (let i = 0; i < dataArray.length; i++) {
           sum += dataArray[i];
         }
         let avg = sum / dataArray.length; // 0 -> 255
-        
+
         // Khuếch đại giá trị lên một chút để miệng mở rõ hơn
         aaWeight = Math.min(1.0, (avg / 255.0) * 3.0);
       } else if (currentAnimUrl === "talk.fbx" || (window as any).isChatbotTalking) {
@@ -1180,7 +1321,7 @@ function animate() {
       currentVrm.expressionManager.setValue("aa", finalAa);
 
       // Mẹo: Khép hờ mắt (0.1) mặc định, để khi ngạc nhiên (0.0) mắt trông to hơn hẳn
-      let baseBlink = 0.1; 
+      let baseBlink = 0.1;
       if (
         appState.expressions.surprised > 0.3 ||
         currentAnimUrl === "Surprised.fbx" ||
@@ -1398,15 +1539,15 @@ function setupChatbot() {
     while ((match = regex.exec(text)) !== null) {
       lastAnim = match[1].trim();
     }
-    
+
     if (lastAnim) {
-       // Kích hoạt animation (tương đương với click nút)
-       const btn = document.querySelector(`.anim-btn[data-anim="${lastAnim}"]`) as HTMLButtonElement;
-       if (btn) {
-         btn.click();
-       }
+      // Kích hoạt animation (tương đương với click nút)
+      const btn = document.querySelector(`.anim-btn[data-anim="${lastAnim}"]`) as HTMLButtonElement;
+      if (btn) {
+        btn.click();
+      }
     }
-    
+
     // Xóa thẻ ANIM khỏi chuỗi hiển thị
     return text.replace(/\[ANIM:\s*[^\]]+\]/g, "").trim();
   };
@@ -1414,7 +1555,7 @@ function setupChatbot() {
   const handleSend = async () => {
     const userText = input.value.trim();
     if (!userText) return;
-    
+
     appendMsg(userText, true);
     input.value = "";
     input.style.height = '46px'; // Reset chiều cao sau khi gửi
@@ -1433,23 +1574,23 @@ function setupChatbot() {
       });
 
       const data = await response.json();
-      
+
       if (data.error) {
-         appendMsg(`Lỗi Server: ${data.error}`, false);
-         sendBtn.disabled = false;
-         return;
+        appendMsg(`Lỗi Server: ${data.error}`, false);
+        sendBtn.disabled = false;
+        return;
       }
 
       chatHistory.push({ role: "user", parts: [{ text: userText }] });
       chatHistory.push({ role: "model", parts: [{ text: data.aiResponse }] });
-      
+
       if (data.anim) {
-         const btn = document.querySelector(`.anim-btn[data-anim="${data.anim}"]`) as HTMLButtonElement;
-         if (btn) btn.click();
+        const btn = document.querySelector(`.anim-btn[data-anim="${data.anim}"]`) as HTMLButtonElement;
+        if (btn) btn.click();
       }
 
       const viText = data.viText;
-      
+
       // Tạo bubble tin nhắn rỗng cho AI
       const msgDiv = document.createElement("div");
       msgDiv.className = 'chat-msg ai';
@@ -1458,7 +1599,7 @@ function setupChatbot() {
 
       // Hiệu ứng gõ chữ (Typing effect) cho phụ đề tiếng Việt
       let i = 0;
-      const typeSpeed = 50; 
+      const typeSpeed = 50;
       const typingInterval = setInterval(() => {
         msgDiv.innerHTML += viText.charAt(i);
         historyDiv.scrollTop = historyDiv.scrollHeight;
@@ -1470,48 +1611,48 @@ function setupChatbot() {
 
       // Phát âm thanh
       if (data.audioBase64) {
-          const audioUrl = `data:audio/mp3;base64,${data.audioBase64}`;
-          
-          if (!(window as any).chatbotAudio) {
-            const audio = new Audio();
-            audio.crossOrigin = "anonymous";
-            (window as any).chatbotAudio = audio;
-            
-            // Khởi tạo Web Audio API
-            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-            const audioCtx = new AudioContextClass();
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;
-            
-            const source = audioCtx.createMediaElementSource(audio);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            
-            (window as any).chatbotAudioCtx = audioCtx;
-            (window as any).chatbotAnalyser = analyser;
+        const audioUrl = `data:audio/mp3;base64,${data.audioBase64}`;
 
-            audio.addEventListener('play', () => {
-              (window as any).isChatbotTalking = true;
-            });
-            
-            audio.addEventListener('ended', () => {
-              (window as any).isChatbotTalking = false;
-            });
-          }
+        if (!(window as any).chatbotAudio) {
+          const audio = new Audio();
+          audio.crossOrigin = "anonymous";
+          (window as any).chatbotAudio = audio;
 
-          const audio = (window as any).chatbotAudio as HTMLAudioElement;
-          const audioCtx = (window as any).chatbotAudioCtx as AudioContext;
-          
-          audio.src = audioUrl;
-          
-          if (audioCtx.state === 'suspended') {
-             audioCtx.resume();
-          }
+          // Khởi tạo Web Audio API
+          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          const audioCtx = new AudioContextClass();
+          const analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
 
-          audio.play().catch(e => {
-            console.error("Trình duyệt chặn phát âm thanh tự động:", e);
+          const source = audioCtx.createMediaElementSource(audio);
+          source.connect(analyser);
+          analyser.connect(audioCtx.destination);
+
+          (window as any).chatbotAudioCtx = audioCtx;
+          (window as any).chatbotAnalyser = analyser;
+
+          audio.addEventListener('play', () => {
+            (window as any).isChatbotTalking = true;
+          });
+
+          audio.addEventListener('ended', () => {
             (window as any).isChatbotTalking = false;
           });
+        }
+
+        const audio = (window as any).chatbotAudio as HTMLAudioElement;
+        const audioCtx = (window as any).chatbotAudioCtx as AudioContext;
+
+        audio.src = audioUrl;
+
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        audio.play().catch(e => {
+          console.error("Trình duyệt chặn phát âm thanh tự động:", e);
+          (window as any).isChatbotTalking = false;
+        });
       } else {
         (window as any).isChatbotTalking = true;
         setTimeout(() => {
@@ -1522,12 +1663,12 @@ function setupChatbot() {
     } catch (err: any) {
       appendMsg(`Lỗi mạng: ${err.message}`, false);
     }
-    
+
     sendBtn.disabled = false;
   };
 
   sendBtn.addEventListener("click", handleSend);
-  
+
   // Tự động co giãn chiều cao của textarea khi nhập
   const resizeInput = () => {
     input.style.height = '46px'; // Trả về chiều cao mặc định 1 dòng để đo lại
@@ -1551,9 +1692,9 @@ function setupChatbot() {
 function speakText(text: string) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  
+
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'vi-VN'; 
+  utterance.lang = 'vi-VN';
   utterance.rate = 1.1; // Nói nhanh 1 xíu
   utterance.pitch = 1.2; // Tông giọng cao đáng yêu
 
@@ -1562,3 +1703,26 @@ function speakText(text: string) {
 
 // Khởi chạy chatbot
 setupChatbot();
+
+// --- BINDING SỰ KIỆN ĐÓNG/MỞ PANEL BẰNG ICON ---
+function setupPanelToggle(panelId: string, closeBtnId: string, openBtnId: string) {
+  const panel = document.getElementById(panelId);
+  const closeBtn = document.getElementById(closeBtnId);
+  const openBtn = document.getElementById(openBtnId);
+
+  if (panel && closeBtn && openBtn) {
+    closeBtn.addEventListener('click', () => {
+      panel.classList.add('panel-hidden');
+      openBtn.style.display = 'flex';
+    });
+
+    openBtn.addEventListener('click', () => {
+      panel.classList.remove('panel-hidden');
+      openBtn.style.display = 'none';
+    });
+  }
+}
+
+setupPanelToggle('ui', 'close-ui', 'open-ui');
+setupPanelToggle('chat-ui', 'close-chat', 'open-chat');
+setupPanelToggle('control-panel', 'close-control', 'open-control');

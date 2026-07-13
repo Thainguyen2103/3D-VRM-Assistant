@@ -1,7 +1,8 @@
 body {
   margin: 0;
   overflow: hidden;
-  background-color: #ffffff; /* Nền trắng */
+  /* Tạo nền bầu trời Anime rực rỡ (Gradient từ tím nhạt -> hồng pastel -> trắng cam chân trời) */
+  background: linear-gradient(to bottom, #a18cd1 0%, #fbc2eb 50%, #fff1eb 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -39,6 +40,8 @@ canvas {
   border: 1px solid rgba(0,0,0,0.1);
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   z-index: 10;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top left;
 }
 
 #chat-ui {
@@ -58,6 +61,8 @@ canvas {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: bottom right; /* Thu về góc dưới bên phải nơi có icon Chat */
 }
 
 #instruction-text {
@@ -175,7 +180,6 @@ p {
   bottom: 20px;
   width: 320px;
   max-height: none;
-  overflow-y: auto;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   padding: 20px;
@@ -186,13 +190,15 @@ p {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: bottom left; /* Thu về góc dưới bên trái nơi có icon Cài đặt */
 }
 
 /* Tùy chỉnh thanh cuộn cho webkit */
-#control-panel::-webkit-scrollbar {
+.tab-content::-webkit-scrollbar {
   width: 6px;
 }
-#control-panel::-webkit-scrollbar-thumb {
+.tab-content::-webkit-scrollbar-thumb {
   background-color: rgba(0,0,0,0.2);
   border-radius: 3px;
 }
@@ -294,8 +300,71 @@ p {
   display: none;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px; /* Chừa chỗ cho thanh cuộn */
 }
 
 .tab-content.active {
   display: flex;
+}
+
+/* Class ẩn panel (Animation) */
+.panel-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9); /* Thu nhỏ nhẹ tạo hiệu ứng biến mất */
+}
+
+/* Nút X (Đóng) góc trên bên phải của khung */
+.close-btn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: transparent;
+  color: white; /* Đổi nét vẽ (stroke) thành màu trắng */
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 0;
+}
+.close-btn svg {
+  fill: #ff4d4f; /* Đổ màu nền đỏ cho hình tròn bên trong SVG */
+  width: 100%;
+  height: 100%;
+  transition: transform 0.2s, fill 0.2s;
+}
+.close-btn:hover svg {
+  fill: #ff7875;
+  transform: scale(1.15);
+}
+
+/* Nút Icon Nổi khi khung bị ẩn */
+.floating-icon {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e94560;
+  box-shadow: 0 4px 10px rgba(233, 69, 96, 0.2);
+  color: #e94560;
+  cursor: pointer;
+  font-size: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, background 0.2s ease;
+}
+.floating-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+  background: #fff0f2;
 }
