@@ -2,9 +2,49 @@ import { appState, targetExpressions, poseState, targetPoseState, boneMapping, c
 import { loadFBXAnimation, currentVrm } from '../vrm/VRMManager';
 import { updateTimeOfDay } from '../scene/environment';
 import { updateWeatherSystem, setPetalCount } from '../scene/weather';
-import { renderer, directionalLight, transformControl } from '../scene/setup';
+import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
 import { translations } from '../i18n';
 import { setupChatbot } from './chatbot';
+
+// Hàm hỗ trợ khóa góc (tránh phi vật lý) nhận vào object {x, y, z} theo độ (degrees)
+const clampBoneDegrees = (
+  boneKey: string,
+  rot: { x: number; y: number; z: number },
+) => {
+  if (boneKey === "leftLowerLeg" || boneKey === "rightLowerLeg") {
+    rot.x = Math.max(0, Math.min(150, rot.x));
+    rot.y = 0;
+    rot.z = 0;
+  } else if (boneKey === "leftLowerArm") {
+    rot.y = Math.max(-150, Math.min(0, rot.y));
+    rot.x = 0;
+    rot.z = 0;
+  } else if (boneKey === "rightLowerArm") {
+    rot.y = Math.max(0, Math.min(150, rot.y));
+    rot.x = 0;
+    rot.z = 0;
+  } else if (boneKey === "leftUpperLeg" || boneKey === "rightUpperLeg") {
+    rot.x = Math.max(-100, Math.min(45, rot.x));
+  } else if (boneKey === "leftUpperArm" || boneKey === "rightUpperArm") {
+    rot.x = Math.max(-180, Math.min(180, rot.x));
+  } else if (boneKey === "head") {
+    rot.x = Math.max(-30, Math.min(30, rot.x));
+    rot.y = Math.max(-45, Math.min(45, rot.y));
+    rot.z = Math.max(-20, Math.min(20, rot.z));
+  } else if (boneKey === "neck") {
+    rot.x = Math.max(-20, Math.min(20, rot.x));
+    rot.y = Math.max(-45, Math.min(45, rot.y));
+    rot.z = Math.max(-20, Math.min(20, rot.z));
+  } else if (boneKey === "chest" || boneKey === "spine") {
+    rot.x = Math.max(-20, Math.min(20, rot.x));
+    rot.y = Math.max(-30, Math.min(30, rot.y));
+    rot.z = Math.max(-20, Math.min(20, rot.z));
+  } else if (boneKey === "leftFoot" || boneKey === "rightFoot") {
+    rot.x = Math.max(-30, Math.min(45, rot.x));
+    rot.y = Math.max(-15, Math.min(15, rot.y));
+    rot.z = Math.max(-15, Math.min(15, rot.z));
+  }
+};
 
 export function initUI() {
   document.querySelectorAll(".tab-btn").forEach((btn) => {
@@ -117,6 +157,8 @@ export function initUI() {
         y: parseFloat((document.getElementById("bone-y") as HTMLInputElement).value) || 0,
         z: parseFloat((document.getElementById("bone-z") as HTMLInputElement).value) || 0,
       };
+
+      clampBoneDegrees(boneKey, rot);
       
       poseState[boneKey].x = rot.x;
       poseState[boneKey].y = rot.y;
@@ -268,6 +310,41 @@ export function initUI() {
     applyLanguage(currentLang);
   });
   applyLanguage(currentLang);
+
+  // TransformControls: Tắt OrbitControls khi kéo Gizmo, lưu lịch sử khi nhả
+  transformControl.addEventListener("dragging-changed", (event: any) => {
+    controls.enabled = !event.value;
+    if (!event.value) {
+      savePoseToHistory();
+    }
+  });
+
+  const rad2deg = 180 / Math.PI;
+
+  // TransformControls: Đọc góc xoay từ Gizmo -> cập nhật poseState + UI
+  transformControl.addEventListener("objectChange", () => {
+    if (!transformControl.object || appState.activeBone === "none") return;
+    const bone = transformControl.object;
+    const boneKey = boneMapping[appState.activeBone as keyof typeof boneMapping];
+    if (!boneKey || !poseState[boneKey]) return;
+
+    const degRot = {
+      x: bone.rotation.x * rad2deg,
+      y: bone.rotation.y * rad2deg,
+      z: bone.rotation.z * rad2deg,
+    };
+
+    clampBoneDegrees(boneKey, degRot);
+
+    poseState[boneKey].x = degRot.x;
+    poseState[boneKey].y = degRot.y;
+    poseState[boneKey].z = degRot.z;
+    targetPoseState[boneKey].x = degRot.x;
+    targetPoseState[boneKey].y = degRot.y;
+    targetPoseState[boneKey].z = degRot.z;
+
+    updateXYZUI(degRot.x, degRot.y, degRot.z);
+  });
 
   setupChatbot();
 }

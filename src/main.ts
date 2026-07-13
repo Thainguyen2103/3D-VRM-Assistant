@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { scene, camera, renderer, controls } from './scene/setup';
 import { initEnvironment, updateTimeOfDay } from './scene/environment';
 import { updateWeatherAnimation, updateWeatherSystem } from './scene/weather';
-import { initVRM, updateVRM } from './vrm/VRMManager';
+import { initVRM, updateVRM, checkAFK, resetAFKTimer } from './vrm/VRMManager';
 import { initUI } from './ui/UIManager';
 import { initCustomSelects } from "./customSelect";
 import { cameraState } from './core/state';
@@ -36,6 +36,9 @@ function animate() {
   updateWeatherAnimation(delta, time);
   updateVRM(delta, time);
 
+  // Kiểm tra AFK tự động
+  checkAFK();
+
   if (cameraState.isAnimating) {
     camera.position.lerp(cameraState.targetPos, 5.0 * delta);
     controls.target.lerp(cameraState.targetTarget, 5.0 * delta);
@@ -55,3 +58,23 @@ function animate() {
 }
 
 animate();
+
+// Resize handler
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Bắt sự kiện thao tác của người dùng để reset đồng hồ AFK
+window.addEventListener("pointermove", resetAFKTimer);
+window.addEventListener("pointerdown", resetAFKTimer);
+window.addEventListener("keydown", resetAFKTimer);
+window.addEventListener("wheel", resetAFKTimer);
+
+// KHI QUAY LẠI TAB: Reset timer để tránh việc bị quá thời gian AFK và nhảy animation đột ngột
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    resetAFKTimer();
+  }
+});

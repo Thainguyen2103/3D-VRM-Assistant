@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
+import { cameraState } from '../core/state';
 
 export const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
@@ -67,3 +68,7 @@ hemiLight.position.set(0, 20, 0);
 scene.add(hemiLight);
 
 window.addEventListener("contextmenu", (e) => e.preventDefault());
+
+controls.addEventListener("start", () => {
+  cameraState.isAnimating = false; // Hủy tự động di chuyển nếu người dùng tự kéo chuột
+});

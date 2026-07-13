@@ -22,6 +22,31 @@ const loopOnceAnimations = [
 let currentHeadYaw = 0;
 let currentHeadPitch = 0;
 
+// --- AFK Auto-Idle System ---
+let lastInteractionTime = Date.now();
+export let isAutoIdle = false;
+let shouldStopAutoIdle = false;
+const AFK_TIMEOUT = 10000; // 10 giây không thao tác sẽ tự động chuyển sang nhàn rỗi
+
+export function resetAFKTimer() {
+  lastInteractionTime = Date.now();
+  if (isAutoIdle) {
+    // Đánh dấu để chờ đến khi hết vòng lặp animation thì mới dừng (tránh giật cục)
+    shouldStopAutoIdle = true;
+  }
+}
+
+export function checkAFK() {
+  if (Date.now() - lastInteractionTime > AFK_TIMEOUT) {
+    if (currentAnimUrl === "") {
+      isAutoIdle = true;
+      const afkAnims = ["idle.fbx", "angry.fbx", "Sad Idle.fbx", "Shy.fbx", "Thinking.fbx"];
+      const randomAnim = afkAnims[Math.floor(Math.random() * afkAnims.length)];
+      loadFBXAnimation(randomAnim, true);
+    }
+  }
+}
+
 export function initVRM() {
   const loader = new GLTFLoader();
   loader.register((parser) => new VRMLoaderPlugin(parser));
@@ -84,7 +109,14 @@ export function initVRM() {
   );
 }
 
-export function loadFBXAnimation(url: string) {
+export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
+  lastInteractionTime = Date.now(); // Reset timer khi người dùng chủ động tải animation
+
+  if (!isAfkCall) {
+    isAutoIdle = false;
+    shouldStopAutoIdle = false;
+  }
+
   if (!currentVrm) return;
 
   if (currentAction) {
@@ -106,7 +138,15 @@ export function loadFBXAnimation(url: string) {
     if (!clip) return;
     if (!currentMixer) {
       currentMixer = new THREE.AnimationMixer(currentVrm!.scene);
-      currentMixer.addEventListener("finished", (e) => {
+      currentMixer.addEventListener("loop", (e: any) => {
+        // Nếu người dùng đã thao tác lại và đang đợi hết khủng hình của auto-idle
+        if (shouldStopAutoIdle && e.action === currentAction) {
+          shouldStopAutoIdle = false;
+          isAutoIdle = false;
+          loadFBXAnimation(""); // Trở về trạng thái tĩnh ngay khi vừa hết chu kỳ
+        }
+      });
+      currentMixer.addEventListener("finished", (e: any) => {
         if (e.action === currentAction && currentAnimUrl !== "") {
           loadFBXAnimation(""); 
         }
@@ -369,7 +409,49 @@ export function updateVRM(deltaTime: number, time: number) {
       currentVrm.expressionManager.update();
     }
 
+    // 1. Cập nhật animation một lần với đủ deltaTime (set pose xương từ clip)
     if (currentMixer) currentMixer.update(deltaTime);
-    currentVrm.update(deltaTime);
+
+    // 2. Hiệu chỉnh chân KHI animation đang phát (áp dụng 1 lần duy nhất, không lặp)
+    if (currentAction && currentVrm.humanoid) {
+      const leftLeg = currentVrm.humanoid.getNormalizedBoneNode("leftUpperLeg");
+      const rightLeg = currentVrm.humanoid.getNormalizedBoneNode("rightUpperLeg");
+      if (leftLeg) leftLeg.rotation.z += 0.05;
+      if (rightLeg) rightLeg.rotation.z -= 0.05;
+      // Bắt buộc cập nhật World Matrix để spring bones dùng đúng vị trí xương
+      currentVrm.scene.updateMatrixWorld();
+    }
+
+    // 3. Sub-stepping CHỈ cho spring physics (váy áo, tóc) - không chạy mixer lại
+    const SUB_STEPS = 3;
+    let timeRemaining = deltaTime;
+    while (timeRemaining > 0) {
+      const dt = Math.min(timeRemaining, deltaTime / SUB_STEPS);
+      currentVrm.update(dt);
+      timeRemaining -= dt;
+    }
+
+
+    // Khuếch đại chuyển động của con ngươi mắt để dễ nhìn thấy hơn
+    if (currentVrm.humanoid) {
+      const leftEye = currentVrm.humanoid.getNormalizedBoneNode("leftEye");
+      const rightEye = currentVrm.humanoid.getNormalizedBoneNode("rightEye");
+      if (leftEye && rightEye) {
+        leftEye.rotation.x *= 2.5;
+        leftEye.rotation.y *= 2.5;
+        rightEye.rotation.x *= 2.5;
+        rightEye.rotation.y *= 2.5;
+      }
+    }
+
+    if (currentVrm.expressionManager) {
+      // Khuếch đại lookAt expressions (Dành cho model dùng Blendshape)
+      ["lookUp", "lookDown", "lookLeft", "lookRight"].forEach((expr) => {
+        const val = currentVrm!.expressionManager!.getValue(expr);
+        if (val && val > 0) {
+          currentVrm!.expressionManager!.setValue(expr, Math.min(1.0, val * 2.5));
+        }
+      });
+    }
   }
 }

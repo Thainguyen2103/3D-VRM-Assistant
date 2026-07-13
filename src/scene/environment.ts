@@ -66,9 +66,9 @@ export function applyWeatherToTrees(weather: string) {
     tree.traverse((child: any) => {
       if (child.isMesh && child.material) {
         if (weather === 'snow') {
-          child.material.color.setHex(0xffffff); 
+          child.material.color.setHex(0xffffff); // Trắng tuyết
         } else {
-          child.material.color.setHex(0xffffff); 
+          child.material.color.setHex(0xffa6c9); // Phục hồi màu hồng (Pink)
         }
       }
     });
