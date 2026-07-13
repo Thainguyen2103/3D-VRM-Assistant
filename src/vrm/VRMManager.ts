@@ -26,8 +26,13 @@ let currentHeadPitch = 0;
 let lastInteractionTime = Date.now();
 export let isAutoIdle = false;
 let shouldStopAutoIdle = false;
-const AFK_TIMEOUT = 10000; // 10 giây không thao tác sẽ tự động chuyển sang nhàn rỗi
+const AFK_TIMEOUT = 10000; // 10 giây không có tương tác camera -> bắt đầu idle
 
+// Pool animation nhàn rỗi - bao gồm các animation lặp vòng và một lần
+const afkLoopAnims = ["idle.fbx", "Floating.fbx", "dance.fbx", "laugh.fbx"];
+const afkOnceAnims = ["angry.fbx", "Sad Idle.fbx", "Shy.fbx", "Thinking.fbx", "Look Around.fbx", "Looking.fbx", "No.fbx", "Blow A Kiss.fbx"];
+
+// Reset timer tương tác (Dùng khi camera thay đổi góc/zoom)
 export function resetAFKTimer() {
   lastInteractionTime = Date.now();
   if (isAutoIdle) {
@@ -36,12 +41,22 @@ export function resetAFKTimer() {
   }
 }
 
+// Dừng idle người dùng thay đổi góc camera (reset cả timer lẫn dừng idle ngay)
+export function stopIdleOnCameraMove() {
+  lastInteractionTime = Date.now();
+  if (isAutoIdle) {
+    shouldStopAutoIdle = true; // Chờ hết chu kỳ hiện tại
+  }
+}
+
 export function checkAFK() {
   if (Date.now() - lastInteractionTime > AFK_TIMEOUT) {
     if (currentAnimUrl === "") {
       isAutoIdle = true;
-      const afkAnims = ["idle.fbx", "angry.fbx", "Sad Idle.fbx", "Shy.fbx", "Thinking.fbx"];
-      const randomAnim = afkAnims[Math.floor(Math.random() * afkAnims.length)];
+      // 50% xác suất chọn animation lặp vòng, 50% chọn animation 1 lần
+      const useLoop = Math.random() < 0.5;
+      const pool = useLoop ? afkLoopAnims : afkOnceAnims;
+      const randomAnim = pool[Math.floor(Math.random() * pool.length)];
       loadFBXAnimation(randomAnim, true);
     }
   }

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { scene, camera, renderer, controls } from './scene/setup';
 import { initEnvironment, updateTimeOfDay } from './scene/environment';
 import { updateWeatherAnimation, updateWeatherSystem } from './scene/weather';
-import { initVRM, updateVRM, checkAFK, resetAFKTimer } from './vrm/VRMManager';
+import { initVRM, updateVRM, checkAFK, resetAFKTimer, stopIdleOnCameraMove } from './vrm/VRMManager';
 import { initUI } from './ui/UIManager';
 import { initCustomSelects } from "./customSelect";
 import { cameraState } from './core/state';
@@ -66,11 +66,14 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Bắt sự kiện thao tác của người dùng để reset đồng hồ AFK
-window.addEventListener("pointermove", resetAFKTimer);
+// --- AFK LOGIC ---
+// Di chuột thông thường KHÔNG reset AFK (người dùng vẫn "đang rảnh")
+// Chỉ khi camera THAY ĐỔI GÓC/ZOOM mới dừng animation nhàn rỗi
+controls.addEventListener("change", stopIdleOnCameraMove);
+
+// Click UI hoặc gõ bàn phím -> reset timer (nhưng chỉ dừng idle khi animation xong chu kỳ)
 window.addEventListener("pointerdown", resetAFKTimer);
 window.addEventListener("keydown", resetAFKTimer);
-window.addEventListener("wheel", resetAFKTimer);
 
 // KHI QUAY LẠI TAB: Reset timer để tránh việc bị quá thời gian AFK và nhảy animation đột ngột
 document.addEventListener("visibilitychange", () => {
