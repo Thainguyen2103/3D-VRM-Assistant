@@ -497,11 +497,16 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
-// Tối ưu hóa: Giới hạn pixel ratio tối đa là 2.0, không ép máy yếu phải chạy 2.0 (Gây giật lag cực mạnh)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+// Tối ưu hóa: Mặc định render ở 1080p (tỉ lệ 1.0) theo yêu cầu người dùng để chống lag, 
+// khử răng cưa (antialias) đã được bật ở trên để giúp nhân vật anime vẫn sắc nét.
+renderer.setPixelRatio(1.0);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.localClippingEnabled = true; // Bật chế độ cắt gọt mô hình
+
+// Mặt phẳng cắt gọt: Cắt bỏ mọi thứ nằm dưới tọa độ Y = 0.02 (Giấu triệt để các vệt đất tàn dư dưới sàn)
+const groundClipPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.02);
 
 const scene = new THREE.Scene();
 // Thêm sương mù mờ ảo hòa quyện với màu chân trời (Màu trắng cam nhạt của CSS Gradient)
@@ -678,8 +683,8 @@ document.querySelectorAll(".bone-btn").forEach((btn) => {
 const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0); // Tăng cường độ sáng
 directionalLight.position.set(1.0, 2.0, 2.0); // Chếch lên và sang bên để đổ bóng đẹp hơn
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 4096; // Mặc định Siêu Cao (4K)
-directionalLight.shadow.mapSize.height = 4096;
+directionalLight.shadow.mapSize.width = 1024; // Mặc định Trung bình (1K)
+directionalLight.shadow.mapSize.height = 1024;
 directionalLight.shadow.camera.near = 0.5;
 directionalLight.shadow.camera.far = 50;
 directionalLight.shadow.camera.left = -15;
@@ -697,14 +702,81 @@ const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
 hemiLight.position.set(0, 20, 0);
 scene.add(hemiLight);
 
-// Mặt sàn vô hình để hứng bóng đổ
-const floorGeometry = new THREE.PlaneGeometry(50, 50);
-const floorMaterial = new THREE.ShadowMaterial({ opacity: 0.15 });
-const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-floor.rotation.x = -Math.PI / 2;
-floor.position.y = 0; // Thay đổi tùy theo vị trí chân model
-floor.receiveShadow = true;
-scene.add(floor);
+// Mảng chứa đèn lồng để bật/tắt theo thời gian
+const lanternLights: THREE.PointLight[] = [];
+
+// --- LOGIC THỜI GIAN (TIME OF DAY) ---
+let currentTimeSetting = 'auto';
+
+function updateTimeOfDay() {
+  let timeMode = currentTimeSetting;
+
+  if (timeMode === 'auto') {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 10) timeMode = 'morning';
+    else if (hour >= 10 && hour < 16) timeMode = 'noon';
+    else if (hour >= 16 && hour < 19) timeMode = 'sunset';
+    else timeMode = 'night';
+  }
+
+  // Đổi màu nền (document body css background)
+  const body = document.body;
+  if (timeMode === 'morning') {
+    (scene.fog as THREE.FogExp2).color.set('#fff1eb');
+    ambientLight.color.set('#ffffff');
+    ambientLight.intensity = 1.0;
+    directionalLight.color.set('#ffffff');
+    directionalLight.intensity = 2.0;
+    hemiLight.intensity = 1.0;
+    body.style.background = 'linear-gradient(to bottom, #fff1eb 0%, #ace0f9 100%)';
+  } else if (timeMode === 'noon') {
+    (scene.fog as THREE.FogExp2).color.set('#e0f7fa');
+    ambientLight.color.set('#ffffff');
+    ambientLight.intensity = 1.2;
+    directionalLight.color.set('#ffffff');
+    directionalLight.intensity = 2.5;
+    hemiLight.intensity = 1.2;
+    body.style.background = 'linear-gradient(to bottom, #e0f7fa 0%, #80d0c7 100%)';
+  } else if (timeMode === 'sunset') {
+    (scene.fog as THREE.FogExp2).color.set('#ffb28b');
+    ambientLight.color.set('#ffb28b');
+    ambientLight.intensity = 0.4; // Giảm sáng môi trường để bóng râm (shadow) đổ xuống nhìn đen và đậm hơn
+    directionalLight.color.set('#ff8a66');
+    directionalLight.intensity = 2.0;
+    hemiLight.intensity = 0.4; // Giảm sáng môi trường
+    body.style.background = 'linear-gradient(to bottom, #ffb28b 0%, #d47e8c 100%)';
+  } else if (timeMode === 'night') {
+    (scene.fog as THREE.FogExp2).color.set('#101230');
+    ambientLight.color.set('#5a5a8a'); 
+    ambientLight.intensity = 0.3; // Giảm tối đa ánh sáng môi trường để màn đêm sâu hơn
+    directionalLight.color.set('#b0b0ff'); 
+    directionalLight.intensity = 0.2; // Ánh trăng cực kì mờ nhạt (nhường chỗ cho lồng đèn đổ bóng)
+    hemiLight.intensity = 0.1;
+    body.style.background = 'linear-gradient(to bottom, #101230 0%, #202040 100%)';
+  }
+
+  // Cập nhật ánh sáng đèn lồng
+  const isNight = (timeMode === 'night');
+  lanternLights.forEach(light => {
+    light.intensity = isNight ? 15.0 : 0.0; // Tăng nhẹ độ sáng đèn lồng bù lại cho mặt trăng
+    light.castShadow = isNight; // Tắt hoàn toàn thuật toán bóng đổ khi trời sáng
+    // Bật/tắt "bóng đèn" (Mesh) bên trong PointLight
+    if (light.children.length > 0) {
+      light.children[0].visible = isNight;
+    }
+  });
+}
+
+// Khởi chạy lấy giờ hệ thống lúc load
+updateTimeOfDay();
+// --- KẾT THÚC LOGIC THỜI GIAN ---
+
+// Xóa bỏ hoàn toàn mặt sàn vô hình cũ, để bóng râm chỉ rơi trên mặt đất thật (tạo hiệu ứng Diorama)
+// const floorGeometry = new THREE.PlaneGeometry(50, 50);
+// ... đã xóa ...
+
+// Mảng chứa cây Sakura để đổi màu cho Tuyết
+const sakuraTrees: THREE.Object3D[] = [];
 
 // Load bối cảnh phụ (Cây anh đào)
 const envLoader = new GLTFLoader();
@@ -715,15 +787,19 @@ envLoader.load(
     // Tối ưu hóa Bóng đổ (Shadow) cho cây
     originalTree.traverse((child: any) => {
       if (child.isMesh) {
-        // Mặc định là cấu hình Siêu Cao: Bật bóng đổ cho mọi thứ (kể cả lá cây trong suốt)
+        // Mặc định: Bật bóng đổ cho mọi thứ. Khi User đổi setting, nó sẽ tự quét lại.
         child.castShadow = true;
-        
+
         child.receiveShadow = false; // Tắt luôn nhận bóng để nhẹ máy
 
         // Fix lỗi bóng đổ bị hình khối vuông (nếu có dùng alphaTest)
         if (child.material) {
+          // Lưu lại vật liệu gốc để đổi màu (nếu là Array Material thì clone từng phần)
+          child.material = child.material.clone();
           child.material.alphaTest = 0.5;
           child.material.needsUpdate = true;
+          // Cắt bớt phần rễ/đất thò xuống dưới mặt sàn
+          child.material.clippingPlanes = [groundClipPlane];
         }
       }
     });
@@ -741,7 +817,11 @@ envLoader.load(
       treeClone.scale.set(pos.scale, pos.scale, pos.scale);
       treeClone.rotation.y = Math.random() * Math.PI * 2; // Xoay ngẫu nhiên hướng
       scene.add(treeClone);
+      sakuraTrees.push(treeClone);
     });
+
+    // Áp dụng màu sắc của thời tiết hiện tại nếu cây load xong sau khi thời tiết đổi
+    applyWeatherToTrees(currentWeather);
   },
   undefined,
   (error) => console.error("Lỗi khi load cây Sakura:", error)
@@ -758,6 +838,9 @@ envLoader.load(
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        if (child.material) {
+          child.material.clippingPlanes = [groundClipPlane];
+        }
       }
     });
 
@@ -770,6 +853,105 @@ envLoader.load(
   },
   undefined,
   (error) => console.error("Lỗi khi load xe Yatai:", error)
+);
+
+// Load đèn lồng đá phong cách Nhật (Toro)
+envLoader.load(
+  "/Map/old_japanese_lantern.glb",
+  (gltf) => {
+    const originalLantern = gltf.scene;
+
+    originalLantern.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (child.material) {
+          child.material.clippingPlanes = [groundClipPlane];
+          // Tắt đổ bóng (sun shadow) cho các lưới trong suốt (như mặt kính lồng đèn) để tránh bị lỗi bóng hình vuông
+          if (child.material.transparent || child.material.opacity < 1) {
+            child.castShadow = false;
+          }
+        }
+      }
+    });
+
+    const lanternPositions = [
+      { x: -2, y: -0.15, z: -1.35, scale: 1.2 }, // Phía trước bên trái
+      { x: -1.5, y: -0.15, z: 1.2, scale: 1.2 },  // Phía trước bên phải
+    ];
+
+    lanternPositions.forEach((pos) => {
+      const lantern = originalLantern.clone();
+      lantern.position.set(pos.x, pos.y, pos.z);
+      lantern.scale.set(pos.scale, pos.scale, pos.scale);
+      lantern.rotation.y = Math.random() * Math.PI;
+      scene.add(lantern);
+
+      // Thêm ánh sáng vàng ấm phát ra từ trong lồng đèn
+      const pLight = new THREE.PointLight(0xffa500, 0, 5.0); // Bán kính sáng 5m
+
+      // BẬT BÓNG ĐỔ TỪ ĐÈN LỒNG
+      pLight.castShadow = true;
+      pLight.shadow.mapSize.width = 512; // Giảm phân giải bóng đèn lồng để bớt lag
+      pLight.shadow.mapSize.height = 512;
+      pLight.shadow.bias = -0.001; // Giảm lỗi sọc sọc của bóng đổ
+
+      // Tạo một khối cầu phát sáng (MeshBasicMaterial không bị ảnh hưởng bởi bóng tối) đóng vai trò là "Bóng đèn"
+      const bulbGeometry = new THREE.SphereGeometry(0.12, 16, 16); // Tăng kích thước bóng đèn
+      const bulbMaterial = new THREE.MeshBasicMaterial({ color: 0xffdd88 });
+      const bulbMesh = new THREE.Mesh(bulbGeometry, bulbMaterial);
+      pLight.add(bulbMesh); // Gắn bóng đèn vào nguồn sáng
+
+      // Dời ánh sáng lên vị trí lồng kính (khoảng Y = 1.45 so với mặt đất)
+      pLight.position.set(pos.x, pos.y + 1.45, pos.z);
+      scene.add(pLight);
+      lanternLights.push(pLight);
+    });
+
+    // Cập nhật độ sáng ngay lập tức nếu đang là ban đêm
+    updateTimeOfDay();
+  },
+  undefined,
+  (error) => console.error("Lỗi khi load đèn lồng:", error)
+);
+
+// Load mặt đất (Diorama / Ground)
+envLoader.load(
+  "/Map/rocky_ground_with_moss.glb",
+  (gltf) => {
+    const originalGround = gltf.scene;
+
+    originalGround.traverse((child: any) => {
+      if (child.isMesh) {
+        child.receiveShadow = true;
+        child.castShadow = false; // Đất thì không cần đổ bóng râm lên chính nó
+      }
+    });
+
+    // Đặt tỷ lệ to lên một chút để cần ít mảnh ghép hơn
+    originalGround.scale.set(0.3, 0.3, 0.3); 
+
+    // Tính toán kích thước thật của 1 ô đất sau khi scale
+    const bbox = new THREE.Box3().setFromObject(originalGround);
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+
+    const tileWidth = size.x * 0.9; // Nhân 0.9 để các mảnh đất xếp đè lên mép của nhau (xóa khoảng hở)
+    const tileDepth = size.z * 0.9;
+
+    // Tạo lưới 2x2 (4 ô) thay vì 3x3 (9 ô) để giảm 50% số lượng đa giác
+    const offsets = [-0.5, 0.5];
+    for (const i of offsets) {
+      for (const j of offsets) {
+        const tile = originalGround.clone();
+        // Xếp các viên gạch khít vào nhau
+        tile.position.set(i * tileWidth, 0, j * tileDepth);
+        scene.add(tile);
+      }
+    }
+  },
+  undefined,
+  (error) => console.error("Lỗi khi load mặt đất:", error)
 );
 
 
@@ -863,8 +1045,25 @@ let currentHeadPitch = 0;
 
 const clock = new THREE.Clock();
 
-// --- PARTICLE SYSTEM: Hiệu ứng hoa anh đào rơi (InstancedMesh cho xoay 3D chân thực) ---
-const MAX_PETALS = 300; // Số lượng cánh hoa tối đa lưu trong bộ nhớ
+// Biến trạng thái thời tiết
+let currentWeather = 'petals'; // 'clear', 'petals', 'rain', 'snow'
+
+function applyWeatherToTrees(weather: string) {
+  sakuraTrees.forEach(tree => {
+    tree.traverse((child: any) => {
+      if (child.isMesh && child.material) {
+        if (weather === 'snow') {
+          child.material.color.setHex(0xffffff); // Đổi màu lá/hoa thành trắng tuyết
+        } else {
+          child.material.color.setHex(0xffa6c9); // Phục hồi màu hồng (Pink)
+        }
+      }
+    });
+  });
+}
+
+// --- PARTICLE SYSTEM: Hiệu ứng Thời tiết (Hoa rơi, Mưa, Tuyết) ---
+const MAX_PETALS = 300; // Số lượng tối đa lưu trong bộ nhớ
 let currentPetalCount = 80; // Số lượng hiển thị thực tế (mặc định)
 const petalGeometry = new THREE.PlaneGeometry(0.12, 0.12); // Kích thước nhỏ lại cho vừa mắt
 const petalData: any[] = [];
@@ -899,10 +1098,28 @@ for (let i = 0; i < MAX_PETALS; i++) {
   });
 }
 
+// Tạo ảnh Canvas cho Tuyết và Mưa để không cần tải file ngoài
+function createRainTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 8;
+  canvas.height = 64;
+  const ctx = canvas.getContext('2d')!;
+  const grad = ctx.createLinearGradient(0, 0, 0, 64);
+  grad.addColorStop(0, 'rgba(255,255,255,0)');
+  grad.addColorStop(0.5, 'rgba(255,255,255,0.6)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 8, 64);
+  return new THREE.CanvasTexture(canvas);
+}
+
 // Sử dụng ảnh 2D cánh hoa anh đào do người dùng cung cấp
 const textureLoader = new THREE.TextureLoader();
 const petalTexture = textureLoader.load('/Map/sakura_leaves.png');
 petalTexture.colorSpace = THREE.SRGBColorSpace;
+const rainTexture = createRainTexture();
+
+const snowGeometry = new THREE.SphereGeometry(0.015, 6, 6); // Hạt tuyết hình cầu 3D (Đã thu nhỏ)
 
 const petalMaterial = new THREE.MeshBasicMaterial({
   map: petalTexture,
@@ -917,6 +1134,38 @@ const petalSystem = new THREE.InstancedMesh(petalGeometry, petalMaterial, MAX_PE
 petalSystem.count = currentPetalCount; // Chỉ render số lượng theo cài đặt
 const dummy = new THREE.Object3D(); // Dùng để tính toán ma trận xoay
 scene.add(petalSystem);
+
+function updateWeatherSystem(weather: string) {
+  currentWeather = weather;
+  applyWeatherToTrees(weather);
+
+  if (weather === 'clear') {
+    petalSystem.visible = false;
+  } else {
+    petalSystem.visible = true;
+    if (weather === 'petals') {
+      petalSystem.geometry = petalGeometry;
+      petalMaterial.map = petalTexture;
+      petalMaterial.opacity = 1.0;
+      petalMaterial.alphaTest = 0.05;
+      petalMaterial.needsUpdate = true;
+    } else if (weather === 'rain') {
+      petalSystem.geometry = petalGeometry;
+      petalMaterial.map = rainTexture;
+      petalMaterial.opacity = 0.6;
+      petalMaterial.alphaTest = 0.0;
+      petalMaterial.needsUpdate = true;
+    } else if (weather === 'snow') {
+      petalSystem.geometry = snowGeometry;
+      petalMaterial.map = null; // Bỏ texture, chỉ dùng màu trắng khối cầu
+      petalMaterial.opacity = 0.8;
+      petalMaterial.alphaTest = 0.01;
+      petalMaterial.needsUpdate = true;
+    }
+  }
+}
+// Gọi mặc định
+updateWeatherSystem('petals');
 // --- END PARTICLE SYSTEM ---
 
 // 4. Animation Loop
@@ -934,48 +1183,88 @@ function animate() {
   const deltaTime = delta;
   const time = clock.elapsedTime;
 
-  // --- CẬP NHẬT HIỆU ỨNG HOA RƠI ---
+  // --- CẬP NHẬT HIỆU ỨNG THỜI TIẾT ---
   for (let i = 0; i < currentPetalCount; i++) {
     const data = petalData[i];
 
-    // Rơi xuống
-    data.y -= data.velY * deltaTime;
+    if (currentWeather === 'rain') {
+      // Mưa: Rơi rất nhanh, thẳng đứng, không xoay lật
+      data.y -= data.velY * deltaTime * 15.0; // Rơi cực nhanh
+      data.x += data.velX * deltaTime * 0.2; // Gió tạt nhẹ
+      data.z += data.velZ * deltaTime * 0.2;
 
-    // Lắc lư ngẫu nhiên theo hàm Sin & Cos kết hợp gió tạt
-    data.x += (Math.sin(time * data.oscillationSpeed) * data.oscillationWidth * deltaTime) + (data.velX * deltaTime);
-    data.z += (Math.cos(time * data.oscillationSpeed) * data.oscillationWidth * deltaTime) + (data.velZ * deltaTime);
+      dummy.position.set(data.x, data.y, data.z);
+      // Mưa không xoay ngang mà chỉ luôn đứng thẳng
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(0.1, 1.5, 0.1); // Hạt mưa nhỏ lại và mỏng hơn rất nhiều
+    } else if (currentWeather === 'snow') {
+      // Tuyết: Rơi chậm, lắc lư nhẹ nhàng
+      data.y -= data.velY * deltaTime * 0.5; // Rơi chậm
 
-    // Xoay cánh hoa 3D (hiệu ứng lật cuộn)
-    data.rotX += data.rotSpeedX * deltaTime;
-    data.rotY += data.rotSpeedY * deltaTime;
-    data.rotZ += data.rotSpeedZ * deltaTime;
+      // Lắc lư nhẹ
+      data.x += (Math.sin(time * data.oscillationSpeed * 0.5) * data.oscillationWidth * deltaTime) + (data.velX * deltaTime * 0.5);
+      data.z += (Math.cos(time * data.oscillationSpeed * 0.5) * data.oscillationWidth * deltaTime) + (data.velZ * deltaTime * 0.5);
 
-    // Nếu rớt xuống dưới sàn mặt đất thì ném lại vào trong tán cây
+      // Xoay nhẹ nhàng (tuy nhiên bông tuyết tròn nên cũng không rõ xoay lắm)
+      data.rotX += data.rotSpeedX * deltaTime * 0.2;
+      data.rotY += data.rotSpeedY * deltaTime * 0.2;
+      data.rotZ += data.rotSpeedZ * deltaTime * 0.2;
+
+      dummy.position.set(data.x, data.y, data.z);
+      dummy.rotation.set(data.rotX, data.rotY, data.rotZ);
+
+      let scale = 1.2;
+      if (data.y < 0.8) scale = Math.max(0, (data.y / 0.8) * 1.2);
+      dummy.scale.set(scale, scale, scale);
+    } else {
+      // Hoa anh đào (petals): Mặc định
+      // Rơi xuống
+      data.y -= data.velY * deltaTime;
+
+      // Lắc lư ngẫu nhiên theo hàm Sin & Cos kết hợp gió tạt
+      data.x += (Math.sin(time * data.oscillationSpeed) * data.oscillationWidth * deltaTime) + (data.velX * deltaTime);
+      data.z += (Math.cos(time * data.oscillationSpeed) * data.oscillationWidth * deltaTime) + (data.velZ * deltaTime);
+
+      // Xoay cánh hoa 3D (hiệu ứng lật cuộn)
+      data.rotX += data.rotSpeedX * deltaTime;
+      data.rotY += data.rotSpeedY * deltaTime;
+      data.rotZ += data.rotSpeedZ * deltaTime;
+
+      // Tính toán Scale: Khi sắp chạm đất (y < 0.8) thì sẽ thu nhỏ dần (tạo cảm giác tan biến mất)
+      let scale = 1.0;
+      if (data.y < 0.8) {
+        scale = Math.max(0, data.y / 0.8);
+      }
+
+      dummy.position.set(data.x, data.y, data.z);
+      dummy.rotation.set(data.rotX, data.rotY, data.rotZ);
+      dummy.scale.set(scale, scale, scale);
+    }
+
+    // Tái sinh hạt khi chạm đất
     if (data.y < 0) {
       const zone = treeZones[Math.floor(Math.random() * treeZones.length)];
       const r = Math.random() * zone.radius;
       const theta = Math.random() * Math.PI * 2;
 
-      // Hồi sinh cánh hoa ngẫu nhiên ở 1/3 phần ngọn của tán cây (không bị lòi lên trên ngọn)
-      data.y = zone.height - Math.random() * (zone.height * 0.3);
-      data.x = zone.x + r * Math.cos(theta);
-      data.z = zone.z + r * Math.sin(theta);
+      if (currentWeather === 'petals') {
+        // Hồi sinh cánh hoa ngẫu nhiên ở 1/3 phần ngọn của tán cây (không bị lòi lên trên ngọn)
+        data.y = zone.height - Math.random() * (zone.height * 0.3);
+        data.x = zone.x + r * Math.cos(theta);
+        data.z = zone.z + r * Math.sin(theta);
+      } else {
+        // Mưa và Tuyết sẽ rơi từ trên cao và bao phủ toàn bộ bầu trời rộng lớn
+        data.y = 5.0 + Math.random() * 2.0;
+        data.x = (Math.random() - 0.5) * 12.0;
+        data.z = (Math.random() - 0.5) * 12.0;
+      }
     }
 
-    // Tính toán Scale: Khi sắp chạm đất (y < 0.8) thì sẽ thu nhỏ dần (tạo cảm giác tan biến mất)
-    let scale = 1.0;
-    if (data.y < 0.8) {
-      scale = Math.max(0, data.y / 0.8);
-    }
-
-    // Cập nhật vị trí, góc xoay và kích thước (scale) cho từng cánh hoa
-    dummy.position.set(data.x, data.y, data.z);
-    dummy.rotation.set(data.rotX, data.rotY, data.rotZ);
-    dummy.scale.set(scale, scale, scale);
     dummy.updateMatrix();
     petalSystem.setMatrixAt(i, dummy.matrix);
   }
   petalSystem.instanceMatrix.needsUpdate = true;
+  // --- END CẬP NHẬT HIỆU ỨNG THỜI TIẾT ---
   // --- END CẬP NHẬT HOA RƠI ---
 
   if (isAnimatingCamera) {
@@ -1761,17 +2050,6 @@ document.getElementById("setting-shadow")?.addEventListener("change", (e) => {
       directionalLight.shadow.map = null as any;
     }
   }
-
-  // Cập nhật tính năng Đổ bóng của Lá cây (Chỉ kích hoạt ở mức 4K)
-  scene.traverse((child: any) => {
-    if (child.isMesh && child.material && (child.material.transparent || child.material.alphaTest > 0)) {
-      if (val === "4k") {
-        child.castShadow = true; // Bật bóng đổ cho từng chiếc lá
-      } else {
-        child.castShadow = false; // Tắt bóng đổ lá để cứu FPS
-      }
-    }
-  });
 });
 
 document.getElementById("setting-pixel-ratio")?.addEventListener("change", (e) => {
@@ -1787,11 +2065,14 @@ document.getElementById("setting-pixel-ratio")?.addEventListener("change", (e) =
   }
 });
 
-document.getElementById("setting-petals-toggle")?.addEventListener("change", (e) => {
+document.getElementById("setting-time")?.addEventListener("change", (e) => {
+  currentTimeSetting = (e.target as HTMLSelectElement).value;
+  updateTimeOfDay();
+});
+
+document.getElementById("setting-weather")?.addEventListener("change", (e) => {
   const val = (e.target as HTMLSelectElement).value;
-  if (petalSystem) {
-    petalSystem.visible = (val === "on");
-  }
+  updateWeatherSystem(val);
 });
 
 document.getElementById("setting-petals-count")?.addEventListener("input", (e) => {

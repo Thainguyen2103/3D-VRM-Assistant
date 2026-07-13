@@ -167,9 +167,9 @@
                 <div class="control-row">
                     <label title="Độ phân giải bóng đổ. Càng cao bóng càng nét nhưng tốn FPS" data-i18n="settings.shadow">Bóng đổ (Shadow):</label>
                     <select id="setting-shadow">
-                        <option value="4k" selected data-i18n="shadow.4k">Siêu nét (4K + Bóng Lá Cây)</option>
+                        <option value="4k" data-i18n="shadow.4k">Siêu nét (4K + Bóng Lá Cây)</option>
                         <option value="2k" data-i18n="shadow.2k">Cao (2K)</option>
-                        <option value="1k" data-i18n="shadow.1k">Trung bình (1K)</option>
+                        <option value="1k" selected data-i18n="shadow.1k">Trung bình (1K)</option>
                         <option value="720p" data-i18n="shadow.720p">Thấp (720p)</option>
                         <option value="off" data-i18n="shadow.off">Tắt bóng đổ</option>
                     </select>
@@ -177,26 +177,38 @@
                 <div class="control-row">
                     <label title="Độ phân giải render của toàn bộ khung hình" data-i18n="settings.res">Độ phân giải (Resolution):</label>
                     <select id="setting-pixel-ratio">
-                        <option value="4k" selected data-i18n="res.4k">4K (Siêu nét)</option>
+                        <option value="4k" data-i18n="res.4k">4K (Siêu nét)</option>
                         <option value="2k" data-i18n="res.2k">2K (Cao)</option>
-                        <option value="1k" data-i18n="res.1k">1080p (Tiêu chuẩn)</option>
+                        <option value="1k" selected data-i18n="res.1k">1080p (Tiêu chuẩn)</option>
                         <option value="720p" data-i18n="res.720p">720p (Chống Lag)</option>
                     </select>
                 </div>
             </div>
 
             <div class="panel-section">
-                <h3 data-i18n="settings.env">Môi Trường & Hiệu Ứng</h3>
-                <div class="control-row" style="flex-direction: column; align-items: stretch; gap: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label data-i18n="settings.petals">Hoa Anh Đào rơi:</label>
-                        <select id="setting-petals-toggle" style="width: 100px;">
-                            <option value="on" selected data-i18n="petals.on">Bật</option>
-                            <option value="off" data-i18n="petals.off">Tắt</option>
-                        </select>
-                    </div>
-                    <label style="margin-top: 5px; color: #555; font-size: 0.85rem;"><span data-i18n="settings.petal_density">Mật độ hoa:</span> <strong id="petal-count-display">80</strong> <span data-i18n="settings.petal_unit">cánh</span></label>
-                    <input type="range" id="setting-petals-count" min="10" max="300" value="80" step="10">
+                <h3 style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;" data-i18n="settings.env">Môi Trường & Hiệu Ứng</h3>
+                <div class="control-row">
+                    <label data-i18n="settings.time">Thời gian:</label>
+                    <select id="setting-time">
+                        <option value="auto" data-i18n="time.auto">Tự động (Theo máy tính)</option>
+                        <option value="morning" data-i18n="time.morning">Buổi Sáng</option>
+                        <option value="noon" data-i18n="time.noon">Buổi Trưa</option>
+                        <option value="sunset" data-i18n="time.sunset">Hoàng Hôn</option>
+                        <option value="night" data-i18n="time.night">Ban Đêm</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <label data-i18n="settings.weather">Thời tiết:</label>
+                    <select id="setting-weather">
+                        <option value="petals" data-i18n="weather.petals">Hoa Anh Đào</option>
+                        <option value="clear" data-i18n="weather.clear">Trời trong</option>
+                        <option value="rain" data-i18n="weather.rain">Mưa rơi</option>
+                        <option value="snow" data-i18n="weather.snow">Tuyết rơi</option>
+                    </select>
+                </div>
+                <div class="control-row" style="flex-direction: column; align-items: flex-start; gap: 5px;">
+                    <label><span data-i18n="settings.petal_density">Mật độ hạt:</span> <span id="petal-count-display">80</span> <span data-i18n="settings.petal_unit">hạt</span></label>
+                    <input type="range" id="setting-petals-count" min="0" max="300" step="10" value="80" style="width: 100%;">
                 </div>
             </div>
         </div> <!-- End tab-settings -->
