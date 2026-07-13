@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { scene, camera, renderer, controls } from './scene/setup';
-import { initEnvironment } from './scene/environment';
+import { initEnvironment, updateTimeOfDay } from './scene/environment';
 import { updateWeatherAnimation, updateWeatherSystem } from './scene/weather';
 import { initVRM, updateVRM } from './vrm/VRMManager';
 import { initUI } from './ui/UIManager';
@@ -10,6 +10,7 @@ import "./style.css";
 
 // Khởi tạo môi trường mặc định
 initEnvironment('petals');
+updateTimeOfDay('auto');
 
 // Gọi tạo UI, Gán các sự kiện
 initUI();

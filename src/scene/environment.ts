@@ -8,7 +8,16 @@ const envLoader = new GLTFLoader();
 
 export function updateTimeOfDay(timeMode: string) {
   const body = document.body;
-  if (timeMode === 'morning') {
+  let actualTimeMode = timeMode;
+  if (timeMode === 'auto') {
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 10) actualTimeMode = 'morning';
+    else if (hour >= 10 && hour < 16) actualTimeMode = 'noon';
+    else if (hour >= 16 && hour < 19) actualTimeMode = 'sunset';
+    else actualTimeMode = 'night';
+  }
+
+  if (actualTimeMode === 'morning') {
     (scene.fog as THREE.FogExp2).color.set('#fff1eb');
     ambientLight.color.set('#ffffff');
     ambientLight.intensity = 1.0;
@@ -42,7 +51,7 @@ export function updateTimeOfDay(timeMode: string) {
     body.style.background = 'linear-gradient(to bottom, #101230 0%, #202040 100%)';
   }
 
-  const isNight = (timeMode === 'night');
+  const isNight = (actualTimeMode === 'night');
   lanternLights.forEach(light => {
     light.intensity = isNight ? 15.0 : 0.0;
     light.castShadow = isNight; 
