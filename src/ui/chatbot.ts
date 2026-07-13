@@ -1,5 +1,5 @@
 export let chatHistory: any[] = [];
-export const BACKEND_URL = "http://localhost:3000"; // Hoặc url backend thật
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export function setupChatbot() {
   const input = document.getElementById("chat-input") as HTMLInputElement;
