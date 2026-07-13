@@ -1130,7 +1130,7 @@ const petalMaterial = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide // Để ảnh hiển thị khi lật xoay mặt sau
 });
 
-const petalSystem = new THREE.InstancedMesh(petalGeometry, petalMaterial, MAX_PETALS);
+const petalSystem = new THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>(petalGeometry, petalMaterial, MAX_PETALS);
 petalSystem.count = currentPetalCount; // Chỉ render số lượng theo cài đặt
 const dummy = new THREE.Object3D(); // Dùng để tính toán ma trận xoay
 scene.add(petalSystem);
