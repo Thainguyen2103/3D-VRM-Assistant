@@ -427,12 +427,20 @@ export function updateVRM(deltaTime: number, time: number) {
     // 1. Cập nhật animation một lần với đủ deltaTime (set pose xương từ clip)
     if (currentMixer) currentMixer.update(deltaTime);
 
-    // 2. Hiệu chỉnh chân KHI animation đang phát (áp dụng 1 lần duy nhất, không lặp)
-    if (currentAction && currentVrm.humanoid) {
+    // 2. Hiệu chỉnh chân và tay KHI animation đang phát (áp dụng 1 lần duy nhất)
+    // CỰC KỲ QUAN TRỌNG: Chỉ áp dụng khi isRunning() == true. Nếu không rotation sẽ bị cộng dồn vô hạn khi animation dừng!
+    if (currentAction && currentAction.isRunning() && currentVrm.humanoid) {
+      // Ép cánh tay khuỳnh ra để bù trừ khác biệt tỷ lệ Mixamo vs Anime
+      const leftArm = currentVrm.humanoid.getNormalizedBoneNode("leftUpperArm");
+      const rightArm = currentVrm.humanoid.getNormalizedBoneNode("rightUpperArm");
+      if (leftArm) leftArm.rotation.z += 0.25;
+      if (rightArm) rightArm.rotation.z -= 0.25;
+
       const leftLeg = currentVrm.humanoid.getNormalizedBoneNode("leftUpperLeg");
       const rightLeg = currentVrm.humanoid.getNormalizedBoneNode("rightUpperLeg");
       if (leftLeg) leftLeg.rotation.z += 0.05;
       if (rightLeg) rightLeg.rotation.z -= 0.05;
+
       // Bắt buộc cập nhật World Matrix để spring bones dùng đúng vị trí xương
       currentVrm.scene.updateMatrixWorld();
     }
