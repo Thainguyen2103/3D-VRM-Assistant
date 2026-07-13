@@ -25,7 +25,7 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.intensity = 2.0;
     hemiLight.intensity = 1.0;
     body.style.background = 'linear-gradient(to bottom, #fff1eb 0%, #ace0f9 100%)';
-  } else if (timeMode === 'noon') {
+  } else if (actualTimeMode === 'noon') {
     (scene.fog as THREE.FogExp2).color.set('#e0f7fa');
     ambientLight.color.set('#ffffff');
     ambientLight.intensity = 1.2;
@@ -33,7 +33,7 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.intensity = 2.5;
     hemiLight.intensity = 1.2;
     body.style.background = 'linear-gradient(to bottom, #e0f7fa 0%, #80d0c7 100%)';
-  } else if (timeMode === 'sunset') {
+  } else if (actualTimeMode === 'sunset') {
     (scene.fog as THREE.FogExp2).color.set('#ffb28b');
     ambientLight.color.set('#ffb28b');
     ambientLight.intensity = 0.4; 
@@ -41,7 +41,7 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.intensity = 2.0;
     hemiLight.intensity = 0.4; 
     body.style.background = 'linear-gradient(to bottom, #ffb28b 0%, #d47e8c 100%)';
-  } else if (timeMode === 'night') {
+  } else if (actualTimeMode === 'night') {
     (scene.fog as THREE.FogExp2).color.set('#101230');
     ambientLight.color.set('#5a5a8a');
     ambientLight.intensity = 0.3; 
