@@ -68,9 +68,8 @@ window.addEventListener("resize", () => {
 
 // --- AFK LOGIC ---
 // Di chuột thông thường KHÔNG reset AFK (người dùng vẫn "đang rảnh")
-// Dùng 'start' (không phải 'change') để chỉ fire khi user thực sự kéo/zoom camera
-// (controls.change với enableDamping fire mỗi frame -> sẽ làm hỏng AFK timer)
-controls.addEventListener("start", stopIdleOnCameraMove);
+// Chỉ khi camera THAY ĐỔI GÓC/ZOOM mới dừng animation nhàn rỗi
+controls.addEventListener("change", stopIdleOnCameraMove);
 
 // Click UI hoặc gõ bàn phím -> reset timer (nhưng chỉ dừng idle khi animation xong chu kỳ)
 window.addEventListener("pointerdown", resetAFKTimer);
