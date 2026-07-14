@@ -1,5 +1,5 @@
 import { appState, targetExpressions, poseState, targetPoseState, boneMapping, cameraState, savePoseToHistory, poses } from '../core/state';
-import { loadFBXAnimation, currentVrm } from '../vrm/VRMManager';
+import { loadFBXAnimation, currentVrm, currentMixer } from '../vrm/VRMManager';
 import { updateTimeOfDay } from '../scene/environment';
 import { updateWeatherSystem, setPetalCount } from '../scene/weather';
 import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
@@ -176,9 +176,16 @@ export function initUI() {
   });
 
   window.addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
     if (e.key.toLowerCase() === 't') transformControl.setMode('translate');
     if (e.key.toLowerCase() === 'r') transformControl.setMode('rotate');
     if (e.key.toLowerCase() === 's') transformControl.setMode('scale');
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (currentMixer) {
+        currentMixer.timeScale = currentMixer.timeScale === 0 ? 1 : 0;
+      }
+    }
   });
 
   transformControl.addEventListener('dragging-changed', (event) => {
@@ -229,6 +236,9 @@ export function initUI() {
   };
 
   document.querySelectorAll(".bone-btn").forEach((btn) => {
+    // Không reset active cho các nút đặc biệt (như nút tạm dừng)
+    if (btn.id === "pause-anim-btn") return;
+
     btn.addEventListener("click", (e) => {
       document.querySelectorAll(".bone-btn").forEach((b) => b.classList.remove("active"));
       const target = e.target as HTMLElement;
@@ -238,6 +248,12 @@ export function initUI() {
         (window as any).onBoneSelect(boneName);
       }
     });
+  });
+
+  document.getElementById("pause-anim-btn")?.addEventListener("click", () => {
+    if (currentMixer) {
+      currentMixer.timeScale = currentMixer.timeScale === 0 ? 1 : 0;
+    }
   });
 
   document.getElementById("cam-full")?.addEventListener("click", () => {
