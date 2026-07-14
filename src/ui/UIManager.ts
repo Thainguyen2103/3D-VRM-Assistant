@@ -186,6 +186,30 @@ export function initUI() {
         currentMixer.timeScale = currentMixer.timeScale === 0 ? 1 : 0;
       }
     }
+
+    const obj = transformControl.object;
+    if (obj) {
+      const stepT = 0.001; // 1mm
+      const stepR = Math.PI / 180; // 1 độ
+      const isTrans = transformControl.mode === 'translate';
+      let changed = false;
+
+      if (e.key === 'ArrowRight') { if (isTrans) obj.translateX(stepT); else obj.rotateX(stepR); changed = true; }
+      if (e.key === 'ArrowLeft') { if (isTrans) obj.translateX(-stepT); else obj.rotateX(-stepR); changed = true; }
+      if (e.key === 'ArrowUp') { if (isTrans) obj.translateY(stepT); else obj.rotateY(stepR); changed = true; }
+      if (e.key === 'ArrowDown') { if (isTrans) obj.translateY(-stepT); else obj.rotateY(-stepR); changed = true; }
+      if (e.key === 'PageUp') { if (isTrans) obj.translateZ(stepT); else obj.rotateZ(stepR); changed = true; }
+      if (e.key === 'PageDown') { if (isTrans) obj.translateZ(-stepT); else obj.rotateZ(-stepR); changed = true; }
+
+      if (changed) {
+        e.preventDefault();
+        if (obj === (window as any).violinModel) {
+          console.log(`%c[VIOLIN] %cPosition: set(${obj.position.x.toFixed(3)}, ${obj.position.y.toFixed(3)}, ${obj.position.z.toFixed(3)}) | Rotation: set(${obj.rotation.x.toFixed(3)}, ${obj.rotation.y.toFixed(3)}, ${obj.rotation.z.toFixed(3)})`, "color: #e94560; font-weight: bold", "color: inherit;");
+        } else if (obj === (window as any).bowModel) {
+          console.log(`%c[BOW] %cPosition: set(${obj.position.x.toFixed(3)}, ${obj.position.y.toFixed(3)}, ${obj.position.z.toFixed(3)}) | Rotation: set(${obj.rotation.x.toFixed(3)}, ${obj.rotation.y.toFixed(3)}, ${obj.rotation.z.toFixed(3)})`, "color: #4560e9; font-weight: bold", "color: inherit;");
+        }
+      }
+    }
   });
 
   transformControl.addEventListener('dragging-changed', (event) => {
