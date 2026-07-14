@@ -193,17 +193,17 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
         leftHand.add(violinModel);
         violinModel.visible = true;
         violinModel.scale.set(0.01, 0.01, 0.01);
-        // Căn chỉnh phỏng đoán - bạn có thể tinh chỉnh qua Console
-        violinModel.position.set(-0.05, 0.05, -0.05);
-        violinModel.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
+        // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
+        violinModel.position.set(-0.056, -0.163, -0.028);
+        violinModel.rotation.set(1.513, 0.637, -1.141);
       }
       if (rightHand) {
         rightHand.add(bowModel);
         bowModel.visible = true;
         bowModel.scale.set(0.01, 0.01, 0.01);
-        // Căn chỉnh phỏng đoán
-        bowModel.position.set(0, 0.02, 0);
-        bowModel.rotation.set(0, -Math.PI / 2, 0);
+        // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
+        bowModel.position.set(-0.295, 0.039, 0.150);
+        bowModel.rotation.set(2.687, 1.109, 2.196);
       }
     }
   } else {
