@@ -96,6 +96,8 @@ export const boneMapping = {
   "Đùi Phải": "rightUpperLeg",
   "Đầu Gối Phải": "rightLowerLeg",
   "Bàn Chân Phải": "rightFoot",
+  "Violin": "violin",
+  "Bow": "bow",
 };
 
 export function lerp(start: number, end: number, t: number) {

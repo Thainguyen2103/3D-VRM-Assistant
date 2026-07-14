@@ -175,12 +175,41 @@ export function initUI() {
     document.getElementById(id)?.addEventListener("change", savePoseToHistory);
   });
 
+  window.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 't') transformControl.setMode('translate');
+    if (e.key.toLowerCase() === 'r') transformControl.setMode('rotate');
+    if (e.key.toLowerCase() === 's') transformControl.setMode('scale');
+  });
+
+  transformControl.addEventListener('dragging-changed', (event) => {
+    controls.enabled = !event.value;
+    if (!event.value) { // stopped dragging
+      const obj = transformControl.object;
+      if (obj === (window as any).violinModel) {
+        console.log(`%c[VIOLIN] %cPosition: set(${obj.position.x.toFixed(3)}, ${obj.position.y.toFixed(3)}, ${obj.position.z.toFixed(3)}) | Rotation: set(${obj.rotation.x.toFixed(3)}, ${obj.rotation.y.toFixed(3)}, ${obj.rotation.z.toFixed(3)})`, "color: #e94560; font-weight: bold", "color: inherit;");
+      } else if (obj === (window as any).bowModel) {
+        console.log(`%c[BOW] %cPosition: set(${obj.position.x.toFixed(3)}, ${obj.position.y.toFixed(3)}, ${obj.position.z.toFixed(3)}) | Rotation: set(${obj.rotation.x.toFixed(3)}, ${obj.rotation.y.toFixed(3)}, ${obj.rotation.z.toFixed(3)})`, "color: #4560e9; font-weight: bold", "color: inherit;");
+      }
+    }
+  });
+
   (window as any).onBoneSelect = (val: keyof typeof boneMapping) => {
     appState.activeBone = val;
     if (val === "none") {
       transformControl.detach();
     } else if (currentVrm && currentVrm.humanoid) {
       const boneKey = boneMapping[val];
+      
+      if (boneKey === "violin" || boneKey === "bow") {
+          const m = boneKey === "violin" ? (window as any).violinModel : (window as any).bowModel;
+          if (m) {
+              transformControl.showX = true; transformControl.showY = true; transformControl.showZ = true;
+              transformControl.attach(m);
+              console.log(`Đã chọn ${boneKey}. Ấn phím 'T' để Di chuyển, 'R' để Xoay, 'S' để Phóng to thu nhỏ.`);
+          }
+          return;
+      }
+
       const boneNode = currentVrm.humanoid.getNormalizedBoneNode(boneKey as any);
       if (boneKey && poseState[boneKey]) {
         updateXYZUI(poseState[boneKey].x, poseState[boneKey].y, poseState[boneKey].z);
