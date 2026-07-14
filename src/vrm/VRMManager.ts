@@ -323,6 +323,16 @@ export function updateVRM(deltaTime: number, time: number) {
       violinModel.getWorldPosition(violinWorldPos);
       // Nâng nhẹ điểm target lên 1 chút để vào đúng vị trí ngựa đàn/dây đàn
       violinWorldPos.y += 0.05; 
+      
+      // Khắc phục lỗi lật ngược (Gimbal lock/Flipping):
+      // Gán vector hướng "lên trên" của bowContainer trùng với góc xoay của tay phải.
+      // Nhờ vậy cây vĩ sẽ xoay vặn theo cổ tay thay vì cố gắng giữ thăng bằng theo trục Y của thế giới.
+      if (bowContainer.parent) {
+        const handUp = new THREE.Vector3(0, 1, 0);
+        handUp.transformDirection(bowContainer.parent.matrixWorld);
+        bowContainer.up.copy(handUp);
+      }
+      
       bowContainer.lookAt(violinWorldPos);
     }
 
