@@ -14,6 +14,9 @@ export let currentMixer: THREE.AnimationMixer | null = null;
 export let currentAction: THREE.AnimationAction | null = null;
 export let currentAnimUrl: string = "";
 
+let violinModel: THREE.Object3D | null = null;
+let bowModel: THREE.Object3D | null = null;
+
 const loopOnceAnimations = [
   "Waving.fbx", "Pointing.fbx", "No.fbx", "Clapping.fbx",
   "Blow A Kiss.fbx", "Surprised.fbx", "Shy.fbx", "Thinking.fbx", "angry.fbx", "talk.fbx", "Looking.fbx", "Look Around.fbx"
@@ -65,6 +68,32 @@ export function checkAFK() {
 export function initVRM() {
   const loader = new GLTFLoader();
   loader.register((parser) => new VRMLoaderPlugin(parser));
+
+  loader.load('/Map/stradivari_violin.glb', (gltf) => {
+    violinModel = gltf.scene;
+    violinModel.visible = false;
+    
+    // Đảm bảo cast bóng
+    violinModel.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  });
+
+  loader.load('/Map/violin_bow.glb', (gltf) => {
+    bowModel = gltf.scene;
+    bowModel.visible = false;
+
+    // Đảm bảo cast bóng
+    bowModel.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  });
 
   const loadingElement = document.getElementById("loading");
 
@@ -145,9 +174,36 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   if (url === "") {
     currentAnimUrl = "";
     currentAction = null;
+    if (violinModel) violinModel.visible = false;
+    if (bowModel) bowModel.visible = false;
     return;
   }
   currentAnimUrl = url;
+
+  if (url === "Playing The Violin.fbx") {
+    if (violinModel && bowModel && currentVrm && currentVrm.humanoid) {
+      const leftHand = currentVrm.humanoid.getNormalizedBoneNode("leftHand");
+      const rightHand = currentVrm.humanoid.getNormalizedBoneNode("rightHand");
+      
+      if (leftHand) {
+        leftHand.add(violinModel);
+        violinModel.visible = true;
+        // Căn chỉnh tạm thời - có thể cần tinh chỉnh sau
+        violinModel.position.set(0.05, 0.05, 0.0);
+        violinModel.rotation.set(Math.PI / 2, 0, 0);
+      }
+      if (rightHand) {
+        rightHand.add(bowModel);
+        bowModel.visible = true;
+        // Căn chỉnh tạm thời
+        bowModel.position.set(0, 0.05, 0);
+        bowModel.rotation.set(0, 0, 0);
+      }
+    }
+  } else {
+    if (violinModel) violinModel.visible = false;
+    if (bowModel) bowModel.visible = false;
+  }
 
   loadMixamoAnimation("/animations/" + url, currentVrm).then((clip) => {
     if (!clip) return;
