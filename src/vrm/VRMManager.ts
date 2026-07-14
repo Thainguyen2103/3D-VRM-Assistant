@@ -14,8 +14,9 @@ export let currentMixer: THREE.AnimationMixer | null = null;
 export let currentAction: THREE.AnimationAction | null = null;
 export let currentAnimUrl: string = "";
 
-export let violinModel: THREE.Object3D | null = null;
-export let bowModel: THREE.Object3D | null = null;
+export let violinModel: THREE.Group | null = null;
+export let bowModel: THREE.Group | null = null;
+export let pianoModel: THREE.Group | null = null;
 (window as any).violinModel = null;
 (window as any).bowModel = null;
 
@@ -117,6 +118,34 @@ export function initVRM() {
     });
   });
 
+  loader.load('/Map/grand_piano.glb', (gltf) => {
+    pianoModel = gltf.scene;
+    (window as any).pianoModel = pianoModel;
+    pianoModel.visible = false;
+    scene.add(pianoModel);
+    
+    // Scale and position the piano correctly relative to the character
+    pianoModel.scale.set(1.5, 1.5, 1.5); 
+    pianoModel.position.set(0, 0, 0.5); // Adjust position as needed
+    pianoModel.rotation.set(0, Math.PI, 0); // Face the character
+
+    // Đảm bảo cast bóng
+    pianoModel.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach((m: any) => { m.transparent = true; m.needsUpdate = true; });
+          } else {
+            child.material.transparent = true;
+            child.material.needsUpdate = true;
+          }
+        }
+      }
+    });
+  });
+
   const loadingElement = document.getElementById("loading");
 
   loader.load(
@@ -203,6 +232,9 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (bowModel) {
       bowModel.visible = false;
     }
+    if (pianoModel) {
+      pianoModel.visible = false;
+    }
     if (violinAudio) {
       violinAudio.pause();
     }
@@ -222,6 +254,10 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     violinAudio.currentTime = 0;
     violinAudio.volume = 0;
     violinAudio.play().catch(e => console.error("Lỗi phát nhạc:", e));
+  }
+
+  if (url === "Piano Playing.fbx" && currentAnimUrl !== url) {
+    propScaleAnim = 0;
   }
 
   currentAnimUrl = url;
@@ -263,6 +299,9 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
           } else if (currentAnimUrl === "Playing The Violin.fbx") {
             // Khi animation lặp lại, nó sẽ quay về pose thả tay ban đầu -> cần reset fade in
             propScaleAnim = 0;
+          } else if (currentAnimUrl === "Piano Playing.fbx") {
+            // Khi animation lặp lại, reset fade in cho piano
+            propScaleAnim = 0;
           }
         }
       });
@@ -292,50 +331,6 @@ export function updateVRM(deltaTime: number, time: number) {
   lerpPose(poseState, targetPoseState, 5.0 * deltaTime);
   lerpPose(appState.expressions, targetExpressions, 5.0 * deltaTime);
 
-  // Xử lý chống xuyên váy khi ngồi (Piano)
-  if (currentVrm && currentVrm.springBoneManager) {
-    const isSitting = currentAnimUrl === "Piano Playing.fbx";
-    
-    currentVrm.springBoneManager.joints.forEach((joint: any) => {
-      let isHair = false;
-      let curr = joint.bone;
-      while (curr) {
-        const name = curr.name.toLowerCase();
-        // Bỏ qua tóc, ruy băng, nơ cài đầu
-        if (name.includes('hair') || name.includes('head') || name.includes('tie') || name.includes('ribbon')) {
-          isHair = true;
-          break;
-        }
-        curr = curr.parent;
-      }
-      
-      if (!isHair && joint.settings) {
-        if (!joint.bone.userData) joint.bone.userData = {};
-        const userData = joint.bone.userData;
-        
-        if (isSitting) {
-          if (!userData.origGravityDir) {
-            // Lưu lại hướng trọng lực ban đầu
-            userData.origGravityDir = joint.settings.gravityDir.clone();
-            userData.origGravityPower = joint.settings.gravityPower;
-          }
-          // Đẩy váy về phía trước (Z dương) và hơi nhấc lên (Y dương) để tránh đâm qua đùi
-          joint.settings.gravityDir = new THREE.Vector3(0, 0.5, 1).normalize();
-          joint.settings.gravityPower = 1.0; 
-        } else {
-          // Trả lại trạng thái bình thường
-          if (userData.origGravityDir) {
-            joint.settings.gravityDir = userData.origGravityDir.clone();
-            joint.settings.gravityPower = userData.origGravityPower;
-            
-            delete userData.origGravityDir;
-            delete userData.origGravityPower;
-          }
-        }
-      }
-    });
-  }
-
   // Animate the scale and opacity of violin and bow to hide awkward transitions
   const updateOpacity = (obj: THREE.Object3D, opacity: number) => {
     obj.traverse((c: any) => {
@@ -348,7 +343,7 @@ export function updateVRM(deltaTime: number, time: number) {
 
   // Xác định xem có nên fade out vũ khí hay không
   let isFadingOut = false;
-  if (currentAnimUrl === "Playing The Violin.fbx") {
+  if (currentAnimUrl === "Playing The Violin.fbx" || currentAnimUrl === "Piano Playing.fbx") {
     if (currentAction) {
       const clip = currentAction.getClip();
       const timeLeft = clip.duration - (currentAction.time % clip.duration);
@@ -361,22 +356,32 @@ export function updateVRM(deltaTime: number, time: number) {
     isFadingOut = true;
   }
 
-  if (!isFadingOut && currentAnimUrl === "Playing The Violin.fbx") {
+  if (!isFadingOut && (currentAnimUrl === "Playing The Violin.fbx" || currentAnimUrl === "Piano Playing.fbx")) {
     if (propScaleAnim < 1.0) {
       propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
 
       const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
 
-      if (violinModel) {
-        violinModel.visible = true;
-        violinModel.scale.set(0.009, 0.009, 0.009);
-        updateOpacity(violinModel, ease);
-      }
-      if (bowModel) {
-        bowModel.visible = true;
-        bowModel.scale.set(0.008, 0.008, 0.008);
-        updateOpacity(bowModel, ease);
+      if (currentAnimUrl === "Playing The Violin.fbx") {
+        if (violinModel) {
+          violinModel.visible = true;
+          violinModel.scale.set(0.009, 0.009, 0.009);
+          updateOpacity(violinModel, ease);
+        }
+        if (bowModel) {
+          bowModel.visible = true;
+          bowModel.scale.set(0.008, 0.008, 0.008);
+          updateOpacity(bowModel, ease);
+        }
+      } else if (currentAnimUrl === "Piano Playing.fbx") {
+        if (pianoModel) {
+          pianoModel.visible = true;
+          pianoModel.scale.set(1.5, 1.5, 1.5);
+          // Để piano trồi lên từ dưới đất
+          pianoModel.position.set(0, -1.0 + ease, 0.5);
+          updateOpacity(pianoModel, ease);
+        }
       }
       if (violinAudio) {
         violinAudio.volume = ease;
@@ -389,15 +394,26 @@ export function updateVRM(deltaTime: number, time: number) {
         propScaleAnim = 0.0;
         if (violinModel) violinModel.visible = false;
         if (bowModel) bowModel.visible = false;
+        if (pianoModel) pianoModel.visible = false;
       } else {
         const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
-        if (violinModel) {
-          violinModel.scale.set(0.009, 0.009, 0.009);
-          updateOpacity(violinModel, ease);
+        if (currentAnimUrl === "Playing The Violin.fbx" || isFadingOut) {
+          // Khi đổi animation khác, currentAnimUrl có thể khác, nhưng ta cứ thử fade out cái đang hiện
+          if (violinModel && violinModel.visible) {
+            violinModel.scale.set(0.009, 0.009, 0.009);
+            updateOpacity(violinModel, ease);
+          }
+          if (bowModel && bowModel.visible) {
+            bowModel.scale.set(0.008, 0.008, 0.008);
+            updateOpacity(bowModel, ease);
+          }
         }
-        if (bowModel) {
-          bowModel.scale.set(0.008, 0.008, 0.008);
-          updateOpacity(bowModel, ease);
+        if (currentAnimUrl === "Piano Playing.fbx" || isFadingOut) {
+          if (pianoModel && pianoModel.visible) {
+            pianoModel.scale.set(1.5, 1.5, 1.5);
+            pianoModel.position.set(0, -1.0 + ease, 0.5);
+            updateOpacity(pianoModel, ease);
+          }
         }
         if (violinAudio) {
           violinAudio.volume = ease;
