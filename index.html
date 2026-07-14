@@ -68,8 +68,8 @@
                 <div class="control-row">
                     <label data-i18n="pose.label">Tư thế:</label>
                     <select id="pose-select">
-                        <option value="crossed" data-i18n="pose.crossed">Khoanh tay</option>
-                        <option value="relaxed" data-i18n="pose.relaxed">Thả lỏng</option>
+                        <option value="crossed" data-i18n="pose.crossed" data-icon="users">Khoanh tay</option>
+                        <option value="relaxed" data-i18n="pose.relaxed" data-icon="accessibility">Thả lỏng</option>
                     </select>
                 </div>
             </div>
@@ -182,11 +182,11 @@
                         <span data-i18n="settings.lang">Ngôn Ngữ:</span>
                     </label>
                     <select id="setting-language">
-                        <option value="vi" selected>Tiếng Việt</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                        <option value="zh">中文</option>
-                        <option value="ko">한국어</option>
+                        <option value="vi" selected data-icon="flag">Tiếng Việt</option>
+                        <option value="en" data-icon="flag">English</option>
+                        <option value="ja" data-icon="flag">日本語</option>
+                        <option value="zh" data-icon="flag">中文</option>
+                        <option value="ko" data-icon="flag">한국어</option>
                     </select>
                 </div>
             </div>
@@ -202,11 +202,11 @@
                         <span data-i18n="settings.shadow">Bóng đổ (Shadow):</span>
                     </label>
                     <select id="setting-shadow">
-                        <option value="4k" data-i18n="shadow.4k">Siêu nét (4K + Bóng Lá Cây)</option>
-                        <option value="2k" data-i18n="shadow.2k">Cao (2K)</option>
-                        <option value="1k" selected data-i18n="shadow.1k">Trung bình (1K)</option>
-                        <option value="720p" data-i18n="shadow.720p">Thấp (720p)</option>
-                        <option value="off" data-i18n="shadow.off">Tắt bóng đổ</option>
+                        <option value="4k" data-i18n="shadow.4k" data-icon="sun">Siêu nét (4K + Bóng Lá Cây)</option>
+                        <option value="2k" data-i18n="shadow.2k" data-icon="sun-dim">Cao (2K)</option>
+                        <option value="1k" selected data-i18n="shadow.1k" data-icon="cloud-sun">Trung bình (1K)</option>
+                        <option value="720p" data-i18n="shadow.720p" data-icon="cloud">Thấp (720p)</option>
+                        <option value="off" data-i18n="shadow.off" data-icon="cloud-off">Tắt bóng đổ</option>
                     </select>
                 </div>
                 <div class="control-row">
@@ -215,10 +215,10 @@
                         <span data-i18n="settings.res">Độ phân giải (Resolution):</span>
                     </label>
                     <select id="setting-pixel-ratio">
-                        <option value="4k" data-i18n="res.4k">4K (Siêu nét)</option>
-                        <option value="2k" data-i18n="res.2k">2K (Cao)</option>
-                        <option value="1k" selected data-i18n="res.1k">1080p (Tiêu chuẩn)</option>
-                        <option value="720p" data-i18n="res.720p">720p (Chống Lag)</option>
+                        <option value="4k" data-i18n="res.4k" data-icon="monitor-check">4K (Siêu nét)</option>
+                        <option value="2k" data-i18n="res.2k" data-icon="monitor-dot">2K (Cao)</option>
+                        <option value="1k" selected data-i18n="res.1k" data-icon="monitor">1080p (Tiêu chuẩn)</option>
+                        <option value="720p" data-i18n="res.720p" data-icon="monitor-off">720p (Chống Lag)</option>
                     </select>
                 </div>
             </div>
@@ -234,11 +234,11 @@
                         <span data-i18n="settings.time">Thời gian:</span>
                     </label>
                     <select id="setting-time">
-                        <option value="auto" data-i18n="time.auto">Tự động (Theo máy tính)</option>
-                        <option value="morning" data-i18n="time.morning">Buổi Sáng</option>
-                        <option value="noon" data-i18n="time.noon">Buổi Trưa</option>
-                        <option value="sunset" data-i18n="time.sunset">Hoàng Hôn</option>
-                        <option value="night" data-i18n="time.night">Ban Đêm</option>
+                        <option value="auto" data-i18n="time.auto" data-icon="laptop">Tự động (Theo máy tính)</option>
+                        <option value="morning" data-i18n="time.morning" data-icon="sun">Buổi Sáng</option>
+                        <option value="noon" data-i18n="time.noon" data-icon="sun-medium">Buổi Trưa</option>
+                        <option value="sunset" data-i18n="time.sunset" data-icon="sunset">Hoàng Hôn</option>
+                        <option value="night" data-i18n="time.night" data-icon="moon">Ban Đêm</option>
                     </select>
                 </div>
                 <div class="control-row">
@@ -247,10 +247,10 @@
                         <span data-i18n="settings.weather">Thời tiết:</span>
                     </label>
                     <select id="setting-weather">
-                        <option value="petals" data-i18n="weather.petals">Hoa Anh Đào</option>
-                        <option value="clear" data-i18n="weather.clear">Trời trong</option>
-                        <option value="rain" data-i18n="weather.rain">Mưa rơi</option>
-                        <option value="snow" data-i18n="weather.snow">Tuyết rơi</option>
+                        <option value="petals" data-i18n="weather.petals" data-icon="flower">Hoa Anh Đào</option>
+                        <option value="clear" data-i18n="weather.clear" data-icon="sun">Trời trong</option>
+                        <option value="rain" data-i18n="weather.rain" data-icon="cloud-rain">Mưa rơi</option>
+                        <option value="snow" data-i18n="weather.snow" data-icon="snowflake">Tuyết rơi</option>
                     </select>
                 </div>
                 <div class="control-row" style="flex-direction: column; align-items: flex-start; gap: 5px;">
@@ -272,13 +272,13 @@
                 <div class="control-row">
                     <label data-i18n="face.preset">Khuôn mặt (Cài sẵn):</label>
                     <select id="expression-select">
-                        <option value="neutral" data-i18n="face.neutral">Bình thường</option>
-                        <option value="happy" data-i18n="face.happy">Vui vẻ</option>
-                        <option value="angry" data-i18n="face.angry">Tức giận</option>
-                        <option value="sad" data-i18n="face.sad">Buồn</option>
-                        <option value="relaxed" data-i18n="face.relaxed">Thư giãn</option>
-                        <option value="surprised">Ngạc nhiên</option>
-                        <option value="custom" style="display:none;">Tùy chỉnh</option>
+                        <option value="neutral" data-i18n="face.neutral" data-icon="meh">Bình thường</option>
+                        <option value="happy" data-i18n="face.happy" data-icon="smile">Vui vẻ</option>
+                        <option value="angry" data-i18n="face.angry" data-icon="angry">Tức giận</option>
+                        <option value="sad" data-i18n="face.sad" data-icon="frown">Buồn</option>
+                        <option value="relaxed" data-i18n="face.relaxed" data-icon="smile-plus">Thư giãn</option>
+                        <option value="surprised" data-icon="circle-alert">Ngạc nhiên</option>
+                        <option value="custom" style="display:none;" data-icon="sliders-horizontal">Tùy chỉnh</option>
                     </select>
                 </div>
                 <h4 style="margin: 10px 0 5px 0; font-size: 0.9rem; color: #555;" data-i18n="face.details">Tinh chỉnh chi tiết:</h4>
