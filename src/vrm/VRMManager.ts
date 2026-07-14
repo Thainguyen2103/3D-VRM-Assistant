@@ -256,8 +256,8 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     violinAudio.play().catch(e => console.error("Lỗi phát nhạc:", e));
   }
 
-  if (url === "Piano Playing.fbx" && currentAnimUrl !== url) {
-    propScaleAnim = 0;
+  if (url !== "Piano Playing.fbx") {
+    if (pianoModel) pianoModel.visible = false;
   }
 
   currentAnimUrl = url;
@@ -281,6 +281,12 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
         bowModel.position.set(-0.234, 0.067, 0.168);
         bowModel.rotation.set(2.404, 0.791, -2.915);
       }
+    }
+  } else if (url === "Piano Playing.fbx") {
+    if (pianoModel) {
+      pianoModel.visible = true;
+      pianoModel.scale.set(0.4, 0.4, 0.4);
+      pianoModel.position.set(0, 0, 0.5);
     }
   } else {
     // Không ẩn ngay lập tức, để updateVRM lo việc mờ dần
@@ -356,7 +362,7 @@ export function updateVRM(deltaTime: number, time: number) {
     isFadingOut = true;
   }
 
-  if (!isFadingOut && (currentAnimUrl === "Playing The Violin.fbx" || currentAnimUrl === "Piano Playing.fbx")) {
+  if (!isFadingOut && currentAnimUrl === "Playing The Violin.fbx") {
     if (propScaleAnim < 1.0) {
       propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
@@ -374,13 +380,6 @@ export function updateVRM(deltaTime: number, time: number) {
           bowModel.scale.set(0.008, 0.008, 0.008);
           updateOpacity(bowModel, ease);
         }
-      } else if (currentAnimUrl === "Piano Playing.fbx") {
-        if (pianoModel) {
-          pianoModel.visible = true;
-          pianoModel.scale.set(0.4, 0.4, 0.4);
-          pianoModel.position.set(0, 0, 0.5);
-          updateOpacity(pianoModel, ease);
-        }
       }
       if (violinAudio) {
         violinAudio.volume = ease;
@@ -393,7 +392,6 @@ export function updateVRM(deltaTime: number, time: number) {
         propScaleAnim = 0.0;
         if (violinModel) violinModel.visible = false;
         if (bowModel) bowModel.visible = false;
-        if (pianoModel) pianoModel.visible = false;
       } else {
         const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
         if (currentAnimUrl === "Playing The Violin.fbx" || isFadingOut) {
@@ -405,13 +403,6 @@ export function updateVRM(deltaTime: number, time: number) {
           if (bowModel && bowModel.visible) {
             bowModel.scale.set(0.008, 0.008, 0.008);
             updateOpacity(bowModel, ease);
-          }
-        }
-        if (currentAnimUrl === "Piano Playing.fbx" || isFadingOut) {
-          if (pianoModel && pianoModel.visible) {
-            pianoModel.scale.set(0.02, 0.02, 0.02);
-            pianoModel.position.set(0, 0, 0.5);
-            updateOpacity(pianoModel, ease);
           }
         }
         if (violinAudio) {
