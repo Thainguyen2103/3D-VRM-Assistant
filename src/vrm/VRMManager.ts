@@ -82,6 +82,14 @@ export function initVRM() {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach((m: any) => { m.transparent = true; m.needsUpdate = true; });
+          } else {
+            child.material.transparent = true;
+            child.material.needsUpdate = true;
+          }
+        }
       }
     });
   });
@@ -96,6 +104,14 @@ export function initVRM() {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach((m: any) => { m.transparent = true; m.needsUpdate = true; });
+          } else {
+            child.material.transparent = true;
+            child.material.needsUpdate = true;
+          }
+        }
       }
     });
   });
@@ -246,7 +262,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       currentAction.setLoop(THREE.LoopRepeat, Infinity);
     }
 
-    currentAction.reset().fadeIn(0.5).play();
+    currentAction.reset().fadeIn(3.0).play();
   }).catch((err) => {
     console.error("Lỗi khi tải FBX:", err);
   });
@@ -256,22 +272,33 @@ export function updateVRM(deltaTime: number, time: number) {
   lerpPose(poseState, targetPoseState, 5.0 * deltaTime);
   lerpPose(appState.expressions, targetExpressions, 5.0 * deltaTime);
 
-  // Animate the scale of violin and bow to hide awkward transitions
+  // Animate the scale and opacity of violin and bow to hide awkward transitions
   if (currentAnimUrl === "Playing The Violin.fbx") {
     if (propScaleAnim < 1.0) {
-      propScaleAnim += deltaTime * 1.5; // Takes ~0.66s to fully scale (matches crossfade)
+      propScaleAnim += deltaTime * 0.333; // Takes ~3s to fully scale (matches crossfade)
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
       
       // Smooth step easing for a magical "pop-in" effect
       const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
       
+      const updateOpacity = (obj: THREE.Object3D, opacity: number) => {
+        obj.traverse((c: any) => {
+          if (c.isMesh && c.material) {
+            if (Array.isArray(c.material)) c.material.forEach((m:any) => m.opacity = opacity);
+            else c.material.opacity = opacity;
+          }
+        });
+      };
+
       if (violinModel) {
         const vS = ease * 0.009;
         violinModel.scale.set(vS, vS, vS);
+        updateOpacity(violinModel, ease);
       }
       if (bowModel) {
         const bS = ease * 0.008;
         bowModel.scale.set(bS, bS, bS);
+        updateOpacity(bowModel, ease);
       }
     }
   }
