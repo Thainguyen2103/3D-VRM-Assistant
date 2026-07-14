@@ -16,6 +16,7 @@ export let currentAnimUrl: string = "";
 
 export let violinModel: THREE.Object3D | null = null;
 export let bowModel: THREE.Object3D | null = null;
+export let bowContainer: THREE.Group | null = null;
 (window as any).violinModel = null;
 (window as any).bowModel = null;
 
@@ -96,6 +97,7 @@ export function initVRM() {
 
   loader.load('/Map/violin_bow.glb', (gltf) => {
     bowModel = gltf.scene;
+    bowContainer = new THREE.Group();
     (window as any).bowModel = bowModel;
     bowModel.visible = false;
 
@@ -227,12 +229,18 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
         violinModel.position.set(-0.048, -0.153, -0.059);
         violinModel.rotation.set(2.055, 0.814, -1.411);
       }
-      if (rightHand) {
-        rightHand.add(bowModel);
+      if (rightHand && bowContainer) {
+        rightHand.add(bowContainer);
+        bowContainer.add(bowModel);
         bowModel.visible = true;
-        // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
-        bowModel.position.set(-0.234, 0.067, 0.168);
-        bowModel.rotation.set(2.404, 0.791, -2.915);
+        // Điểm bám (tay cầm vĩ)
+        bowContainer.position.set(-0.234, 0.067, 0.168);
+        
+        // Reset toạ độ của vĩ so với điểm bám
+        bowModel.position.set(0, 0, 0);
+        // Lưu ý: Người dùng sẽ cần ấn 'R' để chỉnh lại góc xoay của bowModel
+        // sao cho thân vĩ trùng với hướng trỏ tới ngựa đàn.
+        bowModel.rotation.set(0, 0, 0);
       }
     }
   } else {
@@ -309,6 +317,15 @@ export function updateVRM(deltaTime: number, time: number) {
   }
 
   if (!isFadingOut && currentAnimUrl === "Playing The Violin.fbx") {
+    // IK Constraint: Ép vĩ luôn trỏ về vị trí đàn violin
+    if (bowContainer && violinModel) {
+      const violinWorldPos = new THREE.Vector3();
+      violinModel.getWorldPosition(violinWorldPos);
+      // Nâng nhẹ điểm target lên 1 chút để vào đúng vị trí ngựa đàn/dây đàn
+      violinWorldPos.y += 0.05; 
+      bowContainer.lookAt(violinWorldPos);
+    }
+
     if (propScaleAnim < 1.0) {
       propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
