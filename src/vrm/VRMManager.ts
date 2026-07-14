@@ -32,6 +32,7 @@ let lastInteractionTime = Date.now();
 export let isAutoIdle = false;
 let shouldStopAutoIdle = false;
 let propScaleAnim = 0;
+let violinAudio: HTMLAudioElement | null = null;
 const AFK_TIMEOUT = 10000; // 10 giây không có tương tác camera -> bắt đầu idle
 
 // Pool animation nhàn rỗi - bao gồm các animation lặp vòng và một lần
@@ -202,11 +203,25 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (bowModel) {
       bowModel.visible = false;
     }
+    if (violinAudio) {
+      violinAudio.pause();
+    }
     return;
+  }
+
+  if (url !== "Playing The Violin.fbx" && violinAudio) {
+    violinAudio.pause();
   }
 
   if (url === "Playing The Violin.fbx" && currentAnimUrl !== url) {
     propScaleAnim = 0;
+    if (!violinAudio) {
+      violinAudio = new Audio("/Sounds/violin_music.mp3");
+      violinAudio.loop = true;
+    }
+    violinAudio.currentTime = 0;
+    violinAudio.volume = 0;
+    violinAudio.play().catch(e => console.error("Lỗi phát nhạc:", e));
   }
 
   currentAnimUrl = url;
@@ -319,6 +334,9 @@ export function updateVRM(deltaTime: number, time: number) {
         bowModel.scale.set(0.008, 0.008, 0.008);
         updateOpacity(bowModel, ease);
       }
+      if (violinAudio) {
+        violinAudio.volume = ease;
+      }
     }
   } else {
     if (propScaleAnim > 0.0) {
@@ -336,6 +354,9 @@ export function updateVRM(deltaTime: number, time: number) {
         if (bowModel) {
           bowModel.scale.set(0.008, 0.008, 0.008);
           updateOpacity(bowModel, ease);
+        }
+        if (violinAudio) {
+          violinAudio.volume = ease;
         }
       }
     }
