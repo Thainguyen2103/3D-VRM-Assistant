@@ -292,6 +292,50 @@ export function updateVRM(deltaTime: number, time: number) {
   lerpPose(poseState, targetPoseState, 5.0 * deltaTime);
   lerpPose(appState.expressions, targetExpressions, 5.0 * deltaTime);
 
+  // Xử lý chống xuyên váy khi ngồi (Piano)
+  if (currentVrm && currentVrm.springBoneManager) {
+    const isSitting = currentAnimUrl === "Piano Playing.fbx";
+    
+    currentVrm.springBoneManager.joints.forEach((joint: any) => {
+      let isHair = false;
+      let curr = joint.bone;
+      while (curr) {
+        const name = curr.name.toLowerCase();
+        // Bỏ qua tóc, ruy băng, nơ cài đầu
+        if (name.includes('hair') || name.includes('head') || name.includes('tie') || name.includes('ribbon')) {
+          isHair = true;
+          break;
+        }
+        curr = curr.parent;
+      }
+      
+      if (!isHair && joint.settings) {
+        if (!joint.bone.userData) joint.bone.userData = {};
+        const userData = joint.bone.userData;
+        
+        if (isSitting) {
+          if (!userData.origGravityDir) {
+            // Lưu lại hướng trọng lực ban đầu
+            userData.origGravityDir = joint.settings.gravityDir.clone();
+            userData.origGravityPower = joint.settings.gravityPower;
+          }
+          // Đẩy váy về phía trước (Z dương) và hơi nhấc lên (Y dương) để tránh đâm qua đùi
+          joint.settings.gravityDir = new THREE.Vector3(0, 0.5, 1).normalize();
+          joint.settings.gravityPower = 1.0; 
+        } else {
+          // Trả lại trạng thái bình thường
+          if (userData.origGravityDir) {
+            joint.settings.gravityDir = userData.origGravityDir.clone();
+            joint.settings.gravityPower = userData.origGravityPower;
+            
+            delete userData.origGravityDir;
+            delete userData.origGravityPower;
+          }
+        }
+      }
+    });
+  }
+
   // Animate the scale and opacity of violin and bow to hide awkward transitions
   const updateOpacity = (obj: THREE.Object3D, opacity: number) => {
     obj.traverse((c: any) => {
