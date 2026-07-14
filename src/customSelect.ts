@@ -1,4 +1,4 @@
-import { createIcons } from 'lucide';
+import { createIcons, icons } from 'lucide';
 
 export function initCustomSelects() {
     const selects = document.querySelectorAll('select');
@@ -76,7 +76,7 @@ export function initCustomSelects() {
             display.appendChild(arrow);
             
             if (iconName) {
-                createIcons({ root: display });
+                createIcons({ icons, root: display, nameAttr: 'data-lucide' });
             }
         };
         updateDisplay();
@@ -123,7 +123,7 @@ export function initCustomSelects() {
                 });
                 optionsList.appendChild(optDiv);
             });
-            createIcons({ root: optionsList });
+            createIcons({ icons, root: optionsList, nameAttr: 'data-lucide' });
         };
         
         buildOptionsList();

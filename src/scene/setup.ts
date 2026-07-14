@@ -21,13 +21,13 @@ renderer.localClippingEnabled = true;
 export const groundClipPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.05);
 
 export const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2('#fff1eb', 0.045);
+scene.fog = new THREE.FogExp2('#fff1eb', 0.015);
 
 export const camera = new THREE.PerspectiveCamera(
   35.0,
   window.innerWidth / window.innerHeight,
   0.1,
-  100.0,
+  500.0,
 );
 camera.position.set(0.0, 1.3, 1.5);
 
@@ -35,6 +35,8 @@ export const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0.0, 1.2, 0.0);
 controls.enablePan = false;
 controls.enableDamping = true;
+controls.maxDistance = 20.0;
+controls.minDistance = 0.3;
 controls.mouseButtons = {
   LEFT: 0, 
   MIDDLE: THREE.MOUSE.DOLLY,
