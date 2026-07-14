@@ -123,9 +123,9 @@ export function initVRM() {
     (window as any).pianoModel = pianoModel;
     pianoModel.visible = false;
     scene.add(pianoModel);
-    
+
     // Scale and position the piano correctly relative to the character
-    pianoModel.scale.set(0.02, 0.02, 0.02); 
+    pianoModel.scale.set(0.02, 0.02, 0.02);
     pianoModel.position.set(0, 0, 0.5); // Adjust position as needed
     pianoModel.rotation.set(0, Math.PI, 0); // Face the character
 
@@ -299,9 +299,6 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
           } else if (currentAnimUrl === "Playing The Violin.fbx") {
             // Khi animation lặp lại, nó sẽ quay về pose thả tay ban đầu -> cần reset fade in
             propScaleAnim = 0;
-          } else if (currentAnimUrl === "Piano Playing.fbx") {
-            // Khi animation lặp lại, reset fade in cho piano
-            propScaleAnim = 0;
           }
         }
       });
@@ -343,7 +340,7 @@ export function updateVRM(deltaTime: number, time: number) {
 
   // Xác định xem có nên fade out vũ khí hay không
   let isFadingOut = false;
-  if (currentAnimUrl === "Playing The Violin.fbx" || currentAnimUrl === "Piano Playing.fbx") {
+  if (currentAnimUrl === "Playing The Violin.fbx") {
     if (currentAction) {
       const clip = currentAction.getClip();
       const timeLeft = clip.duration - (currentAction.time % clip.duration);
@@ -352,6 +349,9 @@ export function updateVRM(deltaTime: number, time: number) {
         isFadingOut = true;
       }
     }
+  } else if (currentAnimUrl === "Piano Playing.fbx") {
+    // Piano không cần fade out trước khi lặp lại, nó sẽ giữ nguyên trạng thái
+    isFadingOut = false;
   } else {
     isFadingOut = true;
   }
@@ -377,7 +377,7 @@ export function updateVRM(deltaTime: number, time: number) {
       } else if (currentAnimUrl === "Piano Playing.fbx") {
         if (pianoModel) {
           pianoModel.visible = true;
-          pianoModel.scale.set(0.02, 0.02, 0.02);
+          pianoModel.scale.set(0.4, 0.4, 0.4);
           pianoModel.position.set(0, 0, 0.5);
           updateOpacity(pianoModel, ease);
         }
