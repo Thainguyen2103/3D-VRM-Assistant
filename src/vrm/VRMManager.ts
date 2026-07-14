@@ -16,7 +16,6 @@ export let currentAnimUrl: string = "";
 
 export let violinModel: THREE.Object3D | null = null;
 export let bowModel: THREE.Object3D | null = null;
-export let bowContainer: THREE.Group | null = null;
 (window as any).violinModel = null;
 (window as any).bowModel = null;
 
@@ -97,7 +96,6 @@ export function initVRM() {
 
   loader.load('/Map/violin_bow.glb', (gltf) => {
     bowModel = gltf.scene;
-    bowContainer = new THREE.Group();
     (window as any).bowModel = bowModel;
     bowModel.visible = false;
 
@@ -200,19 +198,15 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     propScaleAnim = 0;
     if (violinModel) {
       violinModel.visible = false;
-      violinModel.scale.set(0, 0, 0);
     }
     if (bowModel) {
       bowModel.visible = false;
-      bowModel.scale.set(0, 0, 0);
     }
     return;
   }
 
   if (url === "Playing The Violin.fbx" && currentAnimUrl !== url) {
     propScaleAnim = 0;
-    if (violinModel) violinModel.scale.set(0, 0, 0);
-    if (bowModel) bowModel.scale.set(0, 0, 0);
   }
 
   currentAnimUrl = url;
@@ -229,18 +223,12 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
         violinModel.position.set(-0.048, -0.153, -0.059);
         violinModel.rotation.set(2.055, 0.814, -1.411);
       }
-      if (rightHand && bowContainer) {
-        rightHand.add(bowContainer);
-        bowContainer.add(bowModel);
+      if (rightHand) {
+        rightHand.add(bowModel);
         bowModel.visible = true;
-        // Điểm bám (tay cầm vĩ)
-        bowContainer.position.set(-0.234, 0.067, 0.168);
-        
-        // Reset toạ độ của vĩ so với điểm bám
-        bowModel.position.set(0, 0, 0);
-        // Lưu ý: Người dùng sẽ cần ấn 'R' để chỉnh lại góc xoay của bowModel
-        // sao cho thân vĩ trùng với hướng trỏ tới ngựa đàn.
-        bowModel.rotation.set(0, 0, 0);
+        // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
+        bowModel.position.set(-0.234, 0.067, 0.168);
+        bowModel.rotation.set(2.404, 0.791, -2.915);
       }
     }
   } else {
@@ -258,10 +246,8 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
             isAutoIdle = false;
             loadFBXAnimation(""); // Trở về trạng thái tĩnh ngay khi vừa hết chu kỳ
           } else if (currentAnimUrl === "Playing The Violin.fbx") {
-            // Khi animation lặp lại, nó sẽ quay về pose thả tay ban đầu -> cần reset scale
+            // Khi animation lặp lại, nó sẽ quay về pose thả tay ban đầu -> cần reset fade in
             propScaleAnim = 0;
-            if (violinModel) violinModel.scale.set(0, 0, 0);
-            if (bowModel) bowModel.scale.set(0, 0, 0);
           }
         }
       });
@@ -317,25 +303,6 @@ export function updateVRM(deltaTime: number, time: number) {
   }
 
   if (!isFadingOut && currentAnimUrl === "Playing The Violin.fbx") {
-    // IK Constraint: Ép vĩ luôn trỏ về vị trí đàn violin
-    if (bowContainer && violinModel) {
-      const violinWorldPos = new THREE.Vector3();
-      violinModel.getWorldPosition(violinWorldPos);
-      // Nâng nhẹ điểm target lên 1 chút để vào đúng vị trí ngựa đàn/dây đàn
-      violinWorldPos.y += 0.05; 
-      
-      // Khắc phục lỗi lật ngược (Gimbal lock/Flipping):
-      // Gán vector hướng "lên trên" của bowContainer trùng với góc xoay của tay phải.
-      // Nhờ vậy cây vĩ sẽ xoay vặn theo cổ tay thay vì cố gắng giữ thăng bằng theo trục Y của thế giới.
-      if (bowContainer.parent) {
-        const handUp = new THREE.Vector3(0, 1, 0);
-        handUp.transformDirection(bowContainer.parent.matrixWorld);
-        bowContainer.up.copy(handUp);
-      }
-      
-      bowContainer.lookAt(violinWorldPos);
-    }
-
     if (propScaleAnim < 1.0) {
       propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
@@ -344,14 +311,12 @@ export function updateVRM(deltaTime: number, time: number) {
 
       if (violinModel) {
         violinModel.visible = true;
-        const vS = ease * 0.009;
-        violinModel.scale.set(vS, vS, vS);
+        violinModel.scale.set(0.009, 0.009, 0.009);
         updateOpacity(violinModel, ease);
       }
       if (bowModel) {
         bowModel.visible = true;
-        const bS = ease * 0.008;
-        bowModel.scale.set(bS, bS, bS);
+        bowModel.scale.set(0.008, 0.008, 0.008);
         updateOpacity(bowModel, ease);
       }
     }
@@ -365,13 +330,11 @@ export function updateVRM(deltaTime: number, time: number) {
       } else {
         const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
         if (violinModel) {
-          const vS = ease * 0.009;
-          violinModel.scale.set(vS, vS, vS);
+          violinModel.scale.set(0.009, 0.009, 0.009);
           updateOpacity(violinModel, ease);
         }
         if (bowModel) {
-          const bS = ease * 0.008;
-          bowModel.scale.set(bS, bS, bS);
+          bowModel.scale.set(0.008, 0.008, 0.008);
           updateOpacity(bowModel, ease);
         }
       }
