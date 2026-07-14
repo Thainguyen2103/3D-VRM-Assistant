@@ -490,8 +490,8 @@ export function updateVRM(deltaTime: number, time: number) {
     if (currentMixer) currentMixer.update(deltaTime);
 
     // 2. Hiệu chỉnh chân và tay KHI animation đang phát (áp dụng 1 lần duy nhất)
-    // CỰC KỲ QUAN TRỌNG: Chỉ áp dụng khi isRunning() == true. Nếu không rotation sẽ bị cộng dồn vô hạn khi animation dừng!
-    if (currentAction && currentAction.isRunning() && currentVrm.humanoid) {
+    // CỰC KỲ QUAN TRỌNG: Chỉ áp dụng khi isRunning() == true VÀ timeScale > 0. Nếu không rotation sẽ bị cộng dồn vô hạn khi animation dừng!
+    if (currentAction && currentAction.isRunning() && currentMixer && currentMixer.timeScale > 0 && currentVrm.humanoid) {
       // Ép cánh tay khuỳnh ra để bù trừ khác biệt tỷ lệ Mixamo vs Anime
       const leftArm = currentVrm.humanoid.getNormalizedBoneNode("leftUpperArm");
       const rightArm = currentVrm.humanoid.getNormalizedBoneNode("rightUpperArm");
