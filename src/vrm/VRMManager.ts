@@ -195,9 +195,6 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   if (url === "") {
     currentAnimUrl = "";
     currentAction = null;
-    propScaleAnim = 0;
-    if (violinModel) violinModel.visible = false;
-    if (bowModel) bowModel.visible = false;
     return;
   }
 
@@ -230,8 +227,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       }
     }
   } else {
-    if (violinModel) violinModel.visible = false;
-    if (bowModel) bowModel.visible = false;
+    // Không ẩn ngay lập tức, để updateVRM lo việc mờ dần
   }
 
   loadMixamoAnimation("/animations/" + url, currentVrm).then((clip) => {
@@ -273,22 +269,21 @@ export function updateVRM(deltaTime: number, time: number) {
   lerpPose(appState.expressions, targetExpressions, 5.0 * deltaTime);
 
   // Animate the scale and opacity of violin and bow to hide awkward transitions
+  const updateOpacity = (obj: THREE.Object3D, opacity: number) => {
+    obj.traverse((c: any) => {
+      if (c.isMesh && c.material) {
+        if (Array.isArray(c.material)) c.material.forEach((m: any) => m.opacity = opacity);
+        else c.material.opacity = opacity;
+      }
+    });
+  };
+
   if (currentAnimUrl === "Playing The Violin.fbx") {
     if (propScaleAnim < 1.0) {
       propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
 
-      // Smooth step easing for a magical "pop-in" effect
       const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
-
-      const updateOpacity = (obj: THREE.Object3D, opacity: number) => {
-        obj.traverse((c: any) => {
-          if (c.isMesh && c.material) {
-            if (Array.isArray(c.material)) c.material.forEach((m: any) => m.opacity = opacity);
-            else c.material.opacity = opacity;
-          }
-        });
-      };
 
       if (violinModel) {
         const vS = ease * 0.009;
@@ -299,6 +294,27 @@ export function updateVRM(deltaTime: number, time: number) {
         const bS = ease * 0.008;
         bowModel.scale.set(bS, bS, bS);
         updateOpacity(bowModel, ease);
+      }
+    }
+  } else {
+    if (propScaleAnim > 0.0) {
+      propScaleAnim -= deltaTime * 0.2; // Fade out over 5s
+      if (propScaleAnim <= 0.0) {
+        propScaleAnim = 0.0;
+        if (violinModel) violinModel.visible = false;
+        if (bowModel) bowModel.visible = false;
+      } else {
+        const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
+        if (violinModel) {
+          const vS = ease * 0.009;
+          violinModel.scale.set(vS, vS, vS);
+          updateOpacity(violinModel, ease);
+        }
+        if (bowModel) {
+          const bS = ease * 0.008;
+          bowModel.scale.set(bS, bS, bS);
+          updateOpacity(bowModel, ease);
+        }
       }
     }
   }
