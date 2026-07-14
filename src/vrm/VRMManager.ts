@@ -188,6 +188,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       if (leftHand) {
         leftHand.add(violinModel);
         violinModel.visible = true;
+        violinModel.scale.set(0.01, 0.01, 0.01);
         // Căn chỉnh tạm thời - có thể cần tinh chỉnh sau
         violinModel.position.set(0.05, 0.05, 0.0);
         violinModel.rotation.set(Math.PI / 2, 0, 0);
@@ -195,6 +196,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       if (rightHand) {
         rightHand.add(bowModel);
         bowModel.visible = true;
+        bowModel.scale.set(0.01, 0.01, 0.01);
         // Căn chỉnh tạm thời
         bowModel.position.set(0, 0.05, 0);
         bowModel.rotation.set(0, 0, 0);
