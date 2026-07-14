@@ -177,9 +177,18 @@ export function initUI() {
 
   window.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-    if (e.key.toLowerCase() === 't') transformControl.setMode('translate');
-    if (e.key.toLowerCase() === 'r') transformControl.setMode('rotate');
-    if (e.key.toLowerCase() === 's') transformControl.setMode('scale');
+    if (e.key.toLowerCase() === 't') {
+      transformControl.setMode('translate');
+      transformControl.showX = true; transformControl.showY = true; transformControl.showZ = true;
+    }
+    if (e.key.toLowerCase() === 'r') {
+      transformControl.setMode('rotate');
+      transformControl.showX = true; transformControl.showY = true; transformControl.showZ = true;
+    }
+    if (e.key.toLowerCase() === 's') {
+      transformControl.setMode('scale');
+      transformControl.showX = false; transformControl.showY = false; transformControl.showZ = false;
+    }
     if (e.code === 'Space') {
       e.preventDefault();
       if (currentMixer) {
