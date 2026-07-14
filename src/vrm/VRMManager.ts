@@ -16,7 +16,6 @@ export let currentAnimUrl: string = "";
 
 export let violinModel: THREE.Object3D | null = null;
 export let bowModel: THREE.Object3D | null = null;
-export let bowContainer: THREE.Object3D | null = null;
 (window as any).violinModel = null;
 (window as any).bowModel = null;
 
@@ -220,11 +219,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
         violinModel.rotation.set(2.055, 0.814, -1.411);
       }
       if (rightHand) {
-        if (!bowContainer) {
-          bowContainer = new THREE.Object3D();
-        }
-        bowContainer.add(bowModel);
-        rightHand.add(bowContainer);
+        rightHand.add(bowModel);
         bowModel.visible = true;
         // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
         bowModel.position.set(-0.234, 0.067, 0.168);
@@ -312,26 +307,17 @@ export function updateVRM(deltaTime: number, time: number) {
       const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
 
       if (violinModel) {
+        violinModel.visible = true;
         const vS = ease * 0.009;
         violinModel.scale.set(vS, vS, vS);
         updateOpacity(violinModel, ease);
       }
       if (bowModel) {
+        bowModel.visible = true;
         const bS = ease * 0.008;
         bowModel.scale.set(bS, bS, bS);
         updateOpacity(bowModel, ease);
       }
-    }
-    
-    // Make the bow point towards the violin's bridge EVERY FRAME
-    if (violinModel && bowContainer) {
-      if (!(window as any).bridgeOffset) {
-        // Khởi tạo vị trí ngựa đàn tương đối (có thể tuỳ chỉnh qua console)
-        (window as any).bridgeOffset = new THREE.Vector3(0.0, 0.05, -0.2);
-      }
-      const bridgePosWorld = new THREE.Vector3().copy((window as any).bridgeOffset);
-      violinModel.localToWorld(bridgePosWorld);
-      bowContainer.lookAt(bridgePosWorld);
     }
   } else {
     if (propScaleAnim > 0.0) {
