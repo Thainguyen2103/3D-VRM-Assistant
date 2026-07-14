@@ -21,17 +21,21 @@ initVRM();
 // Cập nhật cấu hình form drop-down
 initCustomSelects();
 
-const clock = new THREE.Clock();
+let lastTime = performance.now();
+let elapsedTime = 0;
 
 function animate() {
   requestAnimationFrame(animate);
-  let delta = clock.getDelta();
+  const now = performance.now();
+  let delta = (now - lastTime) / 1000;
+  lastTime = now;
   
   if (delta > 0.1) {
     delta = 1 / 60;
   }
 
-  const time = clock.elapsedTime;
+  elapsedTime += delta;
+  const time = elapsedTime;
 
   updateWeatherAnimation(delta, time);
   updateVRM(delta, time);

@@ -106,7 +106,7 @@ export function initVRM() {
     (gltf) => {
       const vrm = gltf.userData.vrm;
       VRMUtils.removeUnnecessaryVertices(gltf.scene);
-      VRMUtils.removeUnnecessaryJoints(gltf.scene);
+      VRMUtils.combineSkeletons(gltf.scene);
       
       vrm.scene.traverse((obj: any) => {
         obj.frustumCulled = false;

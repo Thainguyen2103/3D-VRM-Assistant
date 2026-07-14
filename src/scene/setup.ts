@@ -15,7 +15,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(1.0);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.localClippingEnabled = true;
 
 export const groundClipPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.05);
