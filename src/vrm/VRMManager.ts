@@ -31,6 +31,7 @@ let currentHeadPitch = 0;
 let lastInteractionTime = Date.now();
 export let isAutoIdle = false;
 let shouldStopAutoIdle = false;
+let propScaleAnim = 0;
 const AFK_TIMEOUT = 10000; // 10 giây không có tương tác camera -> bắt đầu idle
 
 // Pool animation nhàn rỗi - bao gồm các animation lặp vòng và một lần
@@ -178,10 +179,18 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   if (url === "") {
     currentAnimUrl = "";
     currentAction = null;
+    propScaleAnim = 0;
     if (violinModel) violinModel.visible = false;
     if (bowModel) bowModel.visible = false;
     return;
   }
+  
+  if (url === "Playing The Violin.fbx" && currentAnimUrl !== url) {
+    propScaleAnim = 0;
+    if (violinModel) violinModel.scale.set(0, 0, 0);
+    if (bowModel) bowModel.scale.set(0, 0, 0);
+  }
+  
   currentAnimUrl = url;
 
   if (url === "Playing The Violin.fbx") {
@@ -192,7 +201,6 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       if (leftHand) {
         leftHand.add(violinModel);
         violinModel.visible = true;
-        violinModel.scale.set(0.009, 0.009, 0.009);
         // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
         violinModel.position.set(-0.048, -0.153, -0.059);
         violinModel.rotation.set(2.055, 0.814, -1.411);
@@ -200,7 +208,6 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       if (rightHand) {
         rightHand.add(bowModel);
         bowModel.visible = true;
-        bowModel.scale.set(0.008, 0.008, 0.008);
         // Căn chỉnh dựa trên thông số đã căn chỉnh trong quá trình chạy
         bowModel.position.set(-0.234, 0.067, 0.168);
         bowModel.rotation.set(2.404, 0.791, -2.915);
@@ -248,6 +255,26 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
 export function updateVRM(deltaTime: number, time: number) {
   lerpPose(poseState, targetPoseState, 5.0 * deltaTime);
   lerpPose(appState.expressions, targetExpressions, 5.0 * deltaTime);
+
+  // Animate the scale of violin and bow to hide awkward transitions
+  if (currentAnimUrl === "Playing The Violin.fbx") {
+    if (propScaleAnim < 1.0) {
+      propScaleAnim += deltaTime * 1.5; // Takes ~0.66s to fully scale (matches crossfade)
+      if (propScaleAnim > 1.0) propScaleAnim = 1.0;
+      
+      // Smooth step easing for a magical "pop-in" effect
+      const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
+      
+      if (violinModel) {
+        const vS = ease * 0.009;
+        violinModel.scale.set(vS, vS, vS);
+      }
+      if (bowModel) {
+        const bS = ease * 0.008;
+        bowModel.scale.set(bS, bS, bS);
+      }
+    }
+  }
 
   if (currentVrm) {
     if (currentVrm.humanoid) {
