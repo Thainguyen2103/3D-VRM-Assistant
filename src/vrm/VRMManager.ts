@@ -383,7 +383,8 @@ export function updateVRM(deltaTime: number, time: number) {
         }
       }
 
-      if (head) {
+      const shouldApplyAdditive = !currentAction || (currentMixer && currentMixer.timeScale > 0);
+      if (head && shouldApplyAdditive) {
         head.rotation.x += currentHeadPitch;
         head.rotation.y += currentHeadYaw;
       }
