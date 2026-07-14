@@ -180,6 +180,7 @@ p {
   bottom: 20px;
   width: 360px;
   max-height: none;
+  transition: top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   padding: 20px;
@@ -190,8 +191,12 @@ p {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   transform-origin: bottom left; /* Thu về góc dưới bên trái nơi có icon Cài đặt */
+}
+
+#control-panel.shifted-up {
+  top: 80px;
 }
 
 /* Tùy chỉnh thanh cuộn cho webkit */

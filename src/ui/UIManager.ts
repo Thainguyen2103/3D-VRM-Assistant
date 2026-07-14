@@ -282,8 +282,20 @@ export function initUI() {
     const closeBtn = document.getElementById(closeBtnId);
     const openBtn = document.getElementById(openBtnId);
     if (panel && closeBtn && openBtn) {
-      closeBtn.addEventListener('click', () => { panel.classList.add('panel-hidden'); openBtn.style.display = 'flex'; });
-      openBtn.addEventListener('click', () => { panel.classList.remove('panel-hidden'); openBtn.style.display = 'none'; });
+      closeBtn.addEventListener('click', () => { 
+        panel.classList.add('panel-hidden'); 
+        openBtn.style.display = 'flex'; 
+        if (panelId === 'ui') {
+          document.getElementById('control-panel')?.classList.add('shifted-up');
+        }
+      });
+      openBtn.addEventListener('click', () => { 
+        panel.classList.remove('panel-hidden'); 
+        openBtn.style.display = 'none'; 
+        if (panelId === 'ui') {
+          document.getElementById('control-panel')?.classList.remove('shifted-up');
+        }
+      });
     }
   }
   setupPanelToggle('ui', 'close-ui', 'open-ui');
