@@ -115,7 +115,10 @@
                     <button class="anim-btn bone-btn" data-anim="Crying.fbx" data-i18n="action.cry">Khóc lóc</button>
                 </div>
 
-                <button class="anim-btn bone-btn" style="background: #e94560; width: 100%; margin-top: 5px;" data-anim="" data-i18n="btn.stop_anim">⏹️ Dừng Mọi Hành Động</button>
+                <button class="anim-btn bone-btn" style="background: #e94560; width: 100%; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px;" data-anim="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pause"><rect x="14" y="3" width="5" height="18" rx="1"/><rect x="5" y="3" width="5" height="18" rx="1"/></svg>
+                    <span data-i18n="btn.stop_anim">Dừng Mọi Hành Động</span>
+                </button>
             </div>
 
         <div class="panel-section">
@@ -162,7 +165,10 @@
             <div class="panel-section">
                 <h3 data-i18n="settings.ui">Giao Diện</h3>
                 <div class="control-row">
-                    <label data-i18n="settings.lang">Ngôn Ngữ:</label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                        <span data-i18n="settings.lang">Ngôn Ngữ:</span>
+                    </label>
                     <select id="setting-language">
                         <option value="vi" selected>Tiếng Việt</option>
                         <option value="en">English</option>
@@ -199,7 +205,10 @@
             <div class="panel-section">
                 <h3 style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;" data-i18n="settings.env">Môi Trường & Hiệu Ứng</h3>
                 <div class="control-row">
-                    <label data-i18n="settings.time">Thời gian:</label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <span data-i18n="settings.time">Thời gian:</span>
+                    </label>
                     <select id="setting-time">
                         <option value="auto" data-i18n="time.auto">Tự động (Theo máy tính)</option>
                         <option value="morning" data-i18n="time.morning">Buổi Sáng</option>
@@ -209,7 +218,10 @@
                     </select>
                 </div>
                 <div class="control-row">
-                    <label data-i18n="settings.weather">Thời tiết:</label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                        <span data-i18n="settings.weather">Thời tiết:</span>
+                    </label>
                     <select id="setting-weather">
                         <option value="petals" data-i18n="weather.petals">Hoa Anh Đào</option>
                         <option value="clear" data-i18n="weather.clear">Trời trong</option>
