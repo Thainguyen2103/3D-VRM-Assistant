@@ -195,6 +195,15 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   if (url === "") {
     currentAnimUrl = "";
     currentAction = null;
+    propScaleAnim = 0;
+    if (violinModel) {
+      violinModel.visible = false;
+      violinModel.scale.set(0, 0, 0);
+    }
+    if (bowModel) {
+      bowModel.visible = false;
+      bowModel.scale.set(0, 0, 0);
+    }
     return;
   }
 
