@@ -284,7 +284,22 @@ export function updateVRM(deltaTime: number, time: number) {
     });
   };
 
+  // Xác định xem có nên fade out vũ khí hay không
+  let isFadingOut = false;
   if (currentAnimUrl === "Playing The Violin.fbx") {
+    if (currentAction) {
+      const clip = currentAction.getClip();
+      const timeLeft = clip.duration - (currentAction.time % clip.duration);
+      // Bắt đầu fade out 5 giây trước khi animation lặp lại
+      if (timeLeft <= 5.0) {
+        isFadingOut = true;
+      }
+    }
+  } else {
+    isFadingOut = true;
+  }
+
+  if (!isFadingOut && currentAnimUrl === "Playing The Violin.fbx") {
     if (propScaleAnim < 1.0) {
       propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
