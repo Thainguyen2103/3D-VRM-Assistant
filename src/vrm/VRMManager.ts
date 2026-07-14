@@ -220,7 +220,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       violinAudio.loop = true;
     }
     violinAudio.currentTime = 0;
-    violinAudio.volume = 1.0;
+    violinAudio.volume = 0;
     violinAudio.play().catch(e => console.error("Lỗi phát nhạc:", e));
   }
 
@@ -334,6 +334,9 @@ export function updateVRM(deltaTime: number, time: number) {
         bowModel.scale.set(0.008, 0.008, 0.008);
         updateOpacity(bowModel, ease);
       }
+      if (violinAudio) {
+        violinAudio.volume = ease;
+      }
     }
   } else {
     if (propScaleAnim > 0.0) {
@@ -351,6 +354,9 @@ export function updateVRM(deltaTime: number, time: number) {
         if (bowModel) {
           bowModel.scale.set(0.008, 0.008, 0.008);
           updateOpacity(bowModel, ease);
+        }
+        if (violinAudio) {
+          violinAudio.volume = ease;
         }
       }
     }
