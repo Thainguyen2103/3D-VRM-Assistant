@@ -235,11 +235,17 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (!currentMixer) {
       currentMixer = new THREE.AnimationMixer(currentVrm!.scene);
       currentMixer.addEventListener("loop", (e: any) => {
-        // Nếu người dùng đã thao tác lại và đang đợi hết khủng hình của auto-idle
-        if (shouldStopAutoIdle && e.action === currentAction) {
-          shouldStopAutoIdle = false;
-          isAutoIdle = false;
-          loadFBXAnimation(""); // Trở về trạng thái tĩnh ngay khi vừa hết chu kỳ
+        if (e.action === currentAction) {
+          if (shouldStopAutoIdle) {
+            shouldStopAutoIdle = false;
+            isAutoIdle = false;
+            loadFBXAnimation(""); // Trở về trạng thái tĩnh ngay khi vừa hết chu kỳ
+          } else if (currentAnimUrl === "Playing The Violin.fbx") {
+            // Khi animation lặp lại, nó sẽ quay về pose thả tay ban đầu -> cần reset scale
+            propScaleAnim = 0;
+            if (violinModel) violinModel.scale.set(0, 0, 0);
+            if (bowModel) bowModel.scale.set(0, 0, 0);
+          }
         }
       });
       currentMixer.addEventListener("finished", (e: any) => {
