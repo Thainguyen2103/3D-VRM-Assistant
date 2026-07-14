@@ -19,6 +19,7 @@ export let bowModel: THREE.Group | null = null;
 export let pianoModel: THREE.Group | null = null;
 (window as any).violinModel = null;
 (window as any).bowModel = null;
+export let pianoChairModel: THREE.Group | null = null;
 
 const loopOnceAnimations = [
   "Waving.fbx", "Pointing.fbx", "No.fbx", "Clapping.fbx",
@@ -146,6 +147,23 @@ export function initVRM() {
     });
   });
 
+  loader.load('/Map/piano_chair.glb', (gltf) => {
+    pianoChairModel = gltf.scene;
+    pianoChairModel.visible = false;
+    scene.add(pianoChairModel);
+
+    pianoChairModel.scale.set(1, 1, 1);
+    pianoChairModel.position.set(0, 0, 0); // Điều chỉnh vị trí càng sau càng tốt
+    pianoChairModel.rotation.set(0, Math.PI, 0);
+
+    pianoChairModel.traverse((child: any) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  });
+
   const loadingElement = document.getElementById("loading");
 
   loader.load(
@@ -258,6 +276,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
 
   if (url !== "Piano Playing.fbx") {
     if (pianoModel) pianoModel.visible = false;
+    if (pianoChairModel) pianoChairModel.visible = false;
   }
 
   currentAnimUrl = url;
@@ -285,8 +304,11 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   } else if (url === "Piano Playing.fbx") {
     if (pianoModel) {
       pianoModel.visible = true;
-      pianoModel.scale.set(0.4, 0.4, 0.4);
-      pianoModel.position.set(0, 0, 0.5);
+      pianoModel.scale.set(1.1, 1.1, 1.1);
+      pianoModel.position.set(0, 0, 0.57);
+    }
+    if (pianoChairModel) {
+      pianoChairModel.visible = true;
     }
   } else {
     // Không ẩn ngay lập tức, để updateVRM lo việc mờ dần
@@ -392,6 +414,8 @@ export function updateVRM(deltaTime: number, time: number) {
         propScaleAnim = 0.0;
         if (violinModel) violinModel.visible = false;
         if (bowModel) bowModel.visible = false;
+        if (pianoModel) pianoModel.visible = false;
+        if (pianoChairModel) pianoChairModel.visible = false;
       } else {
         const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
         if (currentAnimUrl === "Playing The Violin.fbx" || isFadingOut) {
