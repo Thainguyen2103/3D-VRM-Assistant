@@ -43,6 +43,7 @@ export function initCustomSelects() {
             
             display.innerHTML = '';
             const iconName = selectedOption.getAttribute('data-icon');
+            const flagName = selectedOption.getAttribute('data-flag');
             if (iconName) {
                 const iconEl = document.createElement('i');
                 iconEl.setAttribute('data-lucide', iconName);
@@ -50,6 +51,16 @@ export function initCustomSelects() {
                 display.style.alignItems = 'center';
                 display.style.gap = '8px';
                 display.appendChild(iconEl);
+            } else if (flagName) {
+                const imgEl = document.createElement('img');
+                imgEl.src = `https://flagcdn.com/w20/${flagName}.png`;
+                imgEl.style.width = '20px';
+                imgEl.style.height = 'auto';
+                imgEl.style.borderRadius = '2px';
+                display.style.display = 'flex';
+                display.style.alignItems = 'center';
+                display.style.gap = '8px';
+                display.appendChild(imgEl);
             } else {
                 display.style.display = '';
                 display.style.alignItems = '';
@@ -94,6 +105,7 @@ export function initCustomSelects() {
                 optDiv.className = 'custom-select-option' + (index === select.selectedIndex ? ' selected' : '');
                 
                 const iconName = option.getAttribute('data-icon');
+                const flagName = option.getAttribute('data-flag');
                 if (iconName) {
                     const iconEl = document.createElement('i');
                     iconEl.setAttribute('data-lucide', iconName);
@@ -101,6 +113,16 @@ export function initCustomSelects() {
                     optDiv.style.alignItems = 'center';
                     optDiv.style.gap = '8px';
                     optDiv.appendChild(iconEl);
+                } else if (flagName) {
+                    const imgEl = document.createElement('img');
+                    imgEl.src = `https://flagcdn.com/w20/${flagName}.png`;
+                    imgEl.style.width = '20px';
+                    imgEl.style.height = 'auto';
+                    imgEl.style.borderRadius = '2px';
+                    optDiv.style.display = 'flex';
+                    optDiv.style.alignItems = 'center';
+                    optDiv.style.gap = '8px';
+                    optDiv.appendChild(imgEl);
                 }
                 
                 const textSpan = document.createElement('span');
