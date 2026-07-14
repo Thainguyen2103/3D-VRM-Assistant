@@ -187,7 +187,7 @@ export function initUI() {
     }
     if (e.key.toLowerCase() === 's') {
       transformControl.setMode('scale');
-      transformControl.showX = false; transformControl.showY = false; transformControl.showZ = false;
+      transformControl.showX = true; transformControl.showY = true; transformControl.showZ = true;
     }
     if (e.code === 'Space') {
       e.preventDefault();
