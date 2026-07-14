@@ -125,7 +125,7 @@ export function initVRM() {
     scene.add(pianoModel);
     
     // Scale and position the piano correctly relative to the character
-    pianoModel.scale.set(1.5, 1.5, 1.5); 
+    pianoModel.scale.set(0.02, 0.02, 0.02); 
     pianoModel.position.set(0, 0, 0.5); // Adjust position as needed
     pianoModel.rotation.set(0, Math.PI, 0); // Face the character
 
@@ -377,9 +377,8 @@ export function updateVRM(deltaTime: number, time: number) {
       } else if (currentAnimUrl === "Piano Playing.fbx") {
         if (pianoModel) {
           pianoModel.visible = true;
-          pianoModel.scale.set(1.5, 1.5, 1.5);
-          // Để piano trồi lên từ dưới đất
-          pianoModel.position.set(0, -1.0 + ease, 0.5);
+          pianoModel.scale.set(0.02, 0.02, 0.02);
+          pianoModel.position.set(0, 0, 0.5);
           updateOpacity(pianoModel, ease);
         }
       }
@@ -410,8 +409,8 @@ export function updateVRM(deltaTime: number, time: number) {
         }
         if (currentAnimUrl === "Piano Playing.fbx" || isFadingOut) {
           if (pianoModel && pianoModel.visible) {
-            pianoModel.scale.set(1.5, 1.5, 1.5);
-            pianoModel.position.set(0, -1.0 + ease, 0.5);
+            pianoModel.scale.set(0.02, 0.02, 0.02);
+            pianoModel.position.set(0, 0, 0.5);
             updateOpacity(pianoModel, ease);
           }
         }
