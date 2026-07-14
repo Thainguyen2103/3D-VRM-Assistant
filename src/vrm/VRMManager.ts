@@ -76,7 +76,7 @@ export function initVRM() {
     violinModel = gltf.scene;
     (window as any).violinModel = violinModel;
     violinModel.visible = false;
-    
+
     // Đảm bảo cast bóng
     violinModel.traverse((child: any) => {
       if (child.isMesh) {
@@ -124,7 +124,7 @@ export function initVRM() {
       const vrm = gltf.userData.vrm;
       VRMUtils.removeUnnecessaryVertices(gltf.scene);
       VRMUtils.combineSkeletons(gltf.scene);
-      
+
       vrm.scene.traverse((obj: any) => {
         obj.frustumCulled = false;
         if (obj.isMesh) {
@@ -140,7 +140,7 @@ export function initVRM() {
         vrm.springBoneManager.colliderGroups.forEach((group: any) => {
           group.colliders.forEach((collider: any) => {
             if (collider.shape && collider.shape.radius) {
-              collider.shape.radius *= 10; 
+              collider.shape.radius *= 10;
             }
           });
         });
@@ -157,8 +157,8 @@ export function initVRM() {
       if (vrm.humanoid) {
         const leftArm = vrm.humanoid.getNormalizedBoneNode("leftUpperArm");
         const rightArm = vrm.humanoid.getNormalizedBoneNode("rightUpperArm");
-        if (leftArm) leftArm.rotation.z = 1.2; 
-        if (rightArm) rightArm.rotation.z = -1.2; 
+        if (leftArm) leftArm.rotation.z = 1.2;
+        if (rightArm) rightArm.rotation.z = -1.2;
       }
 
       vrm.lookAt.target = lookAtTarget;
@@ -200,20 +200,20 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (bowModel) bowModel.visible = false;
     return;
   }
-  
+
   if (url === "Playing The Violin.fbx" && currentAnimUrl !== url) {
     propScaleAnim = 0;
     if (violinModel) violinModel.scale.set(0, 0, 0);
     if (bowModel) bowModel.scale.set(0, 0, 0);
   }
-  
+
   currentAnimUrl = url;
 
   if (url === "Playing The Violin.fbx") {
     if (violinModel && bowModel && currentVrm && currentVrm.humanoid) {
       const leftHand = currentVrm.humanoid.getNormalizedBoneNode("leftHand");
       const rightHand = currentVrm.humanoid.getNormalizedBoneNode("rightHand");
-      
+
       if (leftHand) {
         leftHand.add(violinModel);
         violinModel.visible = true;
@@ -248,7 +248,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       });
       currentMixer.addEventListener("finished", (e: any) => {
         if (e.action === currentAction && currentAnimUrl !== "") {
-          loadFBXAnimation(""); 
+          loadFBXAnimation("");
         }
       });
     }
@@ -262,7 +262,7 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       currentAction.setLoop(THREE.LoopRepeat, Infinity);
     }
 
-    currentAction.reset().fadeIn(3.0).play();
+    currentAction.reset().fadeIn(0.5).play();
   }).catch((err) => {
     console.error("Lỗi khi tải FBX:", err);
   });
@@ -275,16 +275,16 @@ export function updateVRM(deltaTime: number, time: number) {
   // Animate the scale and opacity of violin and bow to hide awkward transitions
   if (currentAnimUrl === "Playing The Violin.fbx") {
     if (propScaleAnim < 1.0) {
-      propScaleAnim += deltaTime * 0.333; // Takes ~3s to fully scale (matches crossfade)
+      propScaleAnim += deltaTime * 0.2; // Takes ~5s to fully scale
       if (propScaleAnim > 1.0) propScaleAnim = 1.0;
-      
+
       // Smooth step easing for a magical "pop-in" effect
       const ease = propScaleAnim * propScaleAnim * (3 - 2 * propScaleAnim);
-      
+
       const updateOpacity = (obj: THREE.Object3D, opacity: number) => {
         obj.traverse((c: any) => {
           if (c.isMesh && c.material) {
-            if (Array.isArray(c.material)) c.material.forEach((m:any) => m.opacity = opacity);
+            if (Array.isArray(c.material)) c.material.forEach((m: any) => m.opacity = opacity);
             else c.material.opacity = opacity;
           }
         });
@@ -372,15 +372,15 @@ export function updateVRM(deltaTime: number, time: number) {
         if (hips) { hips.rotation.set(poseState.hips.x * deg2rad, poseState.hips.y * deg2rad, poseState.hips.z * deg2rad); }
         if (leftFoot) { leftFoot.rotation.set(poseState.leftFoot.x * deg2rad, poseState.leftFoot.y * deg2rad, poseState.leftFoot.z * deg2rad); }
         if (rightFoot) { rightFoot.rotation.set(poseState.rightFoot.x * deg2rad, poseState.rightFoot.y * deg2rad, poseState.rightFoot.z * deg2rad); }
-        
+
         if (leftLeg) { leftLeg.rotation.set(poseState.leftUpperLeg.x * deg2rad, poseState.leftUpperLeg.y * deg2rad, poseState.leftUpperLeg.z * deg2rad); }
         if (rightLeg) { rightLeg.rotation.set(poseState.rightUpperLeg.x * deg2rad, poseState.rightUpperLeg.y * deg2rad, poseState.rightUpperLeg.z * deg2rad); }
         if (leftLowerLeg) { leftLowerLeg.rotation.set(poseState.leftLowerLeg.x * deg2rad, poseState.leftLowerLeg.y * deg2rad, poseState.leftLowerLeg.z * deg2rad); }
         if (rightLowerLeg) { rightLowerLeg.rotation.set(poseState.rightLowerLeg.x * deg2rad, poseState.rightLowerLeg.y * deg2rad, poseState.rightLowerLeg.z * deg2rad); }
-        
+
         if (leftLowerArm) { leftLowerArm.rotation.set(poseState.leftLowerArm.x * deg2rad, poseState.leftLowerArm.y * deg2rad, poseState.leftLowerArm.z * deg2rad); }
         if (rightLowerArm) { rightLowerArm.rotation.set(poseState.rightLowerArm.x * deg2rad, poseState.rightLowerArm.y * deg2rad, poseState.rightLowerArm.z * deg2rad); }
-        
+
         if (leftArm) {
           leftArm.rotation.z = poseState.leftUpperArm.z * deg2rad + Math.sin(time) * 0.02;
           leftArm.rotation.x = poseState.leftUpperArm.x * deg2rad;
@@ -507,7 +507,7 @@ export function updateVRM(deltaTime: number, time: number) {
           currentVrm.expressionManager.setValue("happy", Math.max(isHappy, eyeSquint));
         }
       }
-      
+
       const blinkCycle = time % 4.0;
       if (blinkCycle < 0.1 && isHappy < 0.8 && isSad < 0.8 && currentAnimUrl !== "angry.fbx") {
         currentVrm.expressionManager.setValue("blink", 1.0);
