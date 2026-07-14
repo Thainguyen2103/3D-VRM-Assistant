@@ -14,8 +14,10 @@ export let currentMixer: THREE.AnimationMixer | null = null;
 export let currentAction: THREE.AnimationAction | null = null;
 export let currentAnimUrl: string = "";
 
-let violinModel: THREE.Object3D | null = null;
-let bowModel: THREE.Object3D | null = null;
+export let violinModel: THREE.Object3D | null = null;
+export let bowModel: THREE.Object3D | null = null;
+(window as any).violinModel = null;
+(window as any).bowModel = null;
 
 const loopOnceAnimations = [
   "Waving.fbx", "Pointing.fbx", "No.fbx", "Clapping.fbx",
@@ -71,6 +73,7 @@ export function initVRM() {
 
   loader.load('/Map/stradivari_violin.glb', (gltf) => {
     violinModel = gltf.scene;
+    (window as any).violinModel = violinModel;
     violinModel.visible = false;
     
     // Đảm bảo cast bóng
@@ -84,6 +87,7 @@ export function initVRM() {
 
   loader.load('/Map/violin_bow.glb', (gltf) => {
     bowModel = gltf.scene;
+    (window as any).bowModel = bowModel;
     bowModel.visible = false;
 
     // Đảm bảo cast bóng
@@ -189,17 +193,17 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
         leftHand.add(violinModel);
         violinModel.visible = true;
         violinModel.scale.set(0.01, 0.01, 0.01);
-        // Căn chỉnh tạm thời - có thể cần tinh chỉnh sau
-        violinModel.position.set(0.05, 0.05, 0.0);
-        violinModel.rotation.set(Math.PI / 2, 0, 0);
+        // Căn chỉnh phỏng đoán - bạn có thể tinh chỉnh qua Console
+        violinModel.position.set(-0.05, 0.05, -0.05);
+        violinModel.rotation.set(Math.PI / 2, -Math.PI / 2, 0);
       }
       if (rightHand) {
         rightHand.add(bowModel);
         bowModel.visible = true;
         bowModel.scale.set(0.01, 0.01, 0.01);
-        // Căn chỉnh tạm thời
-        bowModel.position.set(0, 0.05, 0);
-        bowModel.rotation.set(0, 0, 0);
+        // Căn chỉnh phỏng đoán
+        bowModel.position.set(0, 0.02, 0);
+        bowModel.rotation.set(0, -Math.PI / 2, 0);
       }
     }
   } else {
