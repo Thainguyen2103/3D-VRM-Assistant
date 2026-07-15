@@ -1,33 +1,29 @@
 import * as THREE from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import { camera } from './setup';
 
 let sky: Sky;
 let sun: THREE.Vector3;
 let stars: THREE.Points;
 let cloudMesh: THREE.InstancedMesh;
-const maxClouds = 25;
+const maxClouds = 150;
 let cloudData: any[] = [];
 
 // Create a simple cloud canvas texture
 function createCloudTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
+    canvas.width = 128;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d')!;
     
-    const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
     grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    grad.addColorStop(0.3, 'rgba(255, 255, 255, 0.8)');
-    grad.addColorStop(0.6, 'rgba(255, 255, 255, 0.2)');
+    grad.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+    grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
     grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
     
     ctx.fillStyle = grad;
-    
-    // Draw a few overlapping circles to form a cloud puff
-    ctx.beginPath(); ctx.arc(128, 110, 60, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(80, 140, 50, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(170, 140, 55, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(128, 150, 70, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(0, 0, 128, 128);
 
     return new THREE.CanvasTexture(canvas);
 }
@@ -73,7 +69,7 @@ export function initSky(scene: THREE.Scene) {
 
     // 3. CLOUDS
     const cloudTex = createCloudTexture();
-    const cloudGeo = new THREE.PlaneGeometry(20, 20);
+    const cloudGeo = new THREE.PlaneGeometry(15, 15);
     const cloudMat = new THREE.MeshBasicMaterial({
         map: cloudTex,
         transparent: true,
@@ -84,26 +80,36 @@ export function initSky(scene: THREE.Scene) {
     });
     cloudMesh = new THREE.InstancedMesh(cloudGeo, cloudMat, maxClouds);
     const dummy = new THREE.Object3D();
+    
+    let currentClusterCenter = new THREE.Vector3();
+    let clusterSpeed = 1.0;
+
     for (let i = 0; i < maxClouds; i++) {
-        // Spread clouds around the sky
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 50 + Math.random() * 100;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        const y = 30 + Math.random() * 40; 
+        if (i % 15 === 0) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 60 + Math.random() * 80;
+            currentClusterCenter.set(
+                Math.cos(angle) * radius,
+                30 + Math.random() * 30, 
+                Math.sin(angle) * radius
+            );
+            clusterSpeed = (0.5 + Math.random() * 1.5) * (Math.random() > 0.5 ? 1 : -1);
+        }
+        
+        const x = currentClusterCenter.x + (Math.random() - 0.5) * 20;
+        const y = currentClusterCenter.y + (Math.random() - 0.5) * 10;
+        const z = currentClusterCenter.z + (Math.random() - 0.5) * 20;
         
         dummy.position.set(x, y, z);
+        dummy.lookAt(0, 0, 0); // Initial orientation
         
-        // Orient planes towards the center of the scene
-        dummy.lookAt(0, 0, 0);
-        
-        const s = 1 + Math.random() * 2.5;
+        const s = 1 + Math.random() * 2.0;
         dummy.scale.set(s, s, s);
         dummy.updateMatrix();
         cloudMesh.setMatrixAt(i, dummy.matrix);
 
         cloudData.push({
-            speed: (0.5 + Math.random() * 1.5) * (Math.random() > 0.5 ? 1 : -1)
+            speed: clusterSpeed
         });
     }
     cloudMesh.instanceMatrix.needsUpdate = true;
@@ -181,7 +187,7 @@ export function animateSky(deltaTime: number) {
         if (position.x < -150) position.x = 150;
 
         dummy.position.copy(position);
-        dummy.rotation.setFromQuaternion(rotation);
+        dummy.lookAt(camera.position); // Billboard to always face camera
         dummy.scale.copy(scale);
         dummy.updateMatrix();
         cloudMesh.setMatrixAt(i, dummy.matrix);
