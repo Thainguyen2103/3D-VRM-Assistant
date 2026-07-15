@@ -313,9 +313,8 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       prePianoCameraTarget.copy(controls.target);
       
       // Chuyển camera sang góc nhìn phù hợp cho piano
-      // TODO: Người dùng sẽ tự điều chỉnh các thông số này sau
-      cameraState.targetPos.set(-1.0, 1.2, 1.5);
-      cameraState.targetTarget.set(0.0, 0.8, 0.5);
+      cameraState.targetPos.set(-5.052, 1.432, -2.140);
+      cameraState.targetTarget.set(0.000, 0.800, 0.500);
       cameraState.isAnimating = true;
     }
     pianoAudio.currentTime = 0;

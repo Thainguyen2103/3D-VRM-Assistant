@@ -17,6 +17,7 @@
     "@pixiv/three-vrm-animation": "^3.5.4",
     "@types/three": "^0.185.0",
     "lil-gui": "^0.21.0",
+    "lucide": "^1.24.0",
     "three": "^0.185.1"
   }
 }
