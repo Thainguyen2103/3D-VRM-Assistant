@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { scene, groundClipPlane, ambientLight, directionalLight, hemiLight } from "./setup";
+import { updateSkyTime } from "./sky";
 
 export const sakuraTrees: THREE.Object3D[] = [];
 export const lanternLights: THREE.PointLight[] = [];
@@ -24,7 +25,6 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.color.set('#ffffff');
     directionalLight.intensity = 2.0;
     hemiLight.intensity = 1.0;
-    body.style.background = 'linear-gradient(to bottom, #fff1eb 0%, #ace0f9 100%)';
   } else if (actualTimeMode === 'noon') {
     (scene.fog as THREE.FogExp2).color.set('#e0f7fa');
     ambientLight.color.set('#ffffff');
@@ -32,7 +32,6 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.color.set('#ffffff');
     directionalLight.intensity = 2.5;
     hemiLight.intensity = 1.2;
-    body.style.background = 'linear-gradient(to bottom, #e0f7fa 0%, #80d0c7 100%)';
   } else if (actualTimeMode === 'sunset') {
     (scene.fog as THREE.FogExp2).color.set('#ffb28b');
     ambientLight.color.set('#ffb28b');
@@ -40,7 +39,6 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.color.set('#ff8a66');
     directionalLight.intensity = 2.0;
     hemiLight.intensity = 0.4; 
-    body.style.background = 'linear-gradient(to bottom, #ffb28b 0%, #d47e8c 100%)';
   } else if (actualTimeMode === 'night') {
     (scene.fog as THREE.FogExp2).color.set('#101230');
     ambientLight.color.set('#5a5a8a');
@@ -48,8 +46,9 @@ export function updateTimeOfDay(timeMode: string) {
     directionalLight.color.set('#b0b0ff');
     directionalLight.intensity = 0.2; 
     hemiLight.intensity = 0.1;
-    body.style.background = 'linear-gradient(to bottom, #101230 0%, #202040 100%)';
   }
+
+  updateSkyTime(actualTimeMode, directionalLight);
 
   const isNight = (actualTimeMode === 'night');
   lanternLights.forEach(light => {

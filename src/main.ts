@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { scene, camera, renderer, controls } from './scene/setup';
 import { initEnvironment, updateTimeOfDay } from './scene/environment';
+import { initSky, animateSky } from './scene/sky';
 import { updateWeatherAnimation, updateWeatherSystem } from './scene/weather';
 import { initVRM, updateVRM, checkAFK, resetAFKTimer, stopIdleOnCameraMove } from './vrm/VRMManager';
 import { initUI } from './ui/UIManager';
@@ -9,6 +10,7 @@ import { cameraState } from './core/state';
 import "./style.css";
 
 // Khởi tạo môi trường mặc định
+initSky(scene);
 initEnvironment('petals');
 updateTimeOfDay('auto');
 
@@ -38,6 +40,7 @@ function animate() {
   const time = elapsedTime;
 
   updateWeatherAnimation(delta, time);
+  animateSky(delta);
   updateVRM(delta, time);
 
   // Kiểm tra AFK tự động
