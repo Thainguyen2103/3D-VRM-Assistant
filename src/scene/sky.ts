@@ -4,7 +4,6 @@ import { camera } from './setup';
 
 let sky: Sky;
 let sun: THREE.Vector3;
-let sun: THREE.Vector3;
 let stars: THREE.Points;
 let cloudMesh: THREE.InstancedMesh;
 let nebulaMesh: THREE.InstancedMesh;
