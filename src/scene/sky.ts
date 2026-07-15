@@ -61,11 +61,12 @@ export function initSky(scene: THREE.Scene) {
     }
     starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     const starsMaterial = new THREE.PointsMaterial({
-        size: 1.5,
+        size: 2.5,
         color: 0xffffff,
         transparent: true,
         opacity: 0,
-        depthWrite: false
+        depthWrite: false,
+        fog: false
     });
     stars = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(stars);
@@ -78,7 +79,8 @@ export function initSky(scene: THREE.Scene) {
         transparent: true,
         opacity: 0.8,
         depthWrite: false,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        fog: false
     });
     cloudMesh = new THREE.InstancedMesh(cloudGeo, cloudMat, maxClouds);
     const dummy = new THREE.Object3D();
@@ -92,8 +94,8 @@ export function initSky(scene: THREE.Scene) {
         
         dummy.position.set(x, y, z);
         
-        // Orient planes somewhat towards camera or general center
-        dummy.lookAt(0, y, 0);
+        // Orient planes towards the center of the scene
+        dummy.lookAt(0, 0, 0);
         
         const s = 1 + Math.random() * 2.5;
         dummy.scale.set(s, s, s);
