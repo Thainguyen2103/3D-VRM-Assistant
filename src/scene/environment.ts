@@ -122,6 +122,10 @@ export function initEnvironment(initialWeather: string) {
           child.receiveShadow = true;
           if (child.material) {
             child.material.clippingPlanes = [groundClipPlane];
+            // Khắc phục lỗi nhìn xuyên thấu vật thể (depth sorting / transparency bug)
+            child.material.transparent = false;
+            child.material.alphaTest = 0.5;
+            child.material.depthWrite = true;
           }
         }
       });
