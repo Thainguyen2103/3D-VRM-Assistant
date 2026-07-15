@@ -4,8 +4,10 @@ import { camera } from './setup';
 
 let sky: Sky;
 let sun: THREE.Vector3;
+let sun: THREE.Vector3;
 let stars: THREE.Points;
 let cloudMesh: THREE.InstancedMesh;
+let nebulaMesh: THREE.InstancedMesh;
 const maxClouds = 150;
 let cloudData: any[] = [];
 
@@ -44,8 +46,9 @@ export function initSky(scene: THREE.Scene) {
 
     // 2. STARS
     const starsGeometry = new THREE.BufferGeometry();
-    const starsCount = 2000;
+    const starsCount = 4000;
     const posArray = new Float32Array(starsCount * 3);
+    const colorArray = new Float32Array(starsCount * 3);
     for(let i=0; i<starsCount*3; i+=3) {
         // Random points on upper hemisphere radius ~ 400
         const r = 400 + Math.random() * 100;
@@ -54,11 +57,19 @@ export function initSky(scene: THREE.Scene) {
         posArray[i] = r * Math.sin(phi) * Math.cos(theta);
         posArray[i+1] = r * Math.cos(phi); // Y up
         posArray[i+2] = r * Math.sin(phi) * Math.sin(theta);
+        
+        const starType = Math.random();
+        let sr=1, sg=1, sb=1;
+        if(starType > 0.8) { sr=0.8; sg=0.9; sb=1.0; } // Blueish
+        else if(starType > 0.6) { sr=1.0; sg=0.9; sb=0.8; } // Yellowish
+        else if(starType > 0.95) { sr=1.0; sg=0.6; sb=0.6; } // Reddish
+        colorArray[i]=sr; colorArray[i+1]=sg; colorArray[i+2]=sb;
     }
     starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    starsGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
     const starsMaterial = new THREE.PointsMaterial({
         size: 2.5,
-        color: 0xffffff,
+        vertexColors: true,
         transparent: true,
         opacity: 0,
         depthWrite: false,
@@ -67,8 +78,53 @@ export function initSky(scene: THREE.Scene) {
     stars = new THREE.Points(starsGeometry, starsMaterial);
     scene.add(stars);
 
+    // 2.5 NEBULA / MILKY WAY
+    const cloudTex = createCloudTexture(); // Reuse soft puff
+    const nebulaGeo = new THREE.PlaneGeometry(120, 120);
+    const nebulaMat = new THREE.MeshBasicMaterial({
+        map: cloudTex,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        fog: false,
+        side: THREE.DoubleSide
+    });
+    const nebulaCount = 60;
+    nebulaMesh = new THREE.InstancedMesh(nebulaGeo, nebulaMat, nebulaCount);
+    const dummyNebula = new THREE.Object3D();
+    const nebColor = new THREE.Color();
+    const nebColors = [0x4b0082, 0x800080, 0x00008b, 0x8a2be2, 0x191970, 0xff1493];
+
+    for (let i = 0; i < nebulaCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const r = 350; 
+        const bandOffset = (Math.random() - 0.5) * 80; // Spread width of the band
+        const x = Math.cos(theta) * r;
+        const y = Math.sin(theta) * r;
+        const z = bandOffset; 
+        
+        dummyNebula.position.set(x, y, z);
+        dummyNebula.lookAt(0, 0, 0);
+        
+        const s = 1 + Math.random() * 2;
+        dummyNebula.scale.set(s, s * (0.5 + Math.random()*0.5), 1);
+        dummyNebula.rotation.z = Math.random() * Math.PI;
+        
+        dummyNebula.updateMatrix();
+        nebulaMesh.setMatrixAt(i, dummyNebula.matrix);
+        
+        nebColor.setHex(nebColors[Math.floor(Math.random() * nebColors.length)]);
+        nebulaMesh.setColorAt(i, nebColor);
+    }
+    
+    nebulaMesh.rotation.x = Math.PI / 4; 
+    nebulaMesh.rotation.y = Math.PI / 6;
+    nebulaMesh.instanceMatrix.needsUpdate = true;
+    if (nebulaMesh.instanceColor) nebulaMesh.instanceColor.needsUpdate = true;
+    scene.add(nebulaMesh);
+
     // 3. CLOUDS
-    const cloudTex = createCloudTexture();
     const cloudGeo = new THREE.PlaneGeometry(15, 15);
     const cloudMat = new THREE.MeshBasicMaterial({
         map: cloudTex,
@@ -129,12 +185,14 @@ export function updateSkyTime(timeMode: string, directionalLight: THREE.Directio
     const uniforms = sky.material.uniforms;
     const starsMat = stars.material as THREE.PointsMaterial;
     const cloudMat = cloudMesh.material as THREE.MeshBasicMaterial;
+    const nebMat = nebulaMesh.material as THREE.MeshBasicMaterial;
 
     if (timeMode === 'morning') {
         updateSunPosition(15, -90); // East, low
         uniforms['turbidity'].value = 8;
         uniforms['rayleigh'].value = 1;
         starsMat.opacity = 0;
+        nebMat.opacity = 0;
         cloudMat.color.setHex(0xffffff);
         cloudMat.opacity = 0.8;
         directionalLight.position.copy(sun).multiplyScalar(10);
@@ -144,6 +202,7 @@ export function updateSkyTime(timeMode: string, directionalLight: THREE.Directio
         uniforms['turbidity'].value = 2;
         uniforms['rayleigh'].value = 0.2;
         starsMat.opacity = 0;
+        nebMat.opacity = 0;
         cloudMat.color.setHex(0xffffff);
         cloudMat.opacity = 0.4;
         directionalLight.position.copy(sun).multiplyScalar(10);
@@ -153,6 +212,7 @@ export function updateSkyTime(timeMode: string, directionalLight: THREE.Directio
         uniforms['turbidity'].value = 15;
         uniforms['rayleigh'].value = 3;
         starsMat.opacity = 0;
+        nebMat.opacity = 0;
         cloudMat.color.setHex(0xff9966); // Tint clouds orange
         cloudMat.opacity = 0.9;
         directionalLight.position.copy(sun).multiplyScalar(10);
@@ -160,6 +220,7 @@ export function updateSkyTime(timeMode: string, directionalLight: THREE.Directio
     else if (timeMode === 'night') {
         updateSunPosition(-10, 0); // Below horizon
         starsMat.opacity = 1.0;
+        nebMat.opacity = 0.5; // Show nebula
         cloudMat.color.setHex(0x555566);
         cloudMat.opacity = 0.2; // Barely visible clouds at night
         // For night, directional light acts like moonlight
@@ -198,5 +259,8 @@ export function animateSky(deltaTime: number) {
     const starsMat = stars.material as THREE.PointsMaterial;
     if (starsMat.opacity > 0) {
         stars.rotation.y += deltaTime * 0.01;
+        if (nebulaMesh) {
+            nebulaMesh.rotation.y += deltaTime * 0.005; // slowly rotate the whole nebula band
+        }
     }
 }
