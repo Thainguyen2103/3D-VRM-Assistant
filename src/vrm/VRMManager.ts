@@ -275,8 +275,10 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     return;
   }
 
-  if (url !== "Playing The Violin.fbx" && violinAudio) {
-    violinAudio.pause();
+  if (url !== "Playing The Violin.fbx") {
+    if (violinAudio) violinAudio.pause();
+    if (violinModel) violinModel.visible = false;
+    if (bowModel) bowModel.visible = false;
   }
 
   if (url !== "Piano Playing.fbx" && pianoAudio) {
