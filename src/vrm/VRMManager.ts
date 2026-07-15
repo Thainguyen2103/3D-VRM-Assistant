@@ -253,6 +253,9 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (pianoModel) {
       pianoModel.visible = false;
     }
+    if (pianoChairModel) {
+      pianoChairModel.visible = false;
+    }
     if (violinAudio) {
       violinAudio.pause();
     }
@@ -309,8 +312,8 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     }
     if (pianoChairModel) {
       pianoChairModel.visible = true;
-      pianoChairModel.scale.set(0.01, 0.01, 0.01);
-      pianoChairModel.position.set(0, 0, 0);
+      pianoChairModel.scale.set(0.03, 0.03, 0.03);
+      pianoChairModel.position.set(0, 0.2, 0);
     }
   } else {
     // Không ẩn ngay lập tức, để updateVRM lo việc mờ dần
