@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRMLoaderPlugin, VRMUtils, VRM } from "@pixiv/three-vrm";
-import { scene, camera } from '../scene/setup';
-import { appState, targetExpressions, targetPoseState, poseState, lerpPose } from '../core/state';
+import { scene, camera, controls } from '../scene/setup';
+import { appState, targetExpressions, targetPoseState, poseState, lerpPose, cameraState } from '../core/state';
 import { loadMixamoAnimation } from '../loadMixamoAnimation';
 
 export let currentVrm: VRM | undefined;
@@ -37,6 +37,9 @@ let propScaleAnim = 0;
 let violinAudio: HTMLAudioElement | null = null;
 let pianoAudio: HTMLAudioElement | null = null;
 const AFK_TIMEOUT = 10000; // 10 giây không có tương tác camera -> bắt đầu idle
+
+let prePianoCameraPos = new THREE.Vector3();
+let prePianoCameraTarget = new THREE.Vector3();
 
 // Pool animation nhàn rỗi - bao gồm các animation lặp vòng và một lần
 const afkLoopAnims = ["idle.fbx", "Floating.fbx", "dance.fbx", "laugh.fbx"];
@@ -242,6 +245,12 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   }
 
   if (url === "") {
+    if (currentAnimUrl === "Piano Playing.fbx") {
+      // Phục hồi lại camera khi ngừng chơi piano (Dừng mọi hành động)
+      cameraState.targetPos.copy(prePianoCameraPos);
+      cameraState.targetTarget.copy(prePianoCameraTarget);
+      cameraState.isAnimating = true;
+    }
     currentAnimUrl = "";
     currentAction = null;
     propScaleAnim = 0;
@@ -286,12 +295,28 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   }
 
   if (url !== "Piano Playing.fbx") {
+    if (currentAnimUrl === "Piano Playing.fbx") {
+      // Phục hồi lại camera khi ngừng chơi piano
+      cameraState.targetPos.copy(prePianoCameraPos);
+      cameraState.targetTarget.copy(prePianoCameraTarget);
+      cameraState.isAnimating = true;
+    }
     if (pianoModel) pianoModel.visible = false;
     if (pianoChairModel) pianoChairModel.visible = false;
   } else {
     if (!pianoAudio) {
       pianoAudio = new Audio("/Sounds/piano_music.mp3");
       pianoAudio.loop = true;
+      
+      // Lưu lại camera hiện tại
+      prePianoCameraPos.copy(camera.position);
+      prePianoCameraTarget.copy(controls.target);
+      
+      // Chuyển camera sang góc nhìn phù hợp cho piano
+      // TODO: Người dùng sẽ tự điều chỉnh các thông số này sau
+      cameraState.targetPos.set(-1.0, 1.2, 1.5);
+      cameraState.targetTarget.set(0.0, 0.8, 0.5);
+      cameraState.isAnimating = true;
     }
     pianoAudio.currentTime = 0;
     pianoAudio.volume = 1;
