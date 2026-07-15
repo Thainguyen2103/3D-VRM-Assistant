@@ -5,6 +5,7 @@ import { updateWeatherSystem, setPetalCount } from '../scene/weather';
 import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
 import { translations } from '../i18n';
 import { setupChatbot } from './chatbot';
+import { createIcons, icons } from 'lucide';
 
 // Hàm hỗ trợ khóa góc (tránh phi vật lý) nhận vào object {x, y, z} theo độ (degrees)
 const clampBoneDegrees = (
@@ -47,6 +48,11 @@ const clampBoneDegrees = (
 };
 
 export function initUI() {
+  createIcons({
+    icons,
+    nameAttr: 'data-lucide',
+  });
+
   document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
