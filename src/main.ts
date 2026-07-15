@@ -75,6 +75,16 @@ window.addEventListener("resize", () => {
 // Chỉ khi camera THAY ĐỔI GÓC/ZOOM mới dừng animation nhàn rỗi
 controls.addEventListener("change", stopIdleOnCameraMove);
 
+let lastLogTime = 0;
+controls.addEventListener("change", () => {
+  const now = performance.now();
+  if (now - lastLogTime > 500) { // Log each 500ms
+    console.log(`[Camera] targetPos.set(${camera.position.x.toFixed(3)}, ${camera.position.y.toFixed(3)}, ${camera.position.z.toFixed(3)});`);
+    console.log(`[Camera] targetTarget.set(${controls.target.x.toFixed(3)}, ${controls.target.y.toFixed(3)}, ${controls.target.z.toFixed(3)});`);
+    lastLogTime = now;
+  }
+});
+
 // Click UI hoặc gõ bàn phím -> reset timer (nhưng chỉ dừng idle khi animation xong chu kỳ)
 window.addEventListener("pointerdown", resetAFKTimer);
 window.addEventListener("keydown", resetAFKTimer);
