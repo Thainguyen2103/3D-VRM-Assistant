@@ -307,7 +307,9 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (!pianoAudio) {
       pianoAudio = new Audio("/Sounds/piano_music.mp3");
       pianoAudio.loop = true;
-      
+    }
+    
+    if (currentAnimUrl !== "Piano Playing.fbx") {
       // Lưu lại camera hiện tại
       prePianoCameraPos.copy(camera.position);
       prePianoCameraTarget.copy(controls.target);
