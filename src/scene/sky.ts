@@ -39,8 +39,8 @@ export function initSky(scene: THREE.Scene) {
     const uniforms = sky.material.uniforms;
     uniforms['turbidity'].value = 10;
     uniforms['rayleigh'].value = 2;
-    uniforms['mieCoefficient'].value = 0.005;
-    uniforms['mieDirectionalG'].value = 0.8;
+    uniforms['mieCoefficient'].value = 0.002;
+    uniforms['mieDirectionalG'].value = 0.99;
 
     // 2. STARS
     const starsGeometry = new THREE.BufferGeometry();
