@@ -58,7 +58,7 @@ const rainTexture = createRainTexture();
 
 const snowGeometry = new THREE.SphereGeometry(0.015, 6, 6); 
 
-const petalMaterial = new THREE.MeshBasicMaterial({
+const petalMaterial = new THREE.MeshLambertMaterial({
   map: petalTexture,
   transparent: true,
   opacity: 1.0,
@@ -67,7 +67,7 @@ const petalMaterial = new THREE.MeshBasicMaterial({
   side: THREE.DoubleSide 
 });
 
-export const petalSystem = new THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>(petalGeometry, petalMaterial, MAX_PETALS);
+export const petalSystem = new THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshLambertMaterial>(petalGeometry, petalMaterial, MAX_PETALS);
 petalSystem.count = currentPetalCount; 
 const dummy = new THREE.Object3D(); 
 scene.add(petalSystem);
