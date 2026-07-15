@@ -35,6 +35,7 @@ export let isAutoIdle = false;
 let shouldStopAutoIdle = false;
 let propScaleAnim = 0;
 let violinAudio: HTMLAudioElement | null = null;
+let pianoAudio: HTMLAudioElement | null = null;
 const AFK_TIMEOUT = 10000; // 10 giây không có tương tác camera -> bắt đầu idle
 
 // Pool animation nhàn rỗi - bao gồm các animation lặp vòng và một lần
@@ -259,11 +260,18 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     if (violinAudio) {
       violinAudio.pause();
     }
+    if (pianoAudio) {
+      pianoAudio.pause();
+    }
     return;
   }
 
   if (url !== "Playing The Violin.fbx" && violinAudio) {
     violinAudio.pause();
+  }
+
+  if (url !== "Piano Playing.fbx" && pianoAudio) {
+    pianoAudio.pause();
   }
 
   if (url === "Playing The Violin.fbx" && currentAnimUrl !== url) {
@@ -280,6 +288,14 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
   if (url !== "Piano Playing.fbx") {
     if (pianoModel) pianoModel.visible = false;
     if (pianoChairModel) pianoChairModel.visible = false;
+  } else {
+    if (!pianoAudio) {
+      pianoAudio = new Audio("/Sounds/piano_music.mp3");
+      pianoAudio.loop = true;
+    }
+    pianoAudio.currentTime = 0;
+    pianoAudio.volume = 1;
+    pianoAudio.play().catch(e => console.error("Lỗi phát nhạc:", e));
   }
 
   currentAnimUrl = url;
