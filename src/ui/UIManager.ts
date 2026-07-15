@@ -287,11 +287,7 @@ export function initUI() {
     }
   };
 
-  document.querySelectorAll(".bone-btn").forEach((btn) => {
-    // Không reset active cho các nút đặc biệt (như nút tạm dừng)
-    if (btn.id === "pause-anim-btn") return;
-
-    btn.addEventListener("click", (e) => {
+  document.querySelectorAll(".bone-btn").forEach((btn) => {    btn.addEventListener("click", (e) => {
       document.querySelectorAll(".bone-btn").forEach((b) => b.classList.remove("active"));
       const target = e.target as HTMLElement;
       target.classList.add("active");
@@ -302,11 +298,7 @@ export function initUI() {
     });
   });
 
-  document.getElementById("pause-anim-btn")?.addEventListener("click", () => {
-    if (currentMixer) {
-      currentMixer.timeScale = currentMixer.timeScale === 0 ? 1 : 0;
-    }
-  });
+
 
   document.getElementById("cam-full")?.addEventListener("click", () => {
     cameraState.targetPos.set(0.0, 1.0, 3.5);
