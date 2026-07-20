@@ -7,12 +7,16 @@ import { initVRM, updateVRM, checkAFK, resetAFKTimer, stopIdleOnCameraMove } fro
 import { initUI } from './ui/UIManager';
 import { initCustomSelects } from "./customSelect";
 import { cameraState } from './core/state';
+import { initAuth } from './core/auth';
 import "./style.css";
 
 // Khởi tạo môi trường mặc định
 initSky(scene);
 initEnvironment('petals');
 updateTimeOfDay('auto');
+
+// Khởi tạo tính năng Đăng nhập & Hồ sơ
+await initAuth();
 
 // Gọi tạo UI, Gán các sự kiện
 initUI();

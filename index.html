@@ -7,7 +7,78 @@
     <title>3D VRM Assistant</title>
   </head>
   <body>
-    <div id="loading" data-i18n="loading">Đang chuẩn bị Scene...</div>
+    <div id="loading-screen">
+      <div class="loading-content">
+        <div class="loading-progress-container">
+          <div id="loading-progress-bar"></div>
+        </div>
+        <div id="loading-text" data-i18n="loading">Đang tải tài nguyên... 0%</div>
+        <div id="loading-detail"></div>
+      </div>
+    </div>
+    
+    <!-- Auth Modal -->
+    <div id="auth-modal" style="display: none;">
+      <div class="auth-content">
+        <h2>🌸 Kết nối cùng Citlali 🌸</h2>
+        <p style="font-size: 0.85rem;">Đăng nhập để Citlali có thể ghi nhớ những câu chuyện của riêng hai ta nhé!</p>
+        
+        <!-- Màn hình Đăng Nhập -->
+        <div id="login-view" class="auth-form-view">
+          <div class="auth-form">
+            <input type="email" id="login-email" placeholder="Email" />
+            <input type="password" id="login-password" placeholder="Mật khẩu" />
+            <div class="auth-buttons">
+              <button id="btn-login-submit" class="bone-btn" style="width: 100%;">Đăng nhập</button>
+            </div>
+          </div>
+          <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">Chưa có tài khoản? <a href="#" id="link-to-register" style="color: #e94560; text-decoration: none; font-weight: bold;">Đăng ký ngay</a></p>
+        </div>
+
+        <!-- Màn hình Đăng Ký -->
+        <div id="register-view" class="auth-form-view" style="display: none;">
+          <div class="auth-form">
+            <input type="email" id="register-email" placeholder="Email" />
+            <input type="password" id="register-password" placeholder="Mật khẩu" />
+            <input type="password" id="register-password-confirm" placeholder="Nhập lại mật khẩu" />
+            <div class="auth-buttons">
+              <button id="btn-register-submit" class="bone-btn" style="width: 100%; background: #ffe4e1; color: #e94560; border: 2px solid #ffb6c1;">Đăng ký</button>
+            </div>
+          </div>
+          <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">Đã có tài khoản? <a href="#" id="link-to-login" style="color: #e94560; text-decoration: none; font-weight: bold;">Đăng nhập</a></p>
+        </div>
+        
+        <div class="auth-divider">hoặc</div>
+        
+        <button id="btn-google-login" class="bone-btn google-btn">
+          <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Đăng nhập với Google
+        </button>
+        
+        <button id="btn-guest" class="bone-btn guest-btn">Chế độ Khách (Không lưu dữ liệu)</button>
+      </div>
+    </div>
+
+
+    <!-- Profile Menu -->
+    <button id="btn-profile" style="display: none; position: fixed; top: 20px; right: 20px; padding: 6px 16px 6px 6px; border-radius: 30px; background: rgba(255, 240, 245, 0.85); border: 2px solid #ffb6c1; z-index: 100; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(233, 69, 96, 0.15); backdrop-filter: blur(8px); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 15px rgba(233, 69, 96, 0.25)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(233, 69, 96, 0.15)';">
+        <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <img id="btn-profile-avatar" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <svg id="btn-profile-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span style="color: #e94560; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;">Hồ sơ</span>
+    </button>
+    
+    <!-- Login Header Button (For Guest Mode) -->
+    <button id="btn-login-header" style="display: none; position: fixed; top: 20px; right: 20px; padding: 6px 16px 6px 6px; border-radius: 30px; background: rgba(255, 240, 245, 0.85); border: 2px solid #ffb6c1; z-index: 100; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(233, 69, 96, 0.15); backdrop-filter: blur(8px); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 15px rgba(233, 69, 96, 0.25)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(233, 69, 96, 0.15)';">
+        <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        </div>
+        <span style="color: #e94560; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;">Đăng nhập</span>
+    </button>
+    
+    <!-- Profile Modals were moved to profile.html -->
+
     <button class="floating-icon" id="open-ui" style="display: none; top: 20px; left: 20px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-switch-camera-icon lucide-switch-camera"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/><path d="m18 22-3-3 3-3"/><path d="m6 2 3 3-3 3"/></svg>
     </button>
@@ -30,19 +101,38 @@
     <button class="floating-icon" id="open-chat" style="display: none; bottom: 20px; right: 20px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-question-mark-icon lucide-message-circle-question-mark"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
     </button>
-    <div id="chat-ui">
-        <button class="close-btn" id="close-chat" title="Đóng">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
-        </button>
-        <h2 class="chat-title" data-i18n="chat.title">🌸 Citlali Chat 🌸</h2>
-        
-        <div id="chat-history">
-            <div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>
+    <div id="chat-ui-container">
+        <div id="chat-sidebar" class="panel-hidden" style="display: none; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 250px; flex-direction: column; overflow: hidden; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #e94560; font-size: 1.1rem;">Lịch sử Chat</h3>
+                <button id="btn-new-chat" title="Đoạn chat mới" style="background: none; border: none; color: #e94560; cursor: pointer; padding: 5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>
+                </button>
+            </div>
+            <div id="session-list" style="overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                <!-- Sessions will be populated here -->
+            </div>
         </div>
+        
+        <div id="chat-ui" style="position: relative; right: 0; bottom: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #ff9fb2; padding: 8px 12px; border-radius: 12px; margin: 0; box-shadow: 0 3px 8px rgba(255, 159, 178, 0.4);">
+                <button id="toggle-chat-sidebar" title="Mở lịch sử trò chuyện" style="background: none; border: none; color: white; cursor: pointer; padding: 0; display: flex; transition: transform 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                </button>
+                <h2 class="chat-title" data-i18n="chat.title" style="background: none; padding: 0; margin: 0; box-shadow: none;">🌸 Citlali Chat 🌸</h2>
+                <button id="close-chat" title="Đóng Chat" style="background: none; border: none; color: white; cursor: pointer; padding: 0; display: flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            
+            <div id="chat-history">
+                <div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>
+            </div>
 
-        <div class="chat-input-area">
-            <textarea id="chat-input" rows="1" placeholder="Nhập nhanh lên, tôi không rảnh đâu..." data-i18n="chat.placeholder" autocomplete="off"></textarea>
-            <button id="btn-send-chat" class="bone-btn" data-i18n="btn.send">Gửi</button>
+            <div class="chat-input-area">
+                <textarea id="chat-input" rows="1" placeholder="Nhập nhanh lên, tôi không rảnh đâu..." data-i18n="chat.placeholder" autocomplete="off"></textarea>
+                <button id="btn-send-chat" class="bone-btn" data-i18n="btn.send">Gửi</button>
+            </div>
         </div>
     </div>
 

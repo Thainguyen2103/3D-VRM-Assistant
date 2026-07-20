@@ -12,5 +12,13 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/fish-api/, '')
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        profile: './profile.html'
+      }
+    }
   }
 });

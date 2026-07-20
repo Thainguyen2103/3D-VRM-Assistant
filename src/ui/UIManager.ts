@@ -4,7 +4,7 @@ import { updateTimeOfDay } from '../scene/environment';
 import { updateWeatherSystem, setPetalCount } from '../scene/weather';
 import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
 import { translations } from '../i18n';
-import { setupChatbot } from './chatbot';
+import { initAuth } from '../core/auth';
 import { createIcons, icons } from 'lucide';
 
 // Hàm hỗ trợ khóa góc (tránh phi vật lý) nhận vào object {x, y, z} theo độ (degrees)
@@ -394,7 +394,7 @@ export function initUI() {
     }
   }
   setupPanelToggle('ui', 'close-ui', 'open-ui');
-  setupPanelToggle('chat-ui', 'close-chat', 'open-chat');
+  setupPanelToggle('chat-ui-container', 'close-chat', 'open-chat');
   setupPanelToggle('control-panel', 'close-control', 'open-control');
 
   let currentLang = 'vi';
@@ -453,5 +453,5 @@ export function initUI() {
     updateXYZUI(degRot.x, degRot.y, degRot.z);
   });
 
-  setupChatbot();
+  // Bỏ dòng initAuth() ở đây vì đã được gọi trong main.ts
 }

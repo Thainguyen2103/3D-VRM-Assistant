@@ -168,7 +168,33 @@ export function initVRM() {
     });
   });
 
-  const loadingElement = document.getElementById("loading");
+  THREE.DefaultLoadingManager.onProgress = function (url, itemsLoaded, itemsTotal) {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      const progress = Math.round((itemsLoaded / itemsTotal) * 100);
+      const progressBar = document.getElementById('loading-progress-bar');
+      const loadingText = document.getElementById('loading-text');
+      const loadingDetail = document.getElementById('loading-detail');
+      
+      if (progressBar) progressBar.style.width = progress + '%';
+      if (loadingText) loadingText.innerText = `Đang tải tài nguyên... ${progress}%`;
+      if (loadingDetail) {
+        // Lấy tên file từ url
+        const filename = url.split('/').pop() || url;
+        loadingDetail.innerText = `Đang xử lý: ${filename}`;
+      }
+    }
+  };
+
+  THREE.DefaultLoadingManager.onLoad = function () {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.style.opacity = '0';
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 500);
+    }
+  };
 
   loader.load(
     "/model.vrm",
@@ -214,13 +240,9 @@ export function initVRM() {
       }
 
       vrm.lookAt.target = lookAtTarget;
-
-      if (loadingElement) loadingElement.style.display = "none";
     },
     (progress) => {
-      if (loadingElement) {
-        loadingElement.innerText = `Đang tải model 3D... ${Math.round(100.0 * (progress.loaded / progress.total))}%`;
-      }
+      // Dùng DefaultLoadingManager xử lý chung
     },
     (error) => console.error(error),
   );
