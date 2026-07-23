@@ -1,6 +1,6 @@
 export const translations: Record<string, Record<string, string>> = {
   vi: {
-    "loading": "Đang chuẩn bị Scene...",
+    "loading": "Đang tải tài nguyên...",
     "ui.title": "Trợ lý ảo 3D",
     "cam.full": "Toàn Cảnh",
     "cam.half": "Cận (Hông)",
@@ -15,13 +15,13 @@ export const translations: Record<string, Record<string, string>> = {
     "btn.ok": "Đồng ý",
     "btn.cancel": "Hủy",
     "cam.title": "Góc Quay Camera",
-    "loading": "Đang tải tài nguyên...",
+
     "processing": "Đang xử lý:",
     "confirm.reset_settings": "Bạn có chắc chắn muốn khôi phục toàn bộ cấu hình về mặc định?",
     "chat.history": "Lịch sử Chat",
     "chat.new": "Đoạn chat mới",
     "chat.first": "Chat đầu tiên",
-    "chat.initial": "Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)",
+
     "btn.profile": "Hồ sơ",
     "btn.login": "Đăng nhập",
     "tab.body": "Cơ Thể",
@@ -176,7 +176,7 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.reg_success": "Đăng ký thành công!"
   },
   en: {
-    "loading": "Preparing Scene...",
+    "loading": "Loading resources...",
     "ui.title": "3D Virtual Assistant",
     "cam.full": "Full Body",
     "cam.half": "Half Body",
@@ -191,13 +191,13 @@ export const translations: Record<string, Record<string, string>> = {
     "btn.ok": "OK",
     "btn.cancel": "Cancel",
     "cam.title": "Camera Angle",
-    "loading": "Loading resources...",
+
     "processing": "Processing:",
     "confirm.reset_settings": "Are you sure you want to restore all settings to default?",
     "chat.history": "Chat History",
     "chat.new": "New Chat",
     "chat.first": "First Chat",
-    "chat.initial": "What do you want? I'm very busy, make it quick. (￣^￣)",
+
     "btn.profile": "Profile",
     "btn.login": "Login",
     "tab.body": "Body",
@@ -352,7 +352,7 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.reg_success": "Registration successful!"
   },
   ja: {
-    "loading": "シーンを準備中...",
+    "loading": "リソースをロード中...",
     "ui.title": "3D アシスタント",
     "cam.full": "全身",
     "cam.half": "上半身",
@@ -367,13 +367,13 @@ export const translations: Record<string, Record<string, string>> = {
     "btn.ok": "OK",
     "btn.cancel": "キャンセル",
     "cam.title": "カメラアングル",
-    "loading": "リソースをロード中...",
+
     "processing": "処理中:",
     "confirm.reset_settings": "すべての設定をデフォルトに戻してもよろしいですか？",
     "chat.history": "チャット履歴",
     "chat.new": "新しいチャット",
     "chat.first": "最初のチャット",
-    "chat.initial": "何用？忙しいんだけど、手短に言ってよね。(￣^￣)",
+
     "btn.profile": "プロフィール",
     "btn.login": "ログイン",
     "tab.body": "体",
@@ -528,7 +528,7 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.reg_success": "登録成功！"
   },
   zh: {
-    "loading": "正在准备场景...",
+    "loading": "正在加载资源...",
     "ui.title": "3D 虚拟助手",
     "cam.full": "全身",
     "cam.half": "半身",
@@ -543,13 +543,13 @@ export const translations: Record<string, Record<string, string>> = {
     "btn.ok": "确定",
     "btn.cancel": "取消",
     "cam.title": "摄像机角度",
-    "loading": "正在加载资源...",
+
     "processing": "处理中:",
     "confirm.reset_settings": "您确定要将所有设置恢复为默认值吗？",
     "chat.history": "聊天记录",
     "chat.new": "新聊天",
     "chat.first": "第一次聊天",
-    "chat.initial": "叫我干嘛？我很忙的，有事快说。(￣^￣)",
+
     "btn.profile": "个人档案",
     "btn.login": "登录",
     "tab.body": "身体",
@@ -704,7 +704,7 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.reg_success": "注册成功！"
   },
   ko: {
-    "loading": "씬 준비 중...",
+    "loading": "리소스 로드 중...",
     "ui.title": "3D 가상 비서",
     "cam.full": "전신",
     "cam.half": "반신",
@@ -719,13 +719,13 @@ export const translations: Record<string, Record<string, string>> = {
     "btn.ok": "확인",
     "btn.cancel": "취소",
     "cam.title": "카메라 앵글",
-    "loading": "리소스 로드 중...",
+
     "processing": "처리 중:",
     "confirm.reset_settings": "모든 설정을 기본값으로 복원하시겠습니까?",
     "chat.history": "채팅 기록",
     "chat.new": "새 채팅",
     "chat.first": "첫 번째 채팅",
-    "chat.initial": "뭐야? 나 지금 엄청 바쁘니까 용건만 빨리 말해. (￣^￣)",
+
     "btn.profile": "프로필",
     "btn.login": "로그인",
     "tab.body": "몸",
