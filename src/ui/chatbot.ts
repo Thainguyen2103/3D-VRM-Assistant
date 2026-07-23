@@ -1,5 +1,8 @@
 import { currentUser, supabase } from '../core/auth';
 import { getCurrentUserProfile, fetchCurrentUserProfileState } from './profile';
+import { CustomDialog } from './CustomDialog';
+import { t } from '../i18n';
+
 
 export let chatHistory: any[] = [];
 export let currentSessionId: string | null = null;
@@ -36,7 +39,7 @@ export async function loadChatHistory(sessionId: string | null) {
   if (!sessionId) {
       chatHistory = [];
       const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
-      if (historyDiv) historyDiv.innerHTML = '<div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>';
+      if (historyDiv) historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">${t('chat.initial')}</div>`;
       return;
   }
   try {
@@ -48,7 +51,7 @@ export async function loadChatHistory(sessionId: string | null) {
       if (historyDiv) {
           historyDiv.innerHTML = ''; // clear
           if (chatHistory.length === 0) {
-              historyDiv.innerHTML = '<div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)</div>';
+              historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">${t('chat.initial')}</div>`;
           }
           chatHistory.forEach(msg => {
               const msgDiv = document.createElement("div");
@@ -137,7 +140,7 @@ export async function loadSessions() {
             const response = await fetch(`${BACKEND_URL}/api/sessions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUser.id, title: 'Chat đầu tiên' })
+                body: JSON.stringify({ userId: currentUser.id, title: t('chat.first') })
             });
             const data = await response.json();
             if (data) {
@@ -273,7 +276,9 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
             chatHistory: chatHistory,
             sessionId: currentSessionId,
             contextType: contextType,
-            userProfile: getCurrentUserProfile()
+            userProfile: getCurrentUserProfile(),
+            uiLanguage: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
+            voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh'
         };
 
         const response = await fetch(`${BACKEND_URL}/api/proactive-chat`, {
@@ -335,10 +340,10 @@ export async function setupChatbot() {
       btnNewChat.parentNode?.replaceChild(newBtnChat, btnNewChat);
       newBtnChat.addEventListener('click', async () => {
           if (!currentUser) {
-              alert('Vui lòng đăng nhập để tạo đoạn chat mới!');
+              await CustomDialog.alert(t('alert.login_required'));
               return;
           }
-          const title = "Đoạn chat mới";
+          const title = t('chat.new');
           
           try {
               const response = await fetch(`${BACKEND_URL}/api/sessions`, {
@@ -376,7 +381,7 @@ export async function setupChatbot() {
 
     appendMsg(userText, true);
     input.value = "";
-    input.style.height = '46px'; 
+    input.style.height = '70px'; 
     sendBtn.disabled = true;
 
     try {
@@ -384,7 +389,9 @@ export async function setupChatbot() {
         chatHistory: chatHistory,
         userText: userText,
         sessionId: currentSessionId,
-        userProfile: getCurrentUserProfile()
+        userProfile: getCurrentUserProfile(),
+        uiLanguage: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
+        voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh'
       };
 
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
@@ -413,8 +420,8 @@ export async function setupChatbot() {
   sendBtn.addEventListener("click", handleSend);
 
   const resizeInput = () => {
-    input.style.height = '46px'; 
-    input.style.height = (input.scrollHeight) + 'px'; 
+    input.style.height = '70px'; 
+    input.style.height = Math.max(70, input.scrollHeight) + 'px'; 
   };
   input.addEventListener("input", resizeInput);
 

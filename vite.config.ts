@@ -17,7 +17,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: './index.html',
-        profile: './profile.html'
+        profile: './profile.html',
+        login: './login.html'
       }
     }
   }

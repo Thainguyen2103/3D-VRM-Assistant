@@ -5,8 +5,28 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D VRM Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Zen+Maru+Gothic:wght@400;500;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <!-- Font tiếng Trung dễ thương & dễ đọc nhất: LXGW WenKai -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" />
+    <style>
+      /* Chống hiện tượng giật/vỡ giao diện (FOUC) khi chưa tải xong CSS */
+      body {
+        margin: 0;
+        background: #ffe4e1; /* Màu nền chờ */
+        overflow: hidden;
+      }
+      /* Tạm ẩn tất cả UI trừ màn hình loading khi body có class app-loading */
+      body.app-loading > *:not(#loading-screen) {
+        display: none !important;
+      }
+      body.app-loading #loading-screen {
+        display: flex !important;
+      }
+    </style>
   </head>
-  <body>
+  <body class="app-loading">
     <div id="loading-screen">
       <div class="loading-content">
         <div class="loading-progress-container">
@@ -17,47 +37,8 @@
       </div>
     </div>
     
-    <!-- Auth Modal -->
-    <div id="auth-modal" style="display: none;">
-      <div class="auth-content">
-        <h2>🌸 Kết nối cùng Citlali 🌸</h2>
-        <p style="font-size: 0.85rem;">Đăng nhập để Citlali có thể ghi nhớ những câu chuyện của riêng hai ta nhé!</p>
-        
-        <!-- Màn hình Đăng Nhập -->
-        <div id="login-view" class="auth-form-view">
-          <div class="auth-form">
-            <input type="email" id="login-email" placeholder="Email" />
-            <input type="password" id="login-password" placeholder="Mật khẩu" />
-            <div class="auth-buttons">
-              <button id="btn-login-submit" class="bone-btn" style="width: 100%;">Đăng nhập</button>
-            </div>
-          </div>
-          <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">Chưa có tài khoản? <a href="#" id="link-to-register" style="color: #e94560; text-decoration: none; font-weight: bold;">Đăng ký ngay</a></p>
-        </div>
 
-        <!-- Màn hình Đăng Ký -->
-        <div id="register-view" class="auth-form-view" style="display: none;">
-          <div class="auth-form">
-            <input type="email" id="register-email" placeholder="Email" />
-            <input type="password" id="register-password" placeholder="Mật khẩu" />
-            <input type="password" id="register-password-confirm" placeholder="Nhập lại mật khẩu" />
-            <div class="auth-buttons">
-              <button id="btn-register-submit" class="bone-btn" style="width: 100%; background: #ffe4e1; color: #e94560; border: 2px solid #ffb6c1;">Đăng ký</button>
-            </div>
-          </div>
-          <p style="margin-top: 15px; font-size: 0.9rem; color: #555;">Đã có tài khoản? <a href="#" id="link-to-login" style="color: #e94560; text-decoration: none; font-weight: bold;">Đăng nhập</a></p>
-        </div>
-        
-        <div class="auth-divider">hoặc</div>
-        
-        <button id="btn-google-login" class="bone-btn google-btn">
-          <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Đăng nhập với Google
-        </button>
-        
-        <button id="btn-guest" class="bone-btn guest-btn">Chế độ Khách (Không lưu dữ liệu)</button>
-      </div>
-    </div>
+
 
 
     <!-- Profile Menu -->
@@ -66,7 +47,7 @@
             <img id="btn-profile-avatar" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
             <svg id="btn-profile-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <span style="color: #e94560; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;">Hồ sơ</span>
+        <span style="color: #e94560; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;" data-i18n="btn.profile">Hồ sơ</span>
     </button>
     
     <!-- Login Header Button (For Guest Mode) -->
@@ -74,7 +55,7 @@
         <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
         </div>
-        <span style="color: #e94560; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;">Đăng nhập</span>
+        <span style="color: #e94560; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;" data-i18n="btn.login">Đăng nhập</span>
     </button>
     
     <!-- Profile Modals were moved to profile.html -->
@@ -104,8 +85,8 @@
     <div id="chat-ui-container">
         <div id="chat-sidebar" class="panel-hidden" style="display: none; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 250px; flex-direction: column; overflow: hidden; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: #e94560; font-size: 1.1rem;">Lịch sử Chat</h3>
-                <button id="btn-new-chat" title="Đoạn chat mới" style="background: none; border: none; color: #e94560; cursor: pointer; padding: 5px;">
+                <h3 style="margin: 0; color: #e94560; font-size: 1.1rem;" data-i18n="chat.history">Lịch sử Chat</h3>
+                <button id="btn-new-chat" title="Đoạn chat mới" data-i18n-title="chat.new" style="background: none; border: none; color: #e94560; cursor: pointer; padding: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-pen"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>
                 </button>
             </div>
@@ -286,11 +267,23 @@
                         <span data-i18n="settings.lang">Ngôn Ngữ:</span>
                     </label>
                     <select id="setting-language">
-                        <option value="vi" selected data-flag="vn">Tiếng Việt</option>
-                        <option value="en" data-flag="gb">English</option>
-                        <option value="ja" data-flag="jp">日本語</option>
-                        <option value="zh" data-flag="cn">中文</option>
-                        <option value="ko" data-flag="kr">한국어</option>
+                        <option value="vi" selected data-flag="vn" data-i18n="lang.vi">Tiếng Việt</option>
+                        <option value="en" data-flag="gb" data-i18n="lang.en">English</option>
+                        <option value="ja" data-flag="jp" data-i18n="lang.ja">日本語</option>
+                        <option value="zh" data-flag="cn" data-i18n="lang.zh">中文</option>
+                        <option value="ko" data-flag="kr" data-i18n="lang.ko">한국어</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                        <span data-i18n="settings.voice">Giọng nói (Voice):</span>
+                    </label>
+                    <select id="setting-voice">
+                        <option value="zh" selected data-flag="cn" data-i18n="lang.zh">Tiếng Trung</option>
+                        <option value="ja" data-flag="jp" data-i18n="lang.ja">Tiếng Nhật</option>
+                        <option value="en" data-flag="gb" data-i18n="lang.en">English</option>
+                        <option value="vi" data-flag="vn" data-i18n="lang.vi">Tiếng Việt</option>
                     </select>
                 </div>
             </div>
@@ -364,6 +357,11 @@
                     </label>
                     <input type="range" id="setting-petals-count" min="0" max="300" step="10" value="80" style="width: 100%;">
                 </div>
+            </div>
+
+            <div class="panel-section" style="display: flex; gap: 10px; margin-top: 20px; border-top: none;">
+                <button id="btn-save-settings" class="bone-btn" style="flex: 1; background: #e94560;" data-i18n="btn.save_settings">Lưu Cấu Hình</button>
+                <button id="btn-reset-settings" class="bone-btn" style="flex: 1; background: #555;" data-i18n="btn.reset_settings">Mặc Định</button>
             </div>
         </div> <!-- End tab-settings -->
 

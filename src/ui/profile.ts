@@ -1,6 +1,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { supabase, currentUser } from '../core/auth';
+import { applyLanguage, t } from '../i18n';
 
 let cropper: Cropper | null = null;
 let currentAvatarBlob: Blob | null = null;
@@ -12,7 +13,7 @@ export async function fetchCurrentUserProfileState() {
     if (!currentUser || !supabase) return;
     const { data, error } = await supabase
         .from('user_profiles')
-        .select('display_name, nickname, avatar_url')
+        .select('display_name, nickname, avatar_url, settings')
         .eq('id', currentUser.id)
         .single();
     if (data) {
@@ -82,7 +83,7 @@ export async function setupProfileUI() {
 
         const { data, error } = await supabase
             .from('user_profiles')
-            .select('display_name, nickname, avatar_url')
+            .select('display_name, nickname, avatar_url, settings')
             .eq('id', currentUser.id)
             .single();
 
@@ -133,6 +134,22 @@ export async function setupProfileUI() {
 
     // Call load on setup
     await loadUserProfile();
+    
+    // --- Load Language ---
+    let currentLang = 'vi';
+    if (currentUserProfileState && currentUserProfileState.settings && currentUserProfileState.settings.language) {
+        currentLang = currentUserProfileState.settings.language;
+    } else {
+        const local = localStorage.getItem('app_settings');
+        if (local) {
+            try {
+                const parsed = JSON.parse(local);
+                if (parsed.language) currentLang = parsed.language;
+            } catch(e) {}
+        }
+    }
+    applyLanguage(currentLang);
+
     loadProfilePage();
 
     // --- Avatar Upload & Cropper Logic ---
@@ -220,7 +237,7 @@ export async function setupProfileUI() {
 
             btnSaveProfile.disabled = true;
             const originalText = btnSaveProfile.innerText;
-            btnSaveProfile.innerText = "Đang lưu...";
+            btnSaveProfile.innerText = t('btn.saving');
 
             try {
                 let avatarUrlPath = null;

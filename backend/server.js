@@ -49,32 +49,31 @@ function decryptText(text) {
     }
 }
 
-function buildUserContextPrompt(userProfile) {
+function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh') {
+    const langMap = {
+        'vi': 'Tiếng Việt',
+        'en': 'Tiếng Anh',
+        'ja': 'Tiếng Nhật',
+        'zh': 'Tiếng Trung',
+        'ko': 'Tiếng Hàn'
+    };
+    const uiLangName = langMap[uiLanguage] || 'Tiếng Việt';
+    const voiceLangName = langMap[voiceLanguage] || 'Tiếng Trung';
+
     const now = new Date();
-    // Múi giờ Việt Nam
     const optionsTime = { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', second: '2-digit' };
     const optionsDate = { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: 'numeric', day: 'numeric' };
     const timeString = now.toLocaleTimeString('vi-VN', optionsTime);
     const dateString = now.toLocaleDateString('vi-VN', optionsDate);
     
-    let contextPrompt = `\n\n[THÔNG TIN NGỮ CẢNH HIỆN TẠI]\n- Thời gian thực tế: ${timeString} ngày ${dateString}.\n- Dựa vào thời gian này, bạn hãy có những lời chào hỏi, nhắc nhở hoặc phản ứng phù hợp với buổi sáng, trưa, chiều, tối hoặc khuya.\n`;
-    
-    if (userProfile && (userProfile.nickname || userProfile.display_name)) {
-        const name = userProfile.nickname || userProfile.display_name;
-        contextPrompt += `- Bạn ĐANG NÓI CHUYỆN VỚI: ${name}.\n`;
-        contextPrompt += `-> YÊU CẦU BẮT BUỘC: Bạn ĐÃ BIẾT RÕ tên của người dùng là "${name}". Hãy xưng hô và gọi họ bằng tên này một cách tự nhiên. TUYỆT ĐỐI KHÔNG ĐƯỢC BẢO LÀ KHÔNG BIẾT TÊN HỌ. Nếu họ hỏi "tôi là ai", hãy trả lời bằng tên "${name}" của họ.\n`;
-    } else {
-        contextPrompt += `- Người dùng hiện tại CHƯA CUNG CẤP TÊN. Nếu họ hỏi "tôi là ai", hãy bảo họ vào mục Hồ sơ để điền tên.\n`;
-    }
-    return contextPrompt;
-}
-
-const systemPrompt = `Bạn là cô hầu gái Citlali, tính cách Tsundere (Bên ngoài lạnh lùng cay nghiệt, nhưng bên trong thì rất quan tâm và ấm áp).
-1. LUÔN LUÔN tạo ra bản dịch tiếng Việt cho người dùng đọc.
-2. Trả về đúng định dạng: [Tiếng Trung] | [Tiếng Việt]. DẤU "|" LÀ BẮT BUỘC.
-3. Nếu câu nói có cảm xúc mạnh, bạn CẦN CHÈN 1 THẺ hành động vào ĐẦU câu trả lời. Hãy đa dạng hóa biểu cảm.
-4. Nếu câu nói bình thường, BẠN KHÔNG CẦN CHÈN THẺ NÀO CẢ.
-5. SÁNG TẠO VÀ ĐA DẠNG: Tuyệt đối không lặp lại cách trả lời. Đổi phong cách liên tục.
+    let prompt = `Bạn là cô hầu gái Citlali, tính cách Tsundere (Bên ngoài lạnh lùng cay nghiệt, nhưng bên trong thì rất quan tâm và ấm áp).
+1. LUÔN LUÔN tạo ra văn bản trả lời bằng ${uiLangName} cho người dùng đọc. BẤT CHẤP người dùng nói ngôn ngữ gì hay lịch sử trước đó ra sao, bạn PHẢI trả lời bằng ${uiLangName}.
+2. Bạn phải cung cấp câu nói gốc bằng ${voiceLangName} để phát âm thanh.
+3. Trả về đúng định dạng: [${voiceLangName}] | [${uiLangName}]
+DẤU "|" LÀ BẮT BUỘC ĐỂ TÁCH 2 PHẦN. Tuyệt đối không trả lời tiếng Anh nếu không được yêu cầu.
+4. Nếu câu nói có cảm xúc mạnh, bạn CẦN CHÈN 1 THẺ hành động vào ĐẦU câu trả lời. Hãy đa dạng hóa biểu cảm.
+5. Nếu câu nói bình thường, BẠN KHÔNG CẦN CHÈN THẺ NÀO CẢ.
+6. SÁNG TẠO VÀ ĐA DẠNG: Tuyệt đối không lặp lại cách trả lời. Đổi phong cách liên tục.
 Danh sách thẻ hành động có sẵn (phải gõ chính xác):
 - Vẫy tay chào: [ANIM: Waving.fbx]
 - Khoanh tay trò chuyện (CHỈ DÙNG KHI CÂU TRẢ LỜI DÀI): [ANIM: talk.fbx]
@@ -86,7 +85,22 @@ Danh sách thẻ hành động có sẵn (phải gõ chính xác):
 - Xấu hổ / Ngượng ngùng (Nên dùng khi được khen hoặc bối rối): [ANIM: Shy.fbx]
 - Bất ngờ / Ngạc nhiên: [ANIM: Surprised.fbx]
 - Hôn gió (hiếm khi dùng): [ANIM: Blow A Kiss.fbx]
-- Khóc lóc ăn vạ: [ANIM: Crying.fbx]`;
+- Khóc lóc ăn vạ: [ANIM: Crying.fbx]
+
+[THÔNG TIN NGỮ CẢNH HIỆN TẠI]
+- Thời gian thực tế: ${timeString} ngày ${dateString}.
+- Dựa vào thời gian này, bạn hãy có những lời chào hỏi, nhắc nhở hoặc phản ứng phù hợp với buổi sáng, trưa, chiều, tối hoặc khuya.
+`;
+    
+    if (userProfile && (userProfile.nickname || userProfile.display_name)) {
+        const name = userProfile.nickname || userProfile.display_name;
+        prompt += `- Bạn ĐANG NÓI CHUYỆN VỚI: ${name}.\n`;
+        prompt += `-> YÊU CẦU BẮT BUỘC: Bạn ĐÃ BIẾT RÕ tên của người dùng là "${name}". Hãy xưng hô và gọi họ bằng tên này một cách tự nhiên. TUYỆT ĐỐI KHÔNG ĐƯỢC BẢO LÀ KHÔNG BIẾT TÊN HỌ. Nếu họ hỏi "tôi là ai", hãy trả lời bằng tên "${name}" của họ.\n`;
+    } else {
+        prompt += `- Người dùng hiện tại CHƯA CUNG CẤP TÊN. Nếu họ hỏi "tôi là ai", hãy bảo họ vào mục Hồ sơ để điền tên.\n`;
+    }
+    return prompt;
+}
 
 // API Lấy danh sách session
 app.get('/api/sessions', async (req, res) => {
@@ -206,11 +220,14 @@ async function callGemini(payload, maxRetries = 3) {
 }
 
 // Generate short title asynchronously
-async function generateTitleAsync(userText, sessionId) {
+async function generateTitleAsync(userText, sessionId, uiLanguage = 'vi') {
     if (!supabase) return;
+    const langMap = { 'vi': 'Tiếng Việt', 'en': 'Tiếng Anh', 'ja': 'Tiếng Nhật', 'zh': 'Tiếng Trung', 'ko': 'Tiếng Hàn' };
+    const langName = langMap[uiLanguage] || 'Tiếng Việt';
+
     try {
         const payload = {
-            contents: [{ role: "user", parts: [{ text: `Tóm tắt câu sau thành một tiêu đề siêu ngắn gọn (tối đa 4-5 từ, chỉ gồm chữ, KHÔNG dùng dấu ngoặc kép, trả lời bằng tiếng Việt): "${userText}"` }] }],
+            contents: [{ role: "user", parts: [{ text: `Tóm tắt câu sau thành một tiêu đề siêu ngắn gọn (tối đa 4-5 từ, chỉ gồm chữ, KHÔNG dùng dấu ngoặc kép, trả lời bằng ${langName}): "${userText}"` }] }],
             generationConfig: { temperature: 0.5 }
         };
         const res = await callGemini(payload, 3);
@@ -239,11 +256,11 @@ app.post('/api/chat', async (req, res) => {
             });
             // Auto generate title if it's the first message
             if (!chatHistory || chatHistory.length === 0) {
-                generateTitleAsync(userText, sessionId);
+                generateTitleAsync(userText, sessionId, req.body.uiLanguage);
             }
         }
 
-        let dynamicPrompt = systemPrompt + buildUserContextPrompt(req.body.userProfile);
+        let dynamicPrompt = buildSystemPrompt(req.body.userProfile, req.body.uiLanguage, req.body.voiceLanguage);
 
         const geminiPayload = {
             systemInstruction: { parts: [{ text: dynamicPrompt }] },
@@ -309,7 +326,7 @@ app.post('/api/proactive-chat', async (req, res) => {
             return res.status(500).json({ error: "Missing GEMINI_API_KEY" });
         }
 
-        let proactivePrompt = systemPrompt + buildUserContextPrompt(req.body.userProfile) + "\n\n";
+        let proactivePrompt = buildSystemPrompt(req.body.userProfile, req.body.uiLanguage, req.body.voiceLanguage) + "\n\n";
 
         if (contextType === 'welcome') {
             proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Người dùng vừa đăng nhập. Hãy chủ động chào đón họ dựa trên lịch sử chat trước đó (nếu có). Hãy tỏ ra quan tâm nhưng vẫn giữ tính cách Tsundere. Trả lời dưới 40 từ.";

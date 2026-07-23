@@ -3,7 +3,32 @@ body {
   overflow: hidden;
   /* Tạo nền bầu trời Anime rực rỡ (Gradient từ tím nhạt -> hồng pastel -> trắng cam chân trời) */
   background: linear-gradient(to bottom, #a18cd1 0%, #fbc2eb 50%, #fff1eb 100%);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, Tahoma, Geneva, Verdana, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft JhengHei', 'Meiryo', 'Malgun Gothic', sans-serif;
+}
+
+/* Tùy chỉnh Font chữ theo từng ngôn ngữ */
+body:lang(vi-VN), :lang(vi-VN) {
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+}
+
+body:lang(zh-CN), :lang(zh-CN) {
+  font-family: "LXGW WenKai Lite", 'Microsoft YaHei', sans-serif !important;
+  font-size: 1.05rem; 
+  font-weight: 600;
+}
+
+body:lang(ja-JP), :lang(ja-JP) {
+  font-family: 'Zen Maru Gothic', 'Meiryo', 'Yu Gothic', sans-serif !important;
+  font-weight: 500;
+}
+
+body:lang(ko-KR), :lang(ko-KR) {
+  font-family: 'Gowun Dodum', 'Malgun Gothic', sans-serif !important;
+  font-weight: 600;
+}
+
+body:lang(en), :lang(en) {
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
 }
 
 canvas {
@@ -282,17 +307,15 @@ canvas {
   background: rgba(255, 255, 255, 0.9);
   font-family: inherit;
   font-size: 0.95rem;
-  /* Giảm chút xíu để placeholder không bị rớt dòng */
   resize: none;
   overflow: hidden;
-  /* Tắt hẳn scrollbar */
-  height: 46px;
-  /* 10px padding top + 10px bottom + 24px line-height + 2px border = 46px */
+  /* Tắt thanh cuộn */
+  min-height: 70px;
+  /* Đủ cao để chứa 2 dòng text */
   box-sizing: border-box;
-  /* Bắt buộc để padding không cộng dồn vào height */
-  line-height: 24px;
-  /* Cân đối với padding và border */
+  line-height: 20px;
 }
+
 
 #btn-send-chat {
   padding: 8px 16px;

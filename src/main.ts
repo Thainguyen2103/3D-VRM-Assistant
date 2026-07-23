@@ -8,7 +8,16 @@ import { initUI } from './ui/UIManager';
 import { initCustomSelects } from "./customSelect";
 import { cameraState } from './core/state';
 import { initAuth } from './core/auth';
+import { applyLanguage } from './i18n';
 import "./style.css";
+
+// Khởi tạo ngôn ngữ cực sớm cho màn hình tải
+let savedLang = 'vi';
+try {
+    const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+    if (settings.language) savedLang = settings.language;
+} catch(e) {}
+applyLanguage(savedLang);
 
 // Khởi tạo môi trường mặc định
 initSky(scene);

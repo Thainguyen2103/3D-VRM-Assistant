@@ -4,6 +4,7 @@ import { VRMLoaderPlugin, VRMUtils, VRM } from "@pixiv/three-vrm";
 import { scene, camera, controls } from '../scene/setup';
 import { appState, targetExpressions, targetPoseState, poseState, lerpPose, cameraState } from '../core/state';
 import { loadMixamoAnimation } from '../loadMixamoAnimation';
+import { t } from '../i18n';
 
 export let currentVrm: VRM | undefined;
 export const lookAtTarget = new THREE.Object3D();
@@ -177,16 +178,17 @@ export function initVRM() {
       const loadingDetail = document.getElementById('loading-detail');
       
       if (progressBar) progressBar.style.width = progress + '%';
-      if (loadingText) loadingText.innerText = `Đang tải tài nguyên... ${progress}%`;
+      if (loadingText) loadingText.innerText = `${t('loading')} ${progress}%`;
       if (loadingDetail) {
         // Lấy tên file từ url
         const filename = url.split('/').pop() || url;
-        loadingDetail.innerText = `Đang xử lý: ${filename}`;
+        loadingDetail.innerText = `${t('processing')} ${filename}`;
       }
     }
   };
 
   THREE.DefaultLoadingManager.onLoad = function () {
+    document.body.classList.remove('app-loading');
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
       loadingScreen.style.opacity = '0';

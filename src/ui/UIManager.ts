@@ -3,8 +3,9 @@ import { loadFBXAnimation, currentVrm, currentMixer } from '../vrm/VRMManager';
 import { updateTimeOfDay } from '../scene/environment';
 import { updateWeatherSystem, setPetalCount } from '../scene/weather';
 import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
-import { translations } from '../i18n';
-import { initAuth } from '../core/auth';
+import { translations, applyLanguage, t } from '../i18n';
+import { initAuth, supabase, currentUser } from '../core/auth';
+import { CustomDialog } from './CustomDialog';
 import { createIcons, icons } from 'lucide';
 
 // Hàm hỗ trợ khóa góc (tránh phi vật lý) nhận vào object {x, y, z} theo độ (degrees)
@@ -398,25 +399,15 @@ export function initUI() {
   setupPanelToggle('control-panel', 'close-control', 'open-control');
 
   let currentLang = 'vi';
-  function applyLanguage(lang: string) {
-    const t = translations[lang];
-    if (!t) return;
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      if (key && t[key]) {
-        if (el.tagName.toLowerCase() === 'textarea' || el.tagName.toLowerCase() === 'input') {
-          (el as HTMLInputElement).placeholder = t[key];
-        } else {
-          el.textContent = t[key];
-        }
-      }
-    });
-  }
+  try {
+      const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+      if (settings.language) currentLang = settings.language;
+  } catch(e) {}
+  
   document.getElementById('setting-language')?.addEventListener('change', (e) => {
     currentLang = (e.target as HTMLSelectElement).value;
     applyLanguage(currentLang);
   });
-  applyLanguage(currentLang);
 
   // TransformControls: Tắt OrbitControls khi kéo Gizmo, lưu lịch sử khi nhả
   transformControl.addEventListener("dragging-changed", (event: any) => {
@@ -453,5 +444,154 @@ export function initUI() {
     updateXYZUI(degRot.x, degRot.y, degRot.z);
   });
 
-  // Bỏ dòng initAuth() ở đây vì đã được gọi trong main.ts
+  // --- SETTINGS LOAD / SAVE ---
+  const btnSaveSettings = document.getElementById('btn-save-settings') as HTMLButtonElement;
+  const btnResetSettings = document.getElementById('btn-reset-settings') as HTMLButtonElement;
+
+  async function loadSettings() {
+    let settings: any = null;
+    
+    // Thử lấy từ Supabase nếu đã đăng nhập
+    if (currentUser && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('settings')
+          .eq('id', currentUser.id)
+          .single();
+        if (data && data.settings) {
+          settings = data.settings;
+        }
+      } catch (e) {
+        console.warn("Lỗi khi tải cấu hình từ Supabase:", e);
+      }
+    }
+
+    // Nếu không có trên Supabase, lấy từ localStorage
+    if (!settings) {
+      const local = localStorage.getItem('app_settings');
+      if (local) settings = JSON.parse(local);
+    }
+
+    // Áp dụng cấu hình
+    if (settings) {
+      if (settings.language) {
+         const el = document.getElementById("setting-language") as HTMLSelectElement;
+         if (el) { el.value = settings.language; currentLang = settings.language; el.dispatchEvent(new Event('change')); }
+      }
+      if (settings.voice) {
+         const el = document.getElementById("setting-voice") as HTMLSelectElement;
+         if (el) { el.value = settings.voice; }
+      }
+      if (settings.shadow) {
+         const el = document.getElementById("setting-shadow") as HTMLSelectElement;
+         if (el) { el.value = settings.shadow; el.dispatchEvent(new Event('change')); }
+      }
+      if (settings.pixelRatio) {
+         const el = document.getElementById("setting-pixel-ratio") as HTMLSelectElement;
+         if (el) { el.value = settings.pixelRatio; el.dispatchEvent(new Event('change')); }
+      }
+      if (settings.time) {
+         const el = document.getElementById("setting-time") as HTMLSelectElement;
+         if (el) { el.value = settings.time; el.dispatchEvent(new Event('change')); }
+      }
+      if (settings.weather) {
+         const el = document.getElementById("setting-weather") as HTMLSelectElement;
+         if (el) { el.value = settings.weather; el.dispatchEvent(new Event('change')); }
+      }
+      if (settings.petalCount !== undefined) {
+         const el = document.getElementById("setting-petals-count") as HTMLInputElement;
+         if (el) { el.value = settings.petalCount; el.dispatchEvent(new Event('input')); }
+      }
+    }
+  }
+
+  // Chạy ngay khi khởi tạo UI (do initAuth đã gọi trước ở main.ts)
+  loadSettings();
+
+  if (btnSaveSettings) {
+    btnSaveSettings.addEventListener('click', async () => {
+      const settings = {
+        language: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
+        voice: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh',
+        shadow: (document.getElementById('setting-shadow') as HTMLSelectElement)?.value || 'off',
+        pixelRatio: (document.getElementById('setting-pixel-ratio') as HTMLSelectElement)?.value || '1k',
+        time: (document.getElementById('setting-time') as HTMLSelectElement)?.value || 'auto',
+        weather: (document.getElementById('setting-weather') as HTMLSelectElement)?.value || 'clear',
+        petalCount: (document.getElementById('setting-petals-count') as HTMLInputElement)?.value || '80',
+      };
+
+      const originalText = btnSaveSettings.innerText;
+      btnSaveSettings.innerText = t('btn.saving');
+      btnSaveSettings.disabled = true;
+
+      // Lưu lên Supabase nếu có
+      if (currentUser && supabase) {
+        try {
+          const { error } = await supabase
+            .from('user_profiles')
+            .update({ settings })
+            .eq('id', currentUser.id);
+          
+          if (error) {
+            console.error("Không thể lưu lên Supabase, có thể thiếu cột settings trong bảng user_profiles:", error);
+            // Fallback
+            localStorage.setItem('app_settings', JSON.stringify(settings));
+          } else {
+            // Lưu local như backup
+            localStorage.setItem('app_settings', JSON.stringify(settings));
+          }
+        } catch(e) {
+           console.error(e);
+           localStorage.setItem('app_settings', JSON.stringify(settings));
+        }
+      } else {
+        localStorage.setItem('app_settings', JSON.stringify(settings));
+      }
+
+      setTimeout(() => {
+        btnSaveSettings.innerText = originalText;
+        btnSaveSettings.disabled = false;
+        
+        // Tạo popup thông báo nhỏ
+        const toast = document.createElement('div');
+        toast.innerText = t("toast.saved_settings");
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = '#4CAF50';
+        toast.style.color = 'white';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '5px';
+        toast.style.zIndex = '9999';
+        toast.style.transition = 'opacity 0.3s';
+        document.body.appendChild(toast);
+
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
+      }, 500);
+    });
+  }
+
+  if (btnResetSettings) {
+    btnResetSettings.addEventListener('click', async () => {
+      if (await CustomDialog.confirm(t('confirm.reset_settings'))) {
+        let savedLang = 'vi';
+        try {
+          const currentSettings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+          if (currentSettings.language) savedLang = currentSettings.language;
+        } catch(e) {}
+        
+        const resetSettings = { language: savedLang };
+        localStorage.setItem('app_settings', JSON.stringify(resetSettings));
+
+        if (currentUser && supabase) {
+          try {
+            await supabase.from('user_profiles').update({ settings: resetSettings }).eq('id', currentUser.id);
+          } catch(e) { console.error(e); }
+        }
+        window.location.reload();
+      }
+    });
+  }
 }
