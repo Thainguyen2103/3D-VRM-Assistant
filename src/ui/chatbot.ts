@@ -69,6 +69,59 @@ const appendMsg = (text: string, isUser: boolean, modelUrl?: string): HTMLElemen
   return msgDiv;
 };
 
+export function removeTypingIndicator() {
+  const typingRow = document.getElementById("typing-indicator-row");
+  if (typingRow && typingRow.parentNode) {
+    typingRow.parentNode.removeChild(typingRow);
+  }
+}
+
+export function showTypingIndicator(modelUrl?: string): HTMLElement | null {
+  const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
+  if (!historyDiv) return null;
+  
+  removeTypingIndicator();
+
+  const rowDiv = document.createElement("div");
+  rowDiv.id = "typing-indicator-row";
+  rowDiv.className = "chat-msg-row ai";
+  
+  const model = modelUrl || activeModelUrl;
+  const isXianyun = isXianyunModel(model);
+  const isLauma = isLaumaModel(model);
+  const isNahida = isNahidaModel(model);
+  const isYaeMiko = isYaeMikoModel(model);
+  rowDiv.classList.add(isXianyun ? 'row-xianyun' : (isLauma ? 'row-lauma' : (isNahida ? 'row-nahida' : (isYaeMiko ? 'row-yaemiko' : 'row-citlali'))));
+  
+  const avatarImgSrc = isXianyun ? '/Icon_Models/xianyun_icon.jpg' : (isLauma ? '/Icon_Models/lauma_icon.jpg' : (isNahida ? '/Icon_Models/nahida_icon.jpg' : (isYaeMiko ? '/Icon_Models/yaemiko_icon.jpg' : '/Icon_Models/citlali_icon.jpg')));
+  const avatarName = isXianyun ? 'Xianyun' : (isLauma ? 'Lauma' : (isNahida ? 'Nahida' : (isYaeMiko ? 'Yae Miko' : 'Citlali')));
+  const avatarTitle = isXianyun ? 'Xianyun (Lưu Vân)' : (isLauma ? 'Lauma (Nguyệt Ca Sư)' : (isNahida ? 'Nahida (Tiểu Thảo Thần)' : (isYaeMiko ? 'Yae Miko (Bát Trọng Thần Tử)' : 'Citlali')));
+  
+  const avatarDiv = document.createElement("div");
+  avatarDiv.className = "msg-avatar-wrapper";
+  avatarDiv.innerHTML = `<img src="${avatarImgSrc}" alt="${avatarName}" title="${avatarTitle}" class="msg-avatar-img" />`;
+  rowDiv.appendChild(avatarDiv);
+
+  const msgDiv = document.createElement("div");
+  msgDiv.className = "chat-msg ai typing-bubble";
+  msgDiv.classList.add(isXianyun ? 'msg-xianyun' : (isLauma ? 'msg-lauma' : (isNahida ? 'msg-nahida' : (isYaeMiko ? 'msg-yaemiko' : 'msg-citlali'))));
+  
+  msgDiv.innerHTML = `
+    <div class="typing-indicator">
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+      <span class="typing-dot"></span>
+    </div>
+  `;
+  rowDiv.appendChild(msgDiv);
+  
+  historyDiv.appendChild(rowDiv);
+  historyDiv.scrollTop = historyDiv.scrollHeight;
+  const initialMsgDiv = document.getElementById("initial-msg");
+  if (initialMsgDiv) initialMsgDiv.style.display = 'none';
+  return rowDiv;
+}
+
 export async function loadChatHistory(sessionId: string | null) {
   if (!sessionId) {
       chatHistory = [];
@@ -189,6 +242,7 @@ export async function loadSessions() {
 }
 
 async function handleAIResponseData(data: any) {
+    removeTypingIndicator();
     const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
     const initialMsgDiv = document.getElementById("initial-msg");
     if (initialMsgDiv) initialMsgDiv.style.display = 'none';
@@ -308,6 +362,7 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
     if ((window as any).isChatbotTalking) return;
     
     try {
+        showTypingIndicator();
         const payload = {
             chatHistory: chatHistory,
             sessionId: currentSessionId,
@@ -325,9 +380,11 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
         });
 
         const data = await response.json();
+        removeTypingIndicator();
         chatHistory.push({ role: "model", modelUrl: activeModelUrl, parts: [{ text: data.aiResponse }] });
         handleAIResponseData(data);
     } catch (err) {
+        removeTypingIndicator();
         console.error("Proactive chat error:", err);
     }
 }
@@ -432,6 +489,7 @@ export async function setupChatbot() {
     input.value = "";
     input.style.height = '70px'; 
     sendBtn.disabled = true;
+    showTypingIndicator();
 
     try {
       if (!(window as any).chatbotAudio) {
@@ -481,6 +539,7 @@ export async function setupChatbot() {
       });
 
       const data = await response.json();
+      removeTypingIndicator();
       chatHistory.push({ role: "user", parts: [{ text: userText }] });
       chatHistory.push({ role: "model", modelUrl: activeModelUrl, parts: [{ text: data.aiResponse }] });
       handleAIResponseData(data);
@@ -491,6 +550,7 @@ export async function setupChatbot() {
       }
 
     } catch (err: any) {
+      removeTypingIndicator();
       appendMsg(`Lỗi mạng: ${err.message}`, false);
     }
 
