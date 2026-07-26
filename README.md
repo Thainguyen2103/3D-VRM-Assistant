@@ -1,118 +1,52 @@
 ﻿# 3D VRM AI Assistant (3D VRM AI アシスタント)
 
-**🌐 Live Demo:** [https://3-d-vrm-assistant.vercel.app/](https://3-d-vrm-assistant.vercel.app/)
+**🌐 デモサイト (Live Demo):** [https://3-d-vrm-assistant.vercel.app/](https://3-d-vrm-assistant.vercel.app/)
 
----
+## プロジェクト概要 (Project Overview)
+本プロジェクトは、Three.jsとVRM技術を活用し、ブラウザ上で動作するインタラクティブな3D AIアシスタントです。Google Gemini APIと音声合成（Fish Audio API）を統合することで、ユーザーとの自然な会話・感情豊かな表情変化・会話に応じた自動アニメーション再生を実現しています。
 
-## 📖 Giới thiệu dự án (Project Overview)
+ユーザーはGenshin Impactにインスパイアされた**5体の3Dキャラクター**と会話できます。各キャラクターは固有のAIパーソナリティ、カラーテーマ、音声を持ちます。
 
-**3D VRM AI Assistant** là ứng dụng trợ lý ảo 3D chạy hoàn toàn trên trình duyệt, kết hợp công nghệ **Three.js**, **VRM (Virtual Reality Model)** và **AI (Google Gemini)** để tạo ra những nhân vật 3D có khả năng trò chuyện, phát âm thanh giọng nói tự nhiên và thể hiện cảm xúc thông qua hoạt ảnh.
+## 主な機能 (Key Features)
+- **インタラクティブな3Dアバター**: `@pixiv/three-vrm`とThree.jsによる高品質VRMレンダリング
+- **AIチャットシステム**: Gemini APIを通じたキャラクター別の詳細なシステムプロンプト設計
+- **音声合成 (TTS)**: Fish Audio APIによりキャラクターごとに固有の音声IDを使用
+- **感情連動アニメーション**: AIの返答に含まれる感情タグ（例: `[ANIM: Waving.fbx]`）を解析し、Mixamoベースのアニメーションと表情を自動トリガー
+- **プロアクティブチャット**: ユーザーのアイドル状態を検知し、キャラクターが自発的に話しかける機能
+- **スマートカメラ制御**: キャラクターの体型（幼女・少女・成人女性）に合わせた自動カメラ調整
+- **5種類のキャラクターテーマ**: キャラクター切替時にUI全体のカラーテーマが自動変更
+- **高度なUIコントロールパネル**: カメラアングル切替、環境設定（時間帯・天候）、手動ポーズ調整、表情スライダー
+- **多言語対応 (i18n)**: UIと音声を独立して設定可能（日本語・英語・ベトナム語・中国語・韓国語）
+- **ユーザー認証・プロフィール**: Supabase Authによるログイン、プロフィール管理、チャット履歴の暗号化保存
 
-Người dùng có thể tương tác với **5 nhân vật 3D** lấy cảm hứng từ game Genshin Impact, mỗi nhân vật có cá tính, giao diện màu sắc và giọng nói riêng biệt.
+## 技術スタック (Tech Stack)
+- **フロントエンド**: HTML5, CSS3, TypeScript, Vite, Three.js, `@pixiv/three-vrm`
+- **バックエンド**: Node.js, Express.js
+- **データベース・認証**: Supabase (PostgreSQL + Auth)
+- **外部API**: Google Gemini 3.1 Flash API (LLM), Fish Audio API (TTS)
+- **デプロイ**: Vercel (Frontend) + Render (Backend)
 
----
+## ディレクトリ構成 (Directory Structure)
+- `src/` : フロントエンドのソースコード
+  - `scene/` : 環境・空・天候の設定
+  - `vrm/` : VRMモデルのロードとアニメーション制御
+  - `ui/` : チャットUI・UIManager・プロフィール
+  - `core/` : Supabase認証
+  - `i18n.ts` : 多言語対応 + キャラクター別UI更新
+  - `style.css` : 全CSS + 5キャラクターカラーテーマ
+  - `constants.ts` : キャラクター定数定義
+- `backend/` : Node.jsサーバー (APIプロキシ・プロンプト処理・暗号化)
+- `public/` : 静的アセット (VRMモデル・FBXアニメーション・アイコン)
 
-## 🎭 Danh sách nhân vật (Characters)
+## セットアップと実行方法 (How to Run)
 
-| Nhân vật | Vai trò | Tính cách | Theme màu |
-|---|---|---|---|
-| **🌸 Citlali** | Cô hầu gái Tsundere | Lạnh lùng bên ngoài, ấm áp bên trong | Xanh Đêm Chàm (`#3f51b5`) |
-| **☁️ Xianyun** | Tiên nhân Nhàn Vân (Cloud Retainer) | Thanh tao, quý phái, mẫu tử ngầm | Xanh Ngọc (`#00838f`) |
-| **🌙 Lauma** | Nguyệt Ca Sư (Moonchanter) | Nhân ái, bình yên, chữa lành | Xanh Lá (`#2e7d32`) |
-| **🌿 Nahida** | Tiểu Thảo Thần (Dendro Archon) | Ngây thơ, hiếu kỳ, thông thái | Xanh Lá Nhạt (`#558b2f`) |
-| **🦊 Yae Miko** | Đại Miko Đền Narukami (Guuji Yae) | Ma mãnh, tinh nghịch, bí ẩn | Hồng Anh Đào (`#e94560`) |
+### 前提条件 (Prerequisites)
+- Node.js (v18以上)
+- Google Gemini API キー
+- Fish Audio API キー
+- Supabase プロジェクト
 
----
-
-## ✨ Tính năng chính (Key Features)
-
-### 🤖 AI & Hội thoại
-- **Trò chuyện đa ngôn ngữ**: UI và giọng nói có thể cài đặt độc lập (Tiếng Việt, Nhật, Anh, Trung, Hàn)
-- **Nhân cách AI chuyên sâu**: Mỗi nhân vật có system prompt riêng phản ánh đúng tính cách trong game
-- **Hội thoại chủ động (Proactive Chat)**: Nhân vật tự chủ động mở lời khi chào mừng hoặc phát hiện người dùng nhàn rỗi
-- **Lịch sử chat đa phiên**: Mỗi phiên hội thoại được lưu trữ và mã hoá trên Supabase
-
-### 🔊 Giọng nói (TTS)
-- Tích hợp **Fish Audio API** với từng ID giọng nói riêng cho từng nhân vật
-- Hỗ trợ phát âm thanh real-time cùng với hoạt ảnh nhân vật
-
-### 🎬 Hoạt ảnh & 3D
-- Render nhân vật VRM chất lượng cao với `@pixiv/three-vrm` và Three.js
-- **Hoạt ảnh cảm xúc tự động**: AI phân tích phản hồi và chèn thẻ `[ANIM: xxx.fbx]` để kích hoạt hoạt ảnh Mixamo (vẫy tay, suy nghĩ, tức giận, xấu hổ, bật khóc...)
-- **Điều khiển camera thông minh**: Camera tự động căn chỉnh theo chiều cao từng nhân vật (loli / thiếu nữ / nữ trưởng thành)
-- Bảng điều khiển tư thế thủ công với FK/IK xương ngón tay, tham số biểu cảm khuôn mặt
-
-### 🌍 Môi trường 3D động
-- Skybox thay đổi theo thời gian thực (sáng / trưa / chiều / tối)
-- Hiệu ứng thời tiết động: **Mưa**, **Tuyết**, **Hoa anh đào** bay
-- Cảnh quan Nhật Bản: Torii đỏ, hồ nước, rừng anh đào
-
-### 🎨 Giao diện (UI/UX)
-- **5 theme màu riêng biệt** cho từng nhân vật, tự động chuyển đổi khi đổi nhân vật
-- **Bộ chọn nhân vật** với avatar icon và card UI đẹp mắt
-- **Quản lý phiên chat** (tạo mới, xem lịch sử, xoá phiên)
-- Hỗ trợ **5 ngôn ngữ giao diện**: Tiếng Việt, Nhật, Anh, Trung, Hàn
-
-### 👤 Người dùng & Xác thực
-- Đăng ký / Đăng nhập qua **Supabase Auth**
-- Hồ sơ cá nhân: tên hiển thị, biệt danh, avatar, giới thiệu bản thân
-- AI tự nhận biết tên người dùng và xưng hô đúng theo tên
-
----
-
-## 🛠️ Công nghệ sử dụng (Tech Stack)
-
-| Layer | Công nghệ |
-|---|---|
-| **Frontend** | HTML5, CSS3, TypeScript, Vite, Three.js, `@pixiv/three-vrm` |
-| **Backend** | Node.js, Express.js |
-| **Database & Auth** | Supabase (PostgreSQL + Auth) |
-| **AI / LLM** | Google Gemini 3.1 Flash API |
-| **TTS** | Fish Audio API |
-| **Deployment** | Vercel (Frontend) + Render (Backend) |
-
----
-
-## 📁 Cấu trúc thư mục (Directory Structure)
-
-```
-3D-VRM-Assistant-main/
-├── backend/                # Node.js Express server
-│   ├── server.js           # API chính (chat, sessions, TTS proxy)
-│   └── .env                # Biến môi trường (không commit)
-├── public/                 # Assets tĩnh
-│   ├── *.vrm               # Model 3D (Citlali, Xianyun, Lauma, Nahida, YaeMiko)
-│   ├── Icon_Models/        # Avatar icon từng nhân vật
-│   ├── flaticons/          # Icon PNG
-│   └── animations/         # FBX animation files (Mixamo)
-├── src/                    # Frontend TypeScript source
-│   ├── scene/              # Skybox, môi trường, thời tiết
-│   ├── vrm/                # VRM loader, animation, camera
-│   ├── ui/                 # Chat UI, UIManager, Profile, CustomDialog
-│   ├── core/               # Auth (Supabase)
-│   ├── constants.ts        # Hằng số nhân vật
-│   ├── i18n.ts             # Đa ngôn ngữ + UI theo nhân vật
-│   ├── style.css           # CSS + 5 theme màu nhân vật
-│   └── customSelect.ts     # Component select tuỳ chỉnh
-├── index.html
-├── login.html
-├── profile.html
-├── vite.config.ts
-├── tsconfig.json
-└── vercel.json
-```
-
----
-
-## 🚀 Hướng dẫn chạy local (How to Run Locally)
-
-### Yêu cầu
-- Node.js v18+
-- Google Gemini API Key
-- Fish Audio API Key
-- Supabase Project
-
-### 1. Clone & cài đặt
+### 1. リポジトリのクローンと依存関係のインストール
 ```bash
 git clone https://github.com/Thainguyen2103/3D-VRM-Assistant.git
 cd 3D-VRM-Assistant-main
@@ -120,8 +54,8 @@ npm install
 cd backend && npm install && cd ..
 ```
 
-### 2. Cấu hình biến môi trường
-Tạo file `backend/.env`:
+### 2. 環境変数の設定
+`backend/.env` を作成:
 ```env
 PORT=3000
 GEMINI_API_KEY=your_gemini_api_key
@@ -142,41 +76,25 @@ CHAT_ENCRYPTION_KEY=your_32_char_secret_key
 FRONTEND_URL=http://localhost:5173
 ```
 
-Tạo file `.env` tại thư mục gốc:
+プロジェクトルートに `.env` を作成:
 ```env
 VITE_BACKEND_URL=http://localhost:3000
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 3. Chạy Backend
+### 3. バックエンドサーバーの起動
 ```bash
-cd backend && node server.js
+cd backend
+node server.js
 ```
 
-### 4. Chạy Frontend (terminal khác)
+### 4. フロントエンド開発サーバーの起動 (別ターミナル)
 ```bash
 npm run dev
 ```
 
-Truy cập `http://localhost:5173`
+ブラウザで `http://localhost:5173` にアクセス。
 
----
-
-## ☁️ Deployment
-
-| Service | Vai trò |
-|---|---|
-| **Vercel** | Frontend — tự động deploy khi push `main` |
-| **Render** | Backend Node.js — cần thêm env vars trong dashboard |
-| **Supabase** | Database + Auth — tables: `user_profiles`, `chat_sessions`, `chat_history` |
-
----
-
-## 💡 Điểm nổi bật kỹ thuật (For Recruiters)
-
-- **Prompt Engineering nâng cao**: System prompt động theo nhân vật, ngôn ngữ UI/voice độc lập, thời gian thực và thông tin người dùng. Xử lý dual-language output với fallback tự dịch qua Gemini.
-- **Full-stack TypeScript/JavaScript**: Frontend TypeScript + Vite, Backend Node.js/Express, tích hợp 3 external API (Gemini, Fish Audio, Supabase).
-- **3D Real-time Rendering**: Three.js + VRM, camera thích ứng theo nhân vật, môi trường động (skybox, thời tiết, ánh sáng), hoạt ảnh FBX qua Mixamo.
-- **Bảo mật**: Lịch sử chat mã hoá AES-256-CBC trước khi lưu vào Supabase.
-- **UX Đa nhân vật**: 5 theme CSS, camera preset, voice ID, system prompt riêng — chuyển đổi mượt mà không reload trang.
+## アピールポイント (For Recruiters)
+本プロジェクトは、単なる3Dモデル表示にとどまらず、**LLMのプロンプトエンジニアリング**（キャラクター別・UI/音声言語独立設定・Geminiフォールバック自動翻訳）、**AES-256-CBCによるチャット履歴の暗号化**、**Three.jsによる複雑な3Dシーン・アニメーション・カメラ管理**、そして**フロントエンドからバックエンドまで一貫したフルスタック開発能力**を示しています。5キャラクター分のCSSテーマ・カメラプリセット・音声IDの独立管理をページリロードなしにシームレスに切り替える点が本プロジェクトの技術的な特徴です。
