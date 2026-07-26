@@ -1,7 +1,8 @@
 import { currentUser, supabase } from '../core/auth';
 import { getCurrentUserProfile, fetchCurrentUserProfileState } from './profile';
 import { CustomDialog } from './CustomDialog';
-import { t } from '../i18n';
+import { t, activeModelUrl, updateChatUIForModel } from '../i18n';
+import { isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '../constants';
 
 
 export let chatHistory: any[] = [];
@@ -23,23 +24,59 @@ window.addEventListener('mousemove', resetIdleTimer);
 window.addEventListener('keydown', resetIdleTimer);
 window.addEventListener('click', resetIdleTimer);
 
-const appendMsg = (text: string, isUser: boolean) => {
+const appendMsg = (text: string, isUser: boolean, modelUrl?: string): HTMLElement | null => {
   const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
-  if (!historyDiv) return;
+  if (!historyDiv) return null;
+  
+  const rowDiv = document.createElement("div");
+  rowDiv.className = `chat-msg-row ${isUser ? 'user' : 'ai'}`;
+  
+  if (!isUser) {
+    const model = modelUrl || activeModelUrl;
+    const isXianyun = isXianyunModel(model);
+    const isLauma = isLaumaModel(model);
+    const isNahida = isNahidaModel(model);
+    const isYaeMiko = isYaeMikoModel(model);
+    rowDiv.classList.add(isXianyun ? 'row-xianyun' : (isLauma ? 'row-lauma' : (isNahida ? 'row-nahida' : (isYaeMiko ? 'row-yaemiko' : 'row-citlali'))));
+    
+    const avatarImgSrc = isXianyun ? '/Icon_Models/xianyun_icon.jpg' : (isLauma ? '/Icon_Models/lauma_icon.jpg' : (isNahida ? '/Icon_Models/nahida_icon.jpg' : (isYaeMiko ? '/Icon_Models/yaemiko_icon.jpg' : '/Icon_Models/citlali_icon.jpg')));
+    const avatarName = isXianyun ? 'Xianyun' : (isLauma ? 'Lauma' : (isNahida ? 'Nahida' : (isYaeMiko ? 'Yae Miko' : 'Citlali')));
+    const avatarTitle = isXianyun ? 'Xianyun (Lưu Vân)' : (isLauma ? 'Lauma (Nguyệt Ca Sư)' : (isNahida ? 'Nahida (Tiểu Thảo Thần)' : (isYaeMiko ? 'Yae Miko (Bát Trọng Thần Tử)' : 'Citlali')));
+    
+    const avatarDiv = document.createElement("div");
+    avatarDiv.className = "msg-avatar-wrapper";
+    avatarDiv.innerHTML = `<img src="${avatarImgSrc}" alt="${avatarName}" title="${avatarTitle}" class="msg-avatar-img" />`;
+    rowDiv.appendChild(avatarDiv);
+  }
+
   const msgDiv = document.createElement("div");
   msgDiv.className = `chat-msg ${isUser ? 'user' : 'ai'}`;
+  if (!isUser) {
+    const model = modelUrl || activeModelUrl;
+    const isXianyun = isXianyunModel(model);
+    const isLauma = isLaumaModel(model);
+    const isNahida = isNahidaModel(model);
+    const isYaeMiko = isYaeMikoModel(model);
+    msgDiv.classList.add(isXianyun ? 'msg-xianyun' : (isLauma ? 'msg-lauma' : (isNahida ? 'msg-nahida' : (isYaeMiko ? 'msg-yaemiko' : 'msg-citlali'))));
+  }
   msgDiv.innerText = text;
-  historyDiv.appendChild(msgDiv);
+  rowDiv.appendChild(msgDiv);
+  
+  historyDiv.appendChild(rowDiv);
   historyDiv.scrollTop = historyDiv.scrollHeight;
   const initialMsgDiv = document.getElementById("initial-msg");
   if (initialMsgDiv) initialMsgDiv.style.display = 'none';
+  return msgDiv;
 };
 
 export async function loadChatHistory(sessionId: string | null) {
   if (!sessionId) {
       chatHistory = [];
       const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
-      if (historyDiv) historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">${t('chat.initial')}</div>`;
+      if (historyDiv) {
+        historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg"></div>`;
+        updateChatUIForModel();
+      }
       return;
   }
   try {
@@ -51,20 +88,17 @@ export async function loadChatHistory(sessionId: string | null) {
       if (historyDiv) {
           historyDiv.innerHTML = ''; // clear
           if (chatHistory.length === 0) {
-              historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg" data-i18n="chat.initial">${t('chat.initial')}</div>`;
+              historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg"></div>`;
+              updateChatUIForModel();
           }
           chatHistory.forEach(msg => {
-              const msgDiv = document.createElement("div");
-              msgDiv.className = `chat-msg ${msg.role === 'user' ? 'user' : 'ai'}`;
-              
-              let text = msg.parts[0].text;
+              let text = msg.parts && msg.parts[0] ? msg.parts[0].text : "";
               const regex = /\[ANIM:\s*([^\]]+)\]/g;
               text = text.replace(regex, "").trim();
               const textParts = text.split("|");
               const viText = textParts.length > 1 ? textParts[1].trim() : textParts[0].trim();
 
-              msgDiv.innerText = viText; 
-              historyDiv.appendChild(msgDiv);
+              appendMsg(viText, msg.role === 'user', msg.modelUrl);
           });
           historyDiv.scrollTop = historyDiv.scrollHeight;
       }
@@ -79,6 +113,7 @@ export async function loadSessions() {
     try {
         const response = await fetch(`${BACKEND_URL}/api/sessions?userId=${currentUser.id}`);
         const sessions = await response.json();
+        if (!Array.isArray(sessions)) return;
         
         const sessionList = document.getElementById('session-list');
         if (!sessionList) return;
@@ -169,11 +204,8 @@ async function handleAIResponseData(data: any) {
     }
 
     const viText = data.viText;
-    const msgDiv = document.createElement("div");
-    msgDiv.className = 'chat-msg ai';
-    historyDiv.appendChild(msgDiv);
-    historyDiv.scrollTop = historyDiv.scrollHeight;
-
+    const msgDiv = appendMsg("", false, data.modelUrl || activeModelUrl);
+    if (!msgDiv) return;
     let i = 0;
     const typeSpeed = 50;
     const typingInterval = setInterval(() => {
@@ -238,7 +270,7 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
             try {
                 const { data: userRecord } = await supabase
                     .from('user_profiles')
-                    .select('last_welcome_time')
+                    .select('*')
                     .eq('id', currentUser.id)
                     .single();
 
@@ -249,12 +281,16 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
                     }
                 }
                 
-                await supabase
+                const { error: updateErr } = await supabase
                     .from('user_profiles')
                     .update({ last_welcome_time: new Date().toISOString() })
                     .eq('id', currentUser.id);
+                if (updateErr) {
+                    localStorage.setItem('lastWelcomeTime', now.toString());
+                }
             } catch (e) {
                 console.error('Supabase cooldown error', e);
+                localStorage.setItem('lastWelcomeTime', now.toString());
             }
         } else {
             const lastWelcomeStr = localStorage.getItem('lastWelcomeTime');
@@ -277,6 +313,7 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
             sessionId: currentSessionId,
             contextType: contextType,
             userProfile: getCurrentUserProfile(),
+            modelUrl: activeModelUrl,
             uiLanguage: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
             voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh'
         };
@@ -288,7 +325,7 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
         });
 
         const data = await response.json();
-        chatHistory.push({ role: "model", parts: [{ text: data.aiResponse }] });
+        chatHistory.push({ role: "model", modelUrl: activeModelUrl, parts: [{ text: data.aiResponse }] });
         handleAIResponseData(data);
     } catch (err) {
         console.error("Proactive chat error:", err);
@@ -324,6 +361,7 @@ export async function setupChatbot() {
               chatSidebar.style.display = 'flex';
               void chatSidebar.offsetWidth;
               chatSidebar.classList.remove('panel-hidden');
+              if (currentUser) { loadSessions(); }
           } else {
               chatSidebar.classList.add('panel-hidden');
               setTimeout(() => {
@@ -366,16 +404,27 @@ export async function setupChatbot() {
   if (!input || !sendBtn || !historyDiv) return;
 
   if (initialMsgDiv && chatHistory.length === 0) {
-    const greetings = [
-      "Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)"
-    ];
-    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-    initialMsgDiv.innerText = randomGreeting;
+    updateChatUIForModel();
   }
 
   const handleSend = async () => {
     const userText = input.value.trim();
     if (!userText) return;
+
+    if (!currentSessionId && currentUser) {
+        try {
+            const res = await fetch(`${BACKEND_URL}/api/sessions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUser.id, title: t('chat.first') || "Cuộc trò chuyện mới" })
+            });
+            const sData = await res.json();
+            if (sData && sData.id) {
+                currentSessionId = sData.id;
+                await loadSessions();
+            }
+        } catch(e) { console.error(e); }
+    }
 
     const isFirstMessage = chatHistory.length === 0;
 
@@ -385,11 +434,42 @@ export async function setupChatbot() {
     sendBtn.disabled = true;
 
     try {
+      if (!(window as any).chatbotAudio) {
+        const audio = new Audio();
+        audio.crossOrigin = "anonymous";
+        (window as any).chatbotAudio = audio;
+
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        const audioCtx = new AudioContextClass();
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+
+        const source = audioCtx.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        (window as any).chatbotAudioCtx = audioCtx;
+        (window as any).chatbotAnalyser = analyser;
+
+        audio.addEventListener('play', () => { (window as any).isChatbotTalking = true; });
+        audio.addEventListener('ended', () => { (window as any).isChatbotTalking = false; });
+      }
+      const audioCtx = (window as any).chatbotAudioCtx as AudioContext;
+      if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+      const audio = (window as any).chatbotAudio as HTMLAudioElement;
+      if (audio && !audio.src) {
+        audio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+        audio.play().catch(() => {});
+      }
+    } catch (e) {}
+
+    try {
       const payload = {
         chatHistory: chatHistory,
         userText: userText,
         sessionId: currentSessionId,
         userProfile: getCurrentUserProfile(),
+        modelUrl: activeModelUrl,
         uiLanguage: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
         voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh'
       };
@@ -402,7 +482,7 @@ export async function setupChatbot() {
 
       const data = await response.json();
       chatHistory.push({ role: "user", parts: [{ text: userText }] });
-      chatHistory.push({ role: "model", parts: [{ text: data.aiResponse }] });
+      chatHistory.push({ role: "model", modelUrl: activeModelUrl, parts: [{ text: data.aiResponse }] });
       handleAIResponseData(data);
 
       if (isFirstMessage) {

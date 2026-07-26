@@ -13,7 +13,7 @@ export async function fetchCurrentUserProfileState() {
     if (!currentUser || !supabase) return;
     const { data, error } = await supabase
         .from('user_profiles')
-        .select('display_name, nickname, avatar_url, settings')
+        .select('*')
         .eq('id', currentUser.id)
         .single();
     if (data) {
@@ -83,7 +83,7 @@ export async function setupProfileUI() {
 
         const { data, error } = await supabase
             .from('user_profiles')
-            .select('display_name, nickname, avatar_url, settings')
+            .select('*')
             .eq('id', currentUser.id)
             .single();
 
@@ -231,7 +231,7 @@ export async function setupProfileUI() {
     if (btnSaveProfile) {
         btnSaveProfile.addEventListener('click', async () => {
             if (!currentUser || !supabase) {
-                showToast("Vui lòng đăng nhập lại!", "error");
+                showToast(t("toast.login_again"), "error");
                 return;
             }
 
@@ -253,7 +253,7 @@ export async function setupProfileUI() {
                         });
 
                     if (uploadError) {
-                        throw new Error("Lỗi khi upload ảnh: " + uploadError.message);
+                        throw new Error("Upload error: " + uploadError.message);
                     }
                     avatarUrlPath = uploadData.path;
                     currentAvatarBlob = null; // Clear sau khi upload thành công
@@ -276,15 +276,15 @@ export async function setupProfileUI() {
                     .upsert(updateData);
 
                 if (profileError) {
-                    throw new Error("Lỗi khi cập nhật hồ sơ: " + profileError.message);
+                    throw new Error("Update error: " + profileError.message);
                 }
                 
                 currentUserProfileState = updateData;
 
-                showToast("Đã lưu hồ sơ thành công!", "success");
+                showToast(t("toast.profile_saved"), "success");
                 
             } catch (err: any) {
-                showToast(err.message || "Đã xảy ra lỗi!", "error");
+                showToast(err.message || t("toast.error"), "error");
             } finally {
                 btnSaveProfile.disabled = false;
                 btnSaveProfile.innerText = originalText;

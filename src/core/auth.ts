@@ -40,7 +40,7 @@ export async function initAuth() {
         try {
             const { data: profile } = await supabase
                 .from('user_profiles')
-                .select('avatar_url')
+                .select('*')
                 .eq('id', currentUser.id)
                 .single();
 

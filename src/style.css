@@ -1,8 +1,8 @@
 body {
   margin: 0;
   overflow: hidden;
-  /* Tạo nền bầu trời Anime rực rỡ (Gradient từ tím nhạt -> hồng pastel -> trắng cam chân trời) */
-  background: linear-gradient(to bottom, #a18cd1 0%, #fbc2eb 50%, #fff1eb 100%);
+  /* Tạo nền bầu trời Đêm Chiêm Tinh (Gradient từ xanh đêm -> chàm -> trăng bạc) */
+  background: linear-gradient(to bottom, #1a237e 0%, #3949ab 50%, #e8eaf6 100%);
   font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, Tahoma, Geneva, Verdana, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft JhengHei', 'Meiryo', 'Malgun Gothic', sans-serif;
 }
 
@@ -238,12 +238,13 @@ canvas {
 .chat-title {
   font-size: 1.1rem;
   color: #fff;
-  background: #ff9fb2;
-  padding: 8px;
-  border-radius: 12px;
-  margin: 0;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
   text-align: center;
-  box-shadow: 0 3px 8px rgba(255, 159, 178, 0.4);
+  box-shadow: none !important;
 }
 
 #chat-history {
@@ -268,27 +269,103 @@ canvas {
   border-radius: 3px;
 }
 
+/* Messenger-style Row Layout */
+.chat-msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.chat-msg-row.user {
+  justify-content: flex-end;
+}
+
+.msg-avatar-wrapper {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+.msg-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.row-xianyun .msg-avatar-wrapper {
+  border-color: #4dd0e1;
+}
+
+.row-lauma .msg-avatar-wrapper {
+  border-color: #81c784;
+}
+
+.row-nahida .msg-avatar-wrapper {
+  border-color: #aed581;
+}
+
+.row-citlali .msg-avatar-wrapper {
+  border-color: #ffb6c1;
+}
+
 .chat-msg {
   padding: 10px 14px;
-  border-radius: 15px;
+  border-radius: 16px;
   line-height: 1.5;
   word-wrap: break-word;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  max-width: calc(100% - 45px);
 }
 
 .chat-msg.user {
   background: #a2d2ff;
   color: #111;
   align-self: flex-end;
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
 }
 
 .chat-msg.ai {
-  background: #fff0f5;
-  color: #d6336c;
   align-self: flex-start;
-  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
   border: 1px solid #ffb6c1;
+}
+
+/* Permanent character styles regardless of active theme */
+.chat-msg.ai.msg-citlali {
+  background: #e8eaf6 !important;
+  color: #1a237e !important;
+  border-color: #7986cb !important;
+}
+
+.chat-msg.ai.msg-xianyun {
+  background: #e0f7fa !important;
+  color: #006064 !important;
+  border-color: #4dd0e1 !important;
+}
+
+.chat-msg.ai.msg-lauma {
+  background: #e8f5e9 !important;
+  color: #1b5e20 !important;
+  border-color: #81c784 !important;
+}
+
+.chat-msg.ai.msg-nahida {
+  background: #f1f8e9 !important;
+  color: #33691e !important;
+  border-color: #aed581 !important;
+}
+
+.chat-msg.ai.msg-yaemiko {
+  background: #fff0f5 !important;
+  color: #d6336c !important;
+  border-color: #ffb6c1 !important;
 }
 
 .chat-input-area {
@@ -784,4 +861,1101 @@ p {
 
 .guest-btn:hover {
   background: #bbb;
+}
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ CITLALI (TONE XANH ĐÊM & CHIÊM TINH / STARRY INDIGO)
+   ========================================================= */
+body.theme-citlali {
+  background: linear-gradient(to bottom, #1a237e 0%, #3949ab 50%, #e8eaf6 100%) !important;
+}
+body.theme-citlali #btn-switch-model,
+body.theme-citlali #btn-profile,
+body.theme-citlali #btn-login-header {
+  background: rgba(232, 234, 246, 0.85) !important;
+  border-color: #7986cb !important;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15) !important;
+}
+body.theme-citlali #btn-switch-model:hover,
+body.theme-citlali #btn-profile:hover,
+body.theme-citlali #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(63, 81, 181, 0.25) !important;
+}
+body.theme-citlali #btn-switch-model span,
+body.theme-citlali #btn-profile span,
+body.theme-citlali #btn-login-header span {
+  color: #3f51b5 !important;
+}
+body.theme-citlali #btn-switch-model-circle {
+  border-color: #5c6bc0 !important;
+}
+body.theme-citlali #btn-switch-model svg,
+body.theme-citlali #btn-profile-icon,
+body.theme-citlali #btn-login-header svg {
+  stroke: #3f51b5 !important;
+}
+body.theme-citlali #chat-ui {
+  background: rgba(232, 234, 246, 0.85) !important;
+  border-color: #7986cb !important;
+  box-shadow: 0 8px 25px rgba(63, 81, 181, 0.25) !important;
+}
+body.theme-citlali #chat-ui > div:first-child {
+  background: #5c6bc0 !important;
+  box-shadow: 0 3px 8px rgba(63, 81, 181, 0.4) !important;
+}
+body.theme-citlali .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+body.theme-citlali #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #c5cae9 !important;
+}
+body.theme-citlali #chat-history::-webkit-scrollbar-thumb {
+  background-color: #9fa8da !important;
+}
+body.theme-citlali .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #e8eaf6 !important;
+  color: #1a237e !important;
+  border-color: #7986cb !important;
+}
+body.theme-citlali .chat-msg.user {
+  background: #c5cae9 !important;
+  color: #1a237e !important;
+}
+body.theme-citlali #chat-input {
+  border-color: #9fa8da !important;
+}
+body.theme-citlali #chat-input:focus {
+  border-color: #3f51b5 !important;
+  box-shadow: 0 0 12px rgba(63, 81, 181, 0.25) !important;
+}
+body.theme-citlali #btn-send {
+  background: linear-gradient(135deg, #3949ab, #5c6bc0) !important;
+  box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3) !important;
+}
+body.theme-citlali #btn-send:hover {
+  background: linear-gradient(135deg, #283593, #3949ab) !important;
+  box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4) !important;
+}
+body.theme-citlali #btn-send-chat {
+  background: #5c6bc0 !important;
+  box-shadow: 0 2px 6px rgba(63, 81, 181, 0.4) !important;
+}
+body.theme-citlali #btn-send-chat:hover {
+  background: #3949ab !important;
+}
+body.theme-citlali #chat-sidebar {
+  background: rgba(232, 234, 246, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(63, 81, 181, 0.2) !important;
+}
+body.theme-citlali #chat-sidebar h3 {
+  color: #3f51b5 !important;
+}
+body.theme-citlali #btn-new-chat {
+  color: #3f51b5 !important;
+}
+body.theme-citlali .session-item {
+  border-color: #c5cae9 !important;
+}
+body.theme-citlali .session-item:hover {
+  background: rgba(121, 134, 203, 0.2) !important;
+  border-color: #5c6bc0 !important;
+}
+body.theme-citlali .session-item.active {
+  background: rgba(63, 81, 181, 0.15) !important;
+  border-color: #3f51b5 !important;
+}
+body.theme-citlali .session-item.active .session-title {
+  color: #3f51b5 !important;
+}
+body.theme-citlali #ui,
+body.theme-citlali #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(63, 81, 181, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(63, 81, 181, 0.1) !important;
+}
+body.theme-citlali h2,
+body.theme-citlali h3,
+body.theme-citlali .panel-section h3,
+body.theme-citlali h4[style*="#ff6b81"] {
+  color: #3f51b5 !important;
+  border-bottom-color: rgba(63, 81, 181, 0.2) !important;
+}
+body.theme-citlali h4[style*="#ff6b81"] svg {
+  stroke: #3f51b5 !important;
+}
+body.theme-citlali .bone-btn {
+  background: #3f51b5 !important;
+  color: white !important;
+}
+body.theme-citlali .bone-btn:hover {
+  background: #303f9f !important;
+}
+body.theme-citlali .bone-btn.active {
+  background: #5c6bc0 !important;
+  color: white !important;
+}
+body.theme-citlali .tab-btn:hover {
+  background: rgba(63, 81, 181, 0.1) !important;
+}
+body.theme-citlali .tab-btn.active {
+  color: #3f51b5 !important;
+  border-bottom-color: #3f51b5 !important;
+}
+body.theme-citlali .control-row input[type="range"] {
+  accent-color: #3f51b5 !important;
+}
+body.theme-citlali .custom-select-display:hover,
+body.theme-citlali .custom-select-wrapper.open .custom-select-display {
+  border-color: #3f51b5 !important;
+}
+body.theme-citlali .custom-select-arrow svg {
+  color: #3f51b5 !important;
+}
+body.theme-citlali .custom-select-options {
+  border-color: #3f51b5 !important;
+}
+body.theme-citlali .custom-select-options::-webkit-scrollbar-thumb {
+  background: #9fa8da !important;
+}
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ XIANYUN (TONE XANH TIÊN NHÂN / JADE GREEN)
+   ========================================================= */
+body.theme-xianyun {
+  background: linear-gradient(to bottom, #48c6ef 0%, #6f86d6 50%, #e0f7fa 100%) !important;
+}
+
+/* Nút Header góc trên bên phải */
+body.theme-xianyun #btn-switch-model,
+body.theme-xianyun #btn-profile,
+body.theme-xianyun #btn-login-header {
+  background: rgba(224, 247, 250, 0.85) !important;
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 4px 12px rgba(0, 131, 143, 0.15) !important;
+}
+body.theme-xianyun #btn-switch-model:hover,
+body.theme-xianyun #btn-profile:hover,
+body.theme-xianyun #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(0, 131, 143, 0.25) !important;
+}
+body.theme-xianyun #btn-switch-model span,
+body.theme-xianyun #btn-profile span,
+body.theme-xianyun #btn-login-header span {
+  color: #00838f !important;
+}
+body.theme-xianyun #btn-switch-model-circle {
+  border-color: #4dd0e1 !important;
+}
+body.theme-xianyun #btn-switch-model svg,
+body.theme-xianyun #btn-profile-icon,
+body.theme-xianyun #btn-login-header svg {
+  stroke: #00838f !important;
+}
+
+/* Khung Chat bên phải */
+body.theme-xianyun #chat-ui {
+  background: rgba(224, 247, 250, 0.85) !important;
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 8px 25px rgba(0, 151, 167, 0.25) !important;
+}
+body.theme-xianyun #chat-ui > div:first-child {
+  background: #4dd0e1 !important;
+  box-shadow: 0 3px 8px rgba(0, 151, 167, 0.4) !important;
+}
+body.theme-xianyun .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+body.theme-xianyun #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #b2ebf2 !important;
+}
+body.theme-xianyun #chat-history::-webkit-scrollbar-thumb {
+  background-color: #80deea !important;
+}
+body.theme-xianyun .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #e0f7fa !important;
+  color: #006064 !important;
+  border-color: #4dd0e1 !important;
+}
+body.theme-xianyun .chat-msg.user {
+  background: #b2ebf2 !important;
+  color: #004d40 !important;
+}
+body.theme-xianyun #chat-input {
+  border-color: #80deea !important;
+}
+body.theme-xianyun #chat-input:focus {
+  border-color: #00838f !important;
+  box-shadow: 0 0 8px rgba(0, 131, 143, 0.3) !important;
+}
+body.theme-xianyun #btn-send-chat {
+  background: #4dd0e1 !important;
+  box-shadow: 0 2px 6px rgba(0, 151, 167, 0.4) !important;
+}
+body.theme-xianyun #btn-send-chat:hover {
+  background: #26c6da !important;
+}
+
+/* Thanh bên lịch sử Chat (#chat-sidebar) */
+body.theme-xianyun #chat-sidebar {
+  background: rgba(224, 247, 250, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(0, 151, 167, 0.2) !important;
+}
+body.theme-xianyun #chat-sidebar h3 {
+  color: #00838f !important;
+}
+body.theme-xianyun #btn-new-chat {
+  color: #00838f !important;
+}
+body.theme-xianyun .session-item {
+  border-color: #b2ebf2 !important;
+}
+body.theme-xianyun .session-item:hover {
+  background: rgba(77, 208, 225, 0.2) !important;
+  border-color: #26c6da !important;
+}
+body.theme-xianyun .session-item.active {
+  background: rgba(0, 131, 143, 0.15) !important;
+  border-color: #00838f !important;
+}
+body.theme-xianyun .session-item.active .session-title {
+  color: #00838f !important;
+}
+
+/* Bảng điều khiển camera và cài đặt bên trái (#ui, #control-panel) */
+body.theme-xianyun #ui,
+body.theme-xianyun #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(0, 131, 143, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 131, 143, 0.1) !important;
+}
+body.theme-xianyun h2,
+body.theme-xianyun h3,
+body.theme-xianyun .panel-section h3,
+body.theme-xianyun h4[style*="#ff6b81"] {
+  color: #00838f !important;
+  border-bottom-color: rgba(0, 131, 143, 0.2) !important;
+}
+body.theme-xianyun h4[style*="#ff6b81"] svg {
+  stroke: #00838f !important;
+}
+body.theme-xianyun .bone-btn {
+  background: #00838f !important;
+  color: white !important;
+}
+body.theme-xianyun .bone-btn:hover {
+  background: #006064 !important;
+}
+body.theme-xianyun .bone-btn.active {
+  background: #00e676 !important;
+  color: #003300 !important;
+}
+body.theme-xianyun .tab-btn:hover {
+  background: rgba(0, 131, 143, 0.1) !important;
+}
+body.theme-xianyun .tab-btn.active {
+  color: #00838f !important;
+  background: rgba(0, 131, 143, 0.15) !important;
+}
+body.theme-xianyun .control-row input[type="range"] {
+  accent-color: #00838f !important;
+}
+body.theme-xianyun .custom-select-display:hover,
+body.theme-xianyun .custom-select-wrapper.open .custom-select-display {
+  border-color: #00838f !important;
+}
+body.theme-xianyun .custom-select-arrow svg {
+  color: #00838f !important;
+}
+body.theme-xianyun .custom-select-options {
+  border-color: #00838f !important;
+}
+body.theme-xianyun .custom-select-options::-webkit-scrollbar-thumb {
+  background: #80deea !important;
+}
+body.theme-xianyun .custom-select-option:hover {
+  background: rgba(0, 131, 143, 0.1) !important;
+  color: #00838f !important;
+}
+body.theme-xianyun .custom-select-option.selected {
+  background: rgba(0, 131, 143, 0.15) !important;
+  color: #00838f !important;
+}
+
+/* Các Nút Icon Tròn Nổi (.floating-icon) */
+body.theme-xianyun .floating-icon {
+  border-color: #00838f !important;
+  color: #00838f !important;
+  box-shadow: 0 4px 10px rgba(0, 131, 143, 0.2) !important;
+}
+body.theme-xianyun .floating-icon:hover {
+  background: #e0f7fa !important;
+}
+
+/* Modal Chọn Nhân Vật (#character-modal) */
+body.theme-xianyun .character-modal-content {
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 20px 40px rgba(0, 131, 143, 0.25) !important;
+}
+body.theme-xianyun .character-modal-content h3 {
+  color: #00838f !important;
+}
+body.theme-xianyun #close-character-modal:hover {
+  color: #00838f !important;
+}
+body.theme-xianyun .character-modal-content > div:first-child {
+  border-bottom-color: #e0f7fa !important;
+}
+body.theme-xianyun .character-modal-content > div:last-child {
+  background: #e0f7fa !important;
+  border-color: #b2ebf2 !important;
+  color: #006064 !important;
+}
+body.theme-xianyun .character-modal-content > div:last-child .model-hint-icon {
+  color: #00838f !important;
+}
+body.theme-xianyun .model-card[data-model="/Xianyun.vrm"],
+body.theme-xianyun .model-card[data-model="/model2.vrm"] {
+  background: #e0f7fa !important;
+  border-color: #00838f !important;
+}
+
+/* Hộp Thoại CustomDialog (.custom-dialog-box) */
+body.theme-xianyun .custom-dialog-box {
+  background: rgba(224, 247, 250, 0.95) !important;
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 10px 40px rgba(0, 131, 143, 0.2) !important;
+  color: #006064 !important;
+}
+body.theme-xianyun .btn-confirm {
+  background: #00838f !important;
+  box-shadow: 0 4px 15px rgba(0, 131, 143, 0.3) !important;
+}
+body.theme-xianyun .btn-confirm:hover {
+  background: #006064 !important;
+  box-shadow: 0 6px 20px rgba(0, 131, 143, 0.4) !important;
+}
+body.theme-xianyun .btn-cancel {
+  background: #e0f7fa !important;
+  color: #00838f !important;
+  border-color: #4dd0e1 !important;
+}
+body.theme-xianyun .btn-cancel:hover {
+  background: #b2ebf2 !important;
+}
+
+/* Màn Hình Loading */
+body.theme-xianyun #loading-progress-bar {
+  background: #00838f !important;
+}
+body.theme-xianyun #loading-text {
+  color: #00838f !important;
+}
+body.theme-xianyun .loading-image {
+  box-shadow: 0 10px 30px rgba(0, 131, 143, 0.3) !important;
+}
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ LAUMA (TONE XANH SƯƠNG NGUYỆT / FROSTMOON GREEN)
+   ========================================================= */
+body.theme-lauma {
+  background: linear-gradient(to bottom, #56ab2f 0%, #a8e063 50%, #e8f5e9 100%) !important;
+}
+
+/* Nút Header góc trên bên phải */
+body.theme-lauma #btn-switch-model,
+body.theme-lauma #btn-profile,
+body.theme-lauma #btn-login-header {
+  background: rgba(232, 245, 233, 0.85) !important;
+  border-color: #81c784 !important;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15) !important;
+}
+body.theme-lauma #btn-switch-model:hover,
+body.theme-lauma #btn-profile:hover,
+body.theme-lauma #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(46, 125, 50, 0.25) !important;
+}
+body.theme-lauma #btn-switch-model span,
+body.theme-lauma #btn-profile span,
+body.theme-lauma #btn-login-header span {
+  color: #2e7d32 !important;
+}
+body.theme-lauma #btn-switch-model-circle {
+  border-color: #81c784 !important;
+}
+body.theme-lauma #btn-switch-model svg,
+body.theme-lauma #btn-profile-icon,
+body.theme-lauma #btn-login-header svg {
+  stroke: #2e7d32 !important;
+}
+
+/* Khung Chat bên phải */
+body.theme-lauma #chat-ui {
+  background: rgba(232, 245, 233, 0.85) !important;
+  border-color: #81c784 !important;
+  box-shadow: 0 8px 25px rgba(46, 125, 50, 0.25) !important;
+}
+body.theme-lauma #chat-ui > div:first-child {
+  background: #81c784 !important;
+  box-shadow: 0 3px 8px rgba(46, 125, 50, 0.4) !important;
+}
+body.theme-lauma .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+body.theme-lauma #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #c8e6c9 !important;
+}
+body.theme-lauma #chat-history::-webkit-scrollbar-thumb {
+  background-color: #a5d6a7 !important;
+}
+body.theme-lauma .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #e8f5e9 !important;
+  color: #1b5e20 !important;
+  border-color: #81c784 !important;
+}
+body.theme-lauma .chat-msg.user {
+  background: #c8e6c9 !important;
+  color: #1b5e20 !important;
+}
+body.theme-lauma #chat-input {
+  border-color: #a5d6a7 !important;
+}
+body.theme-lauma #chat-input:focus {
+  border-color: #2e7d32 !important;
+  box-shadow: 0 0 8px rgba(46, 125, 50, 0.3) !important;
+}
+body.theme-lauma #btn-send-chat {
+  background: #81c784 !important;
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.4) !important;
+}
+body.theme-lauma #btn-send-chat:hover {
+  background: #66bb6a !important;
+}
+
+/* Thanh bên lịch sử Chat (#chat-sidebar) */
+body.theme-lauma #chat-sidebar {
+  background: rgba(232, 245, 233, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(46, 125, 50, 0.2) !important;
+}
+body.theme-lauma #chat-sidebar h3 {
+  color: #2e7d32 !important;
+}
+body.theme-lauma #btn-new-chat {
+  color: #2e7d32 !important;
+}
+body.theme-lauma .session-item {
+  border-color: #c8e6c9 !important;
+}
+body.theme-lauma .session-item:hover {
+  background: rgba(129, 199, 132, 0.2) !important;
+  border-color: #66bb6a !important;
+}
+body.theme-lauma .session-item.active {
+  background: rgba(46, 125, 50, 0.15) !important;
+  border-color: #2e7d32 !important;
+}
+body.theme-lauma .session-item.active .session-title {
+  color: #2e7d32 !important;
+}
+
+/* Bảng điều khiển camera và cài đặt bên trái (#ui, #control-panel) */
+body.theme-lauma #ui,
+body.theme-lauma #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(46, 125, 50, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.1) !important;
+}
+body.theme-lauma h2,
+body.theme-lauma h3,
+body.theme-lauma .panel-section h3,
+body.theme-lauma h4[style*="#ff6b81"] {
+  color: #2e7d32 !important;
+  border-bottom-color: rgba(46, 125, 50, 0.2) !important;
+}
+body.theme-lauma h4[style*="#ff6b81"] svg {
+  stroke: #2e7d32 !important;
+}
+body.theme-lauma .bone-btn {
+  background: #2e7d32 !important;
+  color: white !important;
+}
+body.theme-lauma .bone-btn:hover {
+  background: #1b5e20 !important;
+}
+body.theme-lauma .bone-btn.active {
+  background: #00e676 !important;
+  color: #003300 !important;
+}
+body.theme-lauma .tab-btn:hover {
+  background: rgba(46, 125, 50, 0.1) !important;
+}
+body.theme-lauma .tab-btn.active {
+  color: #2e7d32 !important;
+  background: rgba(46, 125, 50, 0.15) !important;
+}
+body.theme-lauma .control-row input[type="range"] {
+  accent-color: #2e7d32 !important;
+}
+body.theme-lauma .custom-select-display:hover,
+body.theme-lauma .custom-select-wrapper.open .custom-select-display {
+  border-color: #2e7d32 !important;
+}
+body.theme-lauma .custom-select-arrow svg {
+  color: #2e7d32 !important;
+}
+body.theme-lauma .custom-select-options {
+  border-color: #2e7d32 !important;
+}
+body.theme-lauma .custom-select-options::-webkit-scrollbar-thumb {
+  background: #a5d6a7 !important;
+}
+body.theme-lauma .custom-select-option:hover {
+  background: rgba(46, 125, 50, 0.1) !important;
+  color: #2e7d32 !important;
+}
+body.theme-lauma .custom-select-option.selected {
+  background: rgba(46, 125, 50, 0.15) !important;
+  color: #2e7d32 !important;
+}
+
+/* Các Nút Icon Tròn Nổi (.floating-icon) */
+body.theme-lauma .floating-icon {
+  border-color: #2e7d32 !important;
+  color: #2e7d32 !important;
+  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2) !important;
+}
+body.theme-lauma .floating-icon:hover {
+  background: #e8f5e9 !important;
+}
+
+/* Modal Chọn Nhân Vật (#character-modal) */
+body.theme-lauma .character-modal-content {
+  border-color: #81c784 !important;
+  box-shadow: 0 20px 40px rgba(46, 125, 50, 0.25) !important;
+}
+body.theme-lauma .character-modal-content h3 {
+  color: #2e7d32 !important;
+}
+body.theme-lauma #close-character-modal:hover {
+  color: #2e7d32 !important;
+}
+body.theme-lauma .character-modal-content > div:first-child {
+  border-bottom-color: #e8f5e9 !important;
+}
+body.theme-lauma .character-modal-content > div:last-child {
+  background: #e8f5e9 !important;
+  border-color: #c8e6c9 !important;
+  color: #1b5e20 !important;
+}
+body.theme-lauma .character-modal-content > div:last-child .model-hint-icon {
+  color: #2e7d32 !important;
+}
+body.theme-lauma .model-card[data-model="/Lauma.vrm"] {
+  background: #e8f5e9 !important;
+  border-color: #2e7d32 !important;
+}
+
+/* Hộp Thoại CustomDialog (.custom-dialog-box) */
+body.theme-lauma .custom-dialog-box {
+  background: rgba(232, 245, 233, 0.95) !important;
+  border-color: #81c784 !important;
+  box-shadow: 0 10px 40px rgba(46, 125, 50, 0.2) !important;
+  color: #1b5e20 !important;
+}
+body.theme-lauma .btn-confirm {
+  background: #2e7d32 !important;
+  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3) !important;
+}
+body.theme-lauma .btn-confirm:hover {
+  background: #1b5e20 !important;
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4) !important;
+}
+body.theme-lauma .btn-cancel {
+  background: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border-color: #81c784 !important;
+}
+body.theme-lauma .btn-cancel:hover {
+  background: #c8e6c9 !important;
+}
+
+/* Màn Hình Loading */
+body.theme-lauma #loading-progress-bar {
+  background: #2e7d32 !important;
+}
+body.theme-lauma #loading-text {
+  color: #2e7d32 !important;
+}
+body.theme-lauma .loading-image {
+  box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3) !important;
+}
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ NAHIDA (TONE XANH THẢO THẦN / DENDRO GREEN)
+   ========================================================= */
+body.theme-nahida {
+  background: linear-gradient(to bottom, #558b2f 0%, #9ccc65 50%, #f1f8e9 100%) !important;
+}
+
+/* Nút Header góc trên bên phải */
+body.theme-nahida #btn-switch-model,
+body.theme-nahida #btn-profile,
+body.theme-nahida #btn-login-header {
+  background: rgba(241, 248, 233, 0.85) !important;
+  border-color: #aed581 !important;
+  box-shadow: 0 4px 12px rgba(85, 139, 47, 0.15) !important;
+}
+body.theme-nahida #btn-switch-model:hover,
+body.theme-nahida #btn-profile:hover,
+body.theme-nahida #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(85, 139, 47, 0.25) !important;
+}
+body.theme-nahida #btn-switch-model span,
+body.theme-nahida #btn-profile span,
+body.theme-nahida #btn-login-header span {
+  color: #558b2f !important;
+}
+body.theme-nahida #btn-switch-model-circle {
+  border-color: #aed581 !important;
+}
+body.theme-nahida #btn-switch-model svg,
+body.theme-nahida #btn-profile-icon,
+body.theme-nahida #btn-login-header svg {
+  stroke: #558b2f !important;
+}
+
+/* Khung Chat bên phải */
+body.theme-nahida #chat-ui {
+  background: rgba(241, 248, 233, 0.85) !important;
+  border-color: #aed581 !important;
+  box-shadow: 0 8px 25px rgba(85, 139, 47, 0.25) !important;
+}
+body.theme-nahida #chat-ui > div:first-child {
+  background: #aed581 !important;
+  box-shadow: 0 3px 8px rgba(85, 139, 47, 0.4) !important;
+}
+body.theme-nahida .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+body.theme-nahida #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #dcedc8 !important;
+}
+body.theme-nahida #chat-history::-webkit-scrollbar-thumb {
+  background-color: #c5e1a5 !important;
+}
+body.theme-nahida .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #f1f8e9 !important;
+  color: #33691e !important;
+  border-color: #aed581 !important;
+}
+body.theme-nahida .chat-msg.user {
+  background: #dcedc8 !important;
+  color: #33691e !important;
+}
+body.theme-nahida #chat-input {
+  border-color: #c5e1a5 !important;
+}
+body.theme-nahida #chat-input:focus {
+  border-color: #558b2f !important;
+  box-shadow: 0 0 8px rgba(85, 139, 47, 0.3) !important;
+}
+body.theme-nahida #btn-send-chat {
+  background: #aed581 !important;
+  box-shadow: 0 2px 6px rgba(85, 139, 47, 0.4) !important;
+}
+body.theme-nahida #btn-send-chat:hover {
+  background: #9ccc65 !important;
+}
+
+/* Thanh bên lịch sử Chat (#chat-sidebar) */
+body.theme-nahida #chat-sidebar {
+  background: rgba(241, 248, 233, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(85, 139, 47, 0.2) !important;
+}
+body.theme-nahida #chat-sidebar h3 {
+  color: #558b2f !important;
+}
+body.theme-nahida #btn-new-chat {
+  color: #558b2f !important;
+}
+body.theme-nahida .session-item {
+  border-color: #dcedc8 !important;
+}
+body.theme-nahida .session-item:hover {
+  background: rgba(174, 213, 129, 0.2) !important;
+  border-color: #9ccc65 !important;
+}
+body.theme-nahida .session-item.active {
+  background: rgba(85, 139, 47, 0.15) !important;
+  border-color: #558b2f !important;
+}
+body.theme-nahida .session-item.active .session-title {
+  color: #558b2f !important;
+}
+
+/* Bảng điều khiển camera và cài đặt bên trái (#ui, #control-panel) */
+body.theme-nahida #ui,
+body.theme-nahida #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(85, 139, 47, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(85, 139, 47, 0.1) !important;
+}
+body.theme-nahida h2,
+body.theme-nahida h3,
+body.theme-nahida .panel-section h3,
+body.theme-nahida h4[style*="#ff6b81"] {
+  color: #558b2f !important;
+  border-bottom-color: rgba(85, 139, 47, 0.2) !important;
+}
+body.theme-nahida h4[style*="#ff6b81"] svg {
+  stroke: #558b2f !important;
+}
+body.theme-nahida .bone-btn {
+  background: #558b2f !important;
+  color: white !important;
+}
+body.theme-nahida .bone-btn:hover {
+  background: #33691e !important;
+}
+body.theme-nahida .bone-btn.active {
+  background: #76ff03 !important;
+  color: #003300 !important;
+}
+body.theme-nahida .tab-btn:hover {
+  background: rgba(85, 139, 47, 0.1) !important;
+}
+body.theme-nahida .tab-btn.active {
+  color: #558b2f !important;
+  background: rgba(85, 139, 47, 0.15) !important;
+}
+body.theme-nahida .control-row input[type="range"] {
+  accent-color: #558b2f !important;
+}
+body.theme-nahida .custom-select-display:hover,
+body.theme-nahida .custom-select-wrapper.open .custom-select-display {
+  border-color: #558b2f !important;
+}
+body.theme-nahida .custom-select-arrow svg {
+  color: #558b2f !important;
+}
+body.theme-nahida .custom-select-options {
+  border-color: #558b2f !important;
+}
+body.theme-nahida .custom-select-options::-webkit-scrollbar-thumb {
+  background: #c5e1a5 !important;
+}
+body.theme-nahida .custom-select-option:hover {
+  background: rgba(85, 139, 47, 0.1) !important;
+  color: #558b2f !important;
+}
+body.theme-nahida .custom-select-option.selected {
+  background: rgba(85, 139, 47, 0.15) !important;
+  color: #558b2f !important;
+}
+
+/* Các Nút Icon Tròn Nổi (.floating-icon) */
+body.theme-nahida .floating-icon {
+  border-color: #558b2f !important;
+  color: #558b2f !important;
+  box-shadow: 0 4px 10px rgba(85, 139, 47, 0.2) !important;
+}
+body.theme-nahida .floating-icon:hover {
+  background: #f1f8e9 !important;
+}
+
+/* Modal Chọn Nhân Vật (#character-modal) */
+body.theme-nahida .character-modal-content {
+  border-color: #aed581 !important;
+  box-shadow: 0 20px 40px rgba(85, 139, 47, 0.25) !important;
+}
+body.theme-nahida .character-modal-content h3 {
+  color: #558b2f !important;
+}
+body.theme-nahida #close-character-modal:hover {
+  color: #558b2f !important;
+}
+body.theme-nahida .character-modal-content > div:first-child {
+  border-bottom-color: #f1f8e9 !important;
+}
+body.theme-nahida .character-modal-content > div:last-child {
+  background: #f1f8e9 !important;
+  border-color: #dcedc8 !important;
+  color: #33691e !important;
+}
+body.theme-nahida .character-modal-content > div:last-child .model-hint-icon {
+  color: #558b2f !important;
+}
+body.theme-nahida .model-card[data-model="/Nahida.vrm"] {
+  background: #f1f8e9 !important;
+  border-color: #558b2f !important;
+}
+
+/* Hộp Thoại CustomDialog (.custom-dialog-box) */
+body.theme-nahida .custom-dialog-box {
+  background: rgba(241, 248, 233, 0.95) !important;
+  border-color: #aed581 !important;
+  box-shadow: 0 10px 40px rgba(85, 139, 47, 0.2) !important;
+  color: #33691e !important;
+}
+body.theme-nahida .btn-confirm {
+  background: #558b2f !important;
+  box-shadow: 0 4px 15px rgba(85, 139, 47, 0.3) !important;
+}
+body.theme-nahida .btn-confirm:hover {
+  background: #33691e !important;
+  box-shadow: 0 6px 20px rgba(85, 139, 47, 0.4) !important;
+}
+body.theme-nahida .btn-cancel {
+  background: #f1f8e9 !important;
+  color: #558b2f !important;
+  border-color: #aed581 !important;
+}
+body.theme-nahida .btn-cancel:hover {
+  background: #dcedc8 !important;
+}
+
+/* Màn Hình Loading */
+body.theme-nahida #loading-progress-bar {
+  background: #558b2f !important;
+}
+body.theme-nahida #loading-text {
+  color: #558b2f !important;
+}
+body.theme-nahida .loading-image {
+  box-shadow: 0 10px 30px rgba(85, 139, 47, 0.3) !important;
+}
+
+/* ==========================================================================
+   THEME 5: YAE MIKO (Màu Hồng Anh Đào & Đỏ Hồng Ngọc / Sakura Pink & Crimson)
+   ========================================================================== */
+body.theme-yaemiko {
+  background: linear-gradient(to bottom, #ffe6ee 0%, #fff0f5 50%, #ffffff 100%) !important;
+}
+body.theme-yaemiko .nav-btn,
+body.theme-yaemiko .camera-btn {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: #ffb6c1 !important;
+  color: #e94560 !important;
+}
+body.theme-yaemiko .nav-btn:hover,
+body.theme-yaemiko .camera-btn:hover,
+body.theme-yaemiko .camera-btn.active {
+  background: #e94560 !important;
+  color: #ffffff !important;
+  border-color: #e94560 !important;
+  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3) !important;
+}
+body.theme-yaemiko .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+body.theme-yaemiko #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #ffb6c1 !important;
+}
+body.theme-yaemiko #chat-history::-webkit-scrollbar-thumb {
+  background-color: #ffb6c1 !important;
+}
+body.theme-yaemiko .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #fff0f5 !important;
+  color: #d6336c !important;
+  border-color: #ffb6c1 !important;
+}
+body.theme-yaemiko .chat-msg.user {
+  background: #ffe6ee !important;
+  color: #c2185b !important;
+}
+body.theme-yaemiko #chat-input {
+  border-color: #ffb6c1 !important;
+}
+body.theme-yaemiko #chat-input:focus {
+  border-color: #e94560 !important;
+  box-shadow: 0 0 12px rgba(233, 69, 96, 0.25) !important;
+}
+body.theme-yaemiko #btn-send {
+  background: linear-gradient(135deg, #e94560, #ff80a0) !important;
+  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3) !important;
+}
+body.theme-yaemiko #btn-send:hover {
+  background: linear-gradient(135deg, #d6335c, #e94560) !important;
+  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4) !important;
+}
+body.theme-yaemiko .modal-content {
+  border-color: #ffb6c1 !important;
+  box-shadow: 0 15px 40px rgba(233, 69, 96, 0.2) !important;
+}
+body.theme-yaemiko .modal-header {
+  border-bottom-color: #fff0f5 !important;
+}
+body.theme-yaemiko .modal-title {
+  color: #e94560 !important;
+}
+body.theme-yaemiko .tab-btn.active {
+  color: #e94560 !important;
+  border-bottom-color: #e94560 !important;
+}
+body.theme-yaemiko .range-slider::-webkit-slider-thumb {
+  background: #e94560 !important;
+  box-shadow: 0 0 10px rgba(233, 69, 96, 0.4) !important;
+}
+body.theme-yaemiko .select-selected {
+  border-color: #ffb6c1 !important;
+}
+body.theme-yaemiko .select-selected:after {
+  border-color: #e94560 transparent transparent transparent !important;
+}
+body.theme-yaemiko .select-items div:hover,
+body.theme-yaemiko .same-as-selected {
+  background-color: #fff0f5 !important;
+  color: #e94560 !important;
+}
+body.theme-yaemiko .btn-confirm {
+  background: #e94560 !important;
+  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3) !important;
+}
+body.theme-yaemiko .btn-confirm:hover {
+  background: #d6335c !important;
+  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4) !important;
+}
+body.theme-yaemiko .btn-cancel {
+  background: #fff0f5 !important;
+  color: #e94560 !important;
+  border-color: #ffb6c1 !important;
+}
+body.theme-yaemiko .btn-cancel:hover {
+  background: #ffe6ee !important;
+}
+body.theme-yaemiko #loading-progress-bar {
+  background: #e94560 !important;
+}
+body.theme-yaemiko #loading-text {
+  color: #e94560 !important;
+}
+body.theme-yaemiko .loading-image {
+  box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3) !important;
+}
+
+/* Bổ sung hoàn thiện Giao Diện Yae Miko (header buttons, sidebar, chat, control panel) */
+body.theme-yaemiko #btn-switch-model,
+body.theme-yaemiko #btn-profile,
+body.theme-yaemiko #btn-login-header {
+  background: rgba(255, 240, 245, 0.85) !important;
+  border-color: #ffb6c1 !important;
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.15) !important;
+}
+body.theme-yaemiko #btn-switch-model:hover,
+body.theme-yaemiko #btn-profile:hover,
+body.theme-yaemiko #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(233, 69, 96, 0.25) !important;
+}
+body.theme-yaemiko #btn-switch-model span,
+body.theme-yaemiko #btn-profile span,
+body.theme-yaemiko #btn-login-header span {
+  color: #e94560 !important;
+}
+body.theme-yaemiko #btn-switch-model-circle {
+  border-color: #ffb6c1 !important;
+}
+body.theme-yaemiko #btn-switch-model svg,
+body.theme-yaemiko #btn-profile-icon,
+body.theme-yaemiko #btn-login-header svg {
+  stroke: #e94560 !important;
+}
+body.theme-yaemiko #chat-ui {
+  background: rgba(255, 240, 245, 0.85) !important;
+  border-color: #ffb6c1 !important;
+  box-shadow: 0 8px 25px rgba(233, 69, 96, 0.25) !important;
+}
+body.theme-yaemiko #chat-ui > div:first-child {
+  background: #ff80a0 !important;
+  box-shadow: 0 3px 8px rgba(233, 69, 96, 0.4) !important;
+}
+body.theme-yaemiko #btn-send-chat {
+  background: #ff80a0 !important;
+  box-shadow: 0 2px 6px rgba(233, 69, 96, 0.4) !important;
+}
+body.theme-yaemiko #btn-send-chat:hover {
+  background: #e94560 !important;
+}
+body.theme-yaemiko #chat-sidebar {
+  background: rgba(255, 240, 245, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2) !important;
+}
+body.theme-yaemiko #chat-sidebar h3 {
+  color: #e94560 !important;
+}
+body.theme-yaemiko #btn-new-chat {
+  color: #e94560 !important;
+}
+body.theme-yaemiko .session-item {
+  border-color: #ffe6ee !important;
+}
+body.theme-yaemiko .session-item:hover {
+  background: rgba(255, 182, 193, 0.2) !important;
+  border-color: #ff80a0 !important;
+}
+body.theme-yaemiko .session-item.active {
+  background: rgba(233, 69, 96, 0.15) !important;
+  border-color: #e94560 !important;
+}
+body.theme-yaemiko .session-item.active .session-title {
+  color: #e94560 !important;
+}
+body.theme-yaemiko #ui,
+body.theme-yaemiko #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(233, 69, 96, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.1) !important;
+}
+body.theme-yaemiko h2,
+body.theme-yaemiko h3,
+body.theme-yaemiko .panel-section h3,
+body.theme-yaemiko h4[style*="#ff6b81"] {
+  color: #e94560 !important;
+  border-bottom-color: rgba(233, 69, 96, 0.2) !important;
+}
+body.theme-yaemiko h4[style*="#ff6b81"] svg {
+  stroke: #e94560 !important;
+}
+body.theme-yaemiko .bone-btn {
+  background: #e94560 !important;
+  color: white !important;
+}
+body.theme-yaemiko .bone-btn:hover {
+  background: #d6335c !important;
+}
+body.theme-yaemiko .bone-btn.active {
+  background: #ff80a0 !important;
+  color: white !important;
+}
+body.theme-yaemiko .tab-btn:hover {
+  background: rgba(233, 69, 96, 0.1) !important;
+}
+body.theme-yaemiko .control-row input[type="range"] {
+  accent-color: #e94560 !important;
+}
+body.theme-yaemiko .custom-select-display:hover,
+body.theme-yaemiko .custom-select-wrapper.open .custom-select-display {
+  border-color: #e94560 !important;
+}
+body.theme-yaemiko .custom-select-arrow svg {
+  color: #e94560 !important;
+}
+body.theme-yaemiko .custom-select-options {
+  border-color: #e94560 !important;
+}
+body.theme-yaemiko .custom-select-options::-webkit-scrollbar-thumb {
+  background: #ffb6c1 !important;
 }

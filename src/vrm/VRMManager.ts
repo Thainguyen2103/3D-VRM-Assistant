@@ -4,7 +4,9 @@ import { VRMLoaderPlugin, VRMUtils, VRM } from "@pixiv/three-vrm";
 import { scene, camera, controls } from '../scene/setup';
 import { appState, targetExpressions, targetPoseState, poseState, lerpPose, cameraState } from '../core/state';
 import { loadMixamoAnimation } from '../loadMixamoAnimation';
-import { t } from '../i18n';
+import { t, updateChatUIForModel } from '../i18n';
+import { normalizeModelUrl } from '../constants';
+import { currentUser, supabase } from '../core/auth';
 
 export let currentVrm: VRM | undefined;
 export const lookAtTarget = new THREE.Object3D();
@@ -176,7 +178,7 @@ export function initVRM() {
       const progressBar = document.getElementById('loading-progress-bar');
       const loadingText = document.getElementById('loading-text');
       const loadingDetail = document.getElementById('loading-detail');
-      
+
       if (progressBar) progressBar.style.width = progress + '%';
       if (loadingText) loadingText.innerText = `${t('loading')} ${progress}%`;
       if (loadingDetail) {
@@ -198,8 +200,111 @@ export function initVRM() {
     }
   };
 
+  getSavedModelUrl().then((savedUrl) => {
+    switchVRMModel(savedUrl, true);
+  });
+}
+
+export let currentModelUrl = "/Citlali.vrm";
+export let currentCameraMode: 'full' | 'half' | 'chest' | 'face' = 'half';
+
+export function applyCameraPreset(mode: 'full' | 'half' | 'chest' | 'face' = currentCameraMode, isInstant: boolean = false) {
+  currentCameraMode = mode;
+  const url = currentModelUrl.toLowerCase();
+
+  let pos = new THREE.Vector3();
+  let target = new THREE.Vector3();
+
+  if (url.includes('nahida') || url.includes('loli')) {
+    // Short / Loli model
+    if (mode === 'full') { pos.set(0.0, 0.65, 2.8); target.set(0.0, 0.55, 0.0); }
+    else if (mode === 'half') { pos.set(0.0, 0.85, 1.5); target.set(0.0, 0.75, 0.0); }
+    else if (mode === 'chest') { pos.set(0.0, 1.05, 0.9); target.set(0.0, 1.00, 0.0); }
+    else if (mode === 'face') { pos.set(0.0, 1.05, 0.7); target.set(0.0, 1.00, 0.0); }
+  } else if (url.includes('xianyun') || url.includes('lauma') || url.includes('yaemiko')) {
+    // Tall adult women model
+    if (mode === 'full') { pos.set(0.0, 1.15, 3.8); target.set(0.0, 0.95, 0.0); }
+    else if (mode === 'half') { pos.set(0.0, 1.5, 1.7); target.set(0.0, 1.4, 0.0); }
+    else if (mode === 'chest') { pos.set(0.0, 1.68, 1.4); target.set(0.0, 1.65, 0.0); }
+    else if (mode === 'face') { pos.set(0.0, 1.68, 0.75); target.set(0.0, 1.65, 0.0); }
+  } else {
+    // Medium / Teenage girl model (Citlali and default fallback)
+    if (mode === 'full') { pos.set(0.0, 1.0, 3.5); target.set(0.0, 0.8, 0.0); }
+    else if (mode === 'half') { pos.set(0.0, 1.3, 1.5); target.set(0.0, 1.2, 0.0); }
+    else if (mode === 'chest') { pos.set(0.0, 1.45, 1.0); target.set(0.0, 1.42, 0.0); }
+    else if (mode === 'face') { pos.set(0.0, 1.45, 0.7); target.set(0.0, 1.42, 0.0); }
+  }
+
+  if (isInstant) {
+    camera.position.copy(pos);
+    controls.target.copy(target);
+    cameraState.targetPos.copy(pos);
+    cameraState.targetTarget.copy(target);
+    cameraState.isAnimating = false;
+  } else {
+    cameraState.targetPos.copy(pos);
+    cameraState.targetTarget.copy(target);
+    cameraState.isAnimating = true;
+  }
+}
+
+export async function getSavedModelUrl(): Promise<string> {
+  let modelUrl = "/Citlali.vrm";
+  try {
+    const local = localStorage.getItem('app_settings');
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (parsed.model) modelUrl = parsed.model;
+    }
+  } catch (e) { }
+
+  if (currentUser && supabase) {
+    try {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+      if (data && data.settings && data.settings.model) {
+        modelUrl = data.settings.model;
+        const local = JSON.parse(localStorage.getItem('app_settings') || '{}');
+        local.model = modelUrl;
+        localStorage.setItem('app_settings', JSON.stringify(local));
+      }
+    } catch (e) {
+      console.warn("Lỗi tải model từ Supabase:", e);
+    }
+  }
+  modelUrl = normalizeModelUrl(modelUrl);
+  return modelUrl;
+}
+
+export function switchVRMModel(url: string, isInitial: boolean = false, onComplete?: () => void) {
+  url = normalizeModelUrl(url);
+  currentModelUrl = url;
+  updateChatUIForModel(url);
+  const loadingManager = isInitial ? THREE.DefaultLoadingManager : new THREE.LoadingManager();
+  const loader = new GLTFLoader(loadingManager);
+  loader.register((parser) => new VRMLoaderPlugin(parser));
+
+  if (currentAction) {
+    currentAction.stop();
+    currentAction = null;
+  }
+  if (currentMixer) {
+    currentMixer.stopAllAction();
+    currentMixer = null;
+  }
+  currentAnimUrl = "";
+
+  if (currentVrm) {
+    scene.remove(currentVrm.scene);
+    VRMUtils.deepDispose(currentVrm.scene);
+    currentVrm = undefined;
+  }
+
   loader.load(
-    "/model.vrm",
+    url,
     (gltf) => {
       const vrm = gltf.userData.vrm;
       VRMUtils.removeUnnecessaryVertices(gltf.scene);
@@ -242,11 +347,17 @@ export function initVRM() {
       }
 
       vrm.lookAt.target = lookAtTarget;
+      applyCameraPreset(currentCameraMode, isInitial);
+
+      if (!isInitial) {
+        loadFBXAnimation("idle.fbx", true);
+      }
+      if (onComplete) onComplete();
     },
     (progress) => {
-      // Dùng DefaultLoadingManager xử lý chung
+      // Xử lý tiến độ nếu cần
     },
-    (error) => console.error(error),
+    (error) => console.error("Lỗi tải VRM:", error)
   );
 }
 
@@ -334,12 +445,12 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
       pianoAudio = new Audio("/Sounds/piano_music.mp3");
       pianoAudio.loop = true;
     }
-    
+
     if (currentAnimUrl !== "Piano Playing.fbx") {
       // Lưu lại camera hiện tại
       prePianoCameraPos.copy(camera.position);
       prePianoCameraTarget.copy(controls.target);
-      
+
       // Chuyển camera sang góc nhìn phù hợp cho piano
       cameraState.targetPos.set(-5.052, 1.432, -2.140);
       cameraState.targetTarget.set(0.000, 0.800, 0.500);

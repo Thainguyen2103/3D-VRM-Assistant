@@ -72,22 +72,22 @@ export class CustomDialog {
           transform: translateY(0);
         }
         .btn-confirm {
-          background: #e94560;
+          background: #3f51b5;
           color: white;
-          box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+          box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
         }
         .btn-confirm:hover {
-          background: #d63d56;
-          box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+          background: #303f9f;
+          box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4);
         }
         .btn-cancel {
-          background: #ffe4e1;
-          color: #e94560;
-          border: 2px solid #ffb6c1;
+          background: #e8eaf6;
+          color: #3f51b5;
+          border: 2px solid #7986cb;
           padding: 8px 22px; /* adjust for border */
         }
         .btn-cancel:hover {
-          background: #ffced5;
+          background: #c5cae9;
         }
       `;
       document.head.appendChild(style);

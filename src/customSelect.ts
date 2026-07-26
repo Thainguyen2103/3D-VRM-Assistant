@@ -92,6 +92,16 @@ export function initCustomSelects() {
         };
         updateDisplay();
         
+        select.addEventListener('change', () => {
+            updateDisplay();
+            if (optionsList) {
+                Array.from(optionsList.children).forEach((c, idx) => {
+                    if (idx === select.selectedIndex) c.classList.add('selected');
+                    else c.classList.remove('selected');
+                });
+            }
+        });
+
         wrapper.appendChild(display);
 
         // 3. Tạo danh sách các tùy chọn (Options list)

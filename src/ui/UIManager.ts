@@ -1,10 +1,11 @@
 import { appState, targetExpressions, poseState, targetPoseState, boneMapping, cameraState, savePoseToHistory, poses } from '../core/state';
-import { loadFBXAnimation, currentVrm, currentMixer } from '../vrm/VRMManager';
+import { loadFBXAnimation, currentVrm, currentMixer, switchVRMModel, currentModelUrl, applyCameraPreset } from '../vrm/VRMManager';
 import { updateTimeOfDay } from '../scene/environment';
 import { updateWeatherSystem, setPetalCount } from '../scene/weather';
 import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
 import { translations, applyLanguage, t } from '../i18n';
 import { initAuth, supabase, currentUser } from '../core/auth';
+import { MODEL_CITLALI, normalizeModelUrl, isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '../constants';
 import { CustomDialog } from './CustomDialog';
 import { createIcons, icons } from 'lucide';
 
@@ -308,24 +309,16 @@ export function initUI() {
 
 
   document.getElementById("cam-full")?.addEventListener("click", () => {
-    cameraState.targetPos.set(0.0, 1.0, 3.5);
-    cameraState.targetTarget.set(0.0, 0.8, 0.0);
-    cameraState.isAnimating = true;
+    applyCameraPreset('full');
   });
   document.getElementById("cam-half")?.addEventListener("click", () => {
-    cameraState.targetPos.set(0.0, 1.3, 1.5);
-    cameraState.targetTarget.set(0.0, 1.2, 0.0);
-    cameraState.isAnimating = true;
+    applyCameraPreset('half');
   });
   document.getElementById("cam-chest")?.addEventListener("click", () => {
-    cameraState.targetPos.set(0.0, 1.45, 1.0);
-    cameraState.targetTarget.set(0.0, 1.42, 0.0);
-    cameraState.isAnimating = true;
+    applyCameraPreset('chest');
   });
   document.getElementById("cam-face")?.addEventListener("click", () => {
-    cameraState.targetPos.set(0.0, 1.45, 0.7);
-    cameraState.targetTarget.set(0.0, 1.42, 0.0);
-    cameraState.isAnimating = true;
+    applyCameraPreset('face');
   });
 
   document.getElementById("setting-shadow")?.addEventListener("change", (e) => {
@@ -456,7 +449,7 @@ export function initUI() {
       try {
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('settings')
+          .select('*')
           .eq('id', currentUser.id)
           .single();
         if (data && data.settings) {
@@ -481,7 +474,7 @@ export function initUI() {
       }
       if (settings.voice) {
          const el = document.getElementById("setting-voice") as HTMLSelectElement;
-         if (el) { el.value = settings.voice; }
+         if (el) { el.value = settings.voice; el.dispatchEvent(new Event('change')); }
       }
       if (settings.shadow) {
          const el = document.getElementById("setting-shadow") as HTMLSelectElement;
@@ -503,6 +496,9 @@ export function initUI() {
          const el = document.getElementById("setting-petals-count") as HTMLInputElement;
          if (el) { el.value = settings.petalCount; el.dispatchEvent(new Event('input')); }
       }
+      if (settings.model) {
+         updateActiveModelCardUI(settings.model);
+      }
     }
   }
 
@@ -511,7 +507,14 @@ export function initUI() {
 
   if (btnSaveSettings) {
     btnSaveSettings.addEventListener('click', async () => {
+      let existingModel = currentModelUrl || '/model.vrm';
+      try {
+        const local = JSON.parse(localStorage.getItem('app_settings') || '{}');
+        if (local.model) existingModel = local.model;
+      } catch (e) {}
+
       const settings = {
+        model: existingModel,
         language: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
         voice: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh',
         shadow: (document.getElementById('setting-shadow') as HTMLSelectElement)?.value || 'off',
@@ -582,7 +585,7 @@ export function initUI() {
           if (currentSettings.language) savedLang = currentSettings.language;
         } catch(e) {}
         
-        const resetSettings = { language: savedLang };
+        const resetSettings = { language: savedLang, model: '/Citlali.vrm' };
         localStorage.setItem('app_settings', JSON.stringify(resetSettings));
 
         if (currentUser && supabase) {
@@ -594,4 +597,185 @@ export function initUI() {
       }
     });
   }
+
+  initCharacterSwitcher();
 }
+
+export function showToast(message: string, color: string = '#4CAF50') {
+  const existingToasts = document.querySelectorAll('.app-toast-popup');
+  existingToasts.forEach((el) => el.remove());
+
+  if (color === 'error') color = '#ff4d4f';
+  if (color === 'success' || color === '#4CAF50') {
+    const isXianyun = document.body.classList.contains('theme-xianyun');
+    const isLauma = document.body.classList.contains('theme-lauma');
+    const isNahida = document.body.classList.contains('theme-nahida');
+    const isYaeMiko = document.body.classList.contains('theme-yaemiko');
+    color = isXianyun ? '#00838f' : (isLauma ? '#2e7d32' : (isNahida ? '#558b2f' : (isYaeMiko ? '#e94560' : '#3f51b5')));
+  }
+
+  const toast = document.createElement('div');
+  toast.className = 'app-toast-popup';
+  toast.innerText = message;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '24px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  toast.style.background = color;
+  toast.style.color = 'white';
+  toast.style.padding = '10px 24px';
+  toast.style.borderRadius = '30px';
+  toast.style.boxShadow = '0 6px 16px rgba(0,0,0,0.25)';
+  toast.style.zIndex = '99999';
+  toast.style.fontWeight = '600';
+  toast.style.pointerEvents = 'none';
+  toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(15px)';
+    setTimeout(() => {
+      if (toast.parentNode) toast.remove();
+    }, 300);
+  }, 2500);
+}
+
+export function updateActiveModelCardUI(url: string) {
+  const modelCards = document.querySelectorAll('.model-card');
+  modelCards.forEach((card) => {
+    const cardModel = card.getAttribute('data-model');
+    const checkIcon = card.querySelector('.model-check-icon') as HTMLElement;
+    if (cardModel === url) {
+      card.classList.add('active');
+      if (isLaumaModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#2e7d32';
+        (card as HTMLElement).style.background = '#e8f5e9';
+      } else if (isNahidaModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#558b2f';
+        (card as HTMLElement).style.background = '#e8f5e9';
+      } else if (isYaeMikoModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#e94560';
+        (card as HTMLElement).style.background = '#ffe6ee';
+      } else if (isXianyunModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#00838f';
+        (card as HTMLElement).style.background = '#e0f7fa';
+      } else {
+        (card as HTMLElement).style.borderColor = '#3f51b5';
+        (card as HTMLElement).style.background = '#e8eaf6';
+      }
+      if (checkIcon) checkIcon.style.display = 'flex';
+    } else {
+      card.classList.remove('active');
+      if (isLaumaModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#81c784';
+        (card as HTMLElement).style.background = '#f1f8e9';
+      } else if (isNahidaModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#aed581';
+        (card as HTMLElement).style.background = '#f1f8e9';
+      } else if (isYaeMikoModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#ffb6c1';
+        (card as HTMLElement).style.background = '#fff0f5';
+      } else if (isXianyunModel(cardModel)) {
+        (card as HTMLElement).style.borderColor = '#4dd0e1';
+        (card as HTMLElement).style.background = '#f0f8ff';
+      } else {
+        (card as HTMLElement).style.borderColor = '#7986cb';
+        (card as HTMLElement).style.background = '#f0f3ff';
+      }
+      if (checkIcon) checkIcon.style.display = 'none';
+    }
+  });
+}
+
+function initCharacterSwitcher() {
+  const btnSwitchModel = document.getElementById('btn-switch-model');
+  const characterModal = document.getElementById('character-modal');
+  const closeCharacterModal = document.getElementById('close-character-modal');
+  const modelCards = document.querySelectorAll('.model-card');
+
+  setTimeout(() => {
+    updateActiveModelCardUI(normalizeModelUrl(currentModelUrl || MODEL_CITLALI));
+  }, 1000);
+
+  if (btnSwitchModel && characterModal) {
+    btnSwitchModel.addEventListener('click', () => {
+      updateActiveModelCardUI(normalizeModelUrl(currentModelUrl || MODEL_CITLALI));
+      characterModal.style.display = 'flex';
+      setTimeout(() => {
+        characterModal.style.opacity = '1';
+        const content = characterModal.querySelector('.character-modal-content') as HTMLElement;
+        if (content) content.style.transform = 'scale(1)';
+      }, 10);
+    });
+  }
+
+  const closeModal = () => {
+    if (!characterModal) return;
+    characterModal.style.opacity = '0';
+    const content = characterModal.querySelector('.character-modal-content') as HTMLElement;
+    if (content) content.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+      characterModal.style.display = 'none';
+    }, 300);
+  };
+
+  if (closeCharacterModal) {
+    closeCharacterModal.addEventListener('click', closeModal);
+  }
+
+  if (characterModal) {
+    characterModal.addEventListener('click', (e) => {
+      if (e.target === characterModal) closeModal();
+    });
+  }
+
+  modelCards.forEach((card) => {
+    card.addEventListener('click', async () => {
+      const selectedModelUrl = normalizeModelUrl(card.getAttribute('data-model') || MODEL_CITLALI);
+      if (selectedModelUrl === currentModelUrl) {
+        closeModal();
+        return;
+      }
+
+      updateActiveModelCardUI(selectedModelUrl);
+      const isXianyunTarget = isXianyunModel(selectedModelUrl);
+      const isLaumaTarget = isLaumaModel(selectedModelUrl);
+      const isNahidaTarget = isNahidaModel(selectedModelUrl);
+      const isYaeMikoTarget = isYaeMikoModel(selectedModelUrl);
+      const toastColor = isXianyunTarget ? "#00838f" : (isLaumaTarget ? "#2e7d32" : (isNahidaTarget ? "#558b2f" : (isYaeMikoTarget ? "#e94560" : "#3f51b5")));
+      showToast(t("toast.switching_model"), toastColor);
+
+      switchVRMModel(selectedModelUrl, false, () => {
+        showToast(t("toast.switched_model"), toastColor);
+      });
+
+      try {
+        const currentSettings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+        currentSettings.model = selectedModelUrl;
+        localStorage.setItem('app_settings', JSON.stringify(currentSettings));
+      } catch (e) {}
+
+      if (currentUser && supabase) {
+        try {
+          const { data } = await supabase
+            .from('user_profiles')
+            .select('settings')
+            .eq('id', currentUser.id)
+            .single();
+
+          const updatedSettings = { ...(data?.settings || {}), model: selectedModelUrl };
+          await supabase
+            .from('user_profiles')
+            .update({ settings: updatedSettings })
+            .eq('id', currentUser.id);
+        } catch (e) {
+          console.error("Lỗi khi lưu model vào Supabase:", e);
+        }
+      }
+
+      closeModal();
+    });
+  });
+}
+

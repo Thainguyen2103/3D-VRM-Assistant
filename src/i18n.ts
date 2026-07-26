@@ -1,3 +1,5 @@
+import { MODEL_CITLALI, normalizeModelUrl, isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from './constants';
+
 export const translations: Record<string, Record<string, string>> = {
   vi: {
     "loading": "Đang tải tài nguyên...",
@@ -8,8 +10,20 @@ export const translations: Record<string, Record<string, string>> = {
     "cam.face": "Cận (Mặt)",
     "instruction": "Kéo chuột PHẢI để xoay | Lăn chuột GIỮA để thu/phóng",
     "chat.title": "🌸 Citlali Chat 🌸",
+    "chat.title.xianyun": "☁️ Xianyun Chat ☁️",
+    "chat.title.lauma": "🌙 Lauma Chat 🌙",
+    "chat.title.nahida": "🌿 Nahida Chat 🌿",
+    "chat.title.yaemiko": "🦊 Yae Miko Chat 🦊",
     "chat.initial": "Gọi gì đấy? Tôi đang bận lắm nhé, có gì thì nói nhanh lên. (￣^￣)",
+    "chat.initial.xianyun": "Bản tiên là Lưu Vân Tá Phong Chân Quân - Xianyun. Hậu bối, hôm nay con ghé thăm có việc gì cần bản tiên chỉ giáo chăng? ☁️",
+    "chat.initial.lauma": "Tôi là Nguyệt Ca Sư Lauma thuộc Sương Nguyệt Tộc. Lữ khách, đêm nay ánh trăng rất ấm áp, bạn có muốn cùng tôi dạo bước và tâm sự không? 🌙",
+    "chat.initial.nahida": "Ư! Lữ khách đến rồi à? Tiểu Tiểu đang thiếu người cùng khám phá đấy! Hôm nay bạn đem chuyện gì thú vị không? 🌿",
+    "chat.initial.yaemiko": "Bản cung là Bát Trọng Thần Tử - Yae Miko. Tiểu gia hỏa, hôm nay ghé thăm Đền Narukami có việc gì, hay là mang tiểu thuyết light novel thú vị đến cho ta? 🦊",
     "chat.placeholder": "Nhập nhanh lên, tôi không rảnh đâu...",
+    "chat.placeholder.xianyun": "Hãy nói cho bản tiên nghe, con gặp chuyện gì sao?...",
+    "chat.placeholder.lauma": "Hãy nói cho tôi nghe, Lữ khách có tâm sự gì sao?...",
+    "chat.placeholder.nahida": "Nói cho Tiểu Tiểu nghe hôm nay có gì thú vị nào?...",
+    "chat.placeholder.yaemiko": "Nói gì thú vị đi, đừng làm ta chán...",
     "btn.send": "Gửi",
     "btn.saving": "Đang lưu...",
     "btn.ok": "Đồng ý",
@@ -24,6 +38,19 @@ export const translations: Record<string, Record<string, string>> = {
 
     "btn.profile": "Hồ sơ",
     "btn.login": "Đăng nhập",
+    "btn.model": "Nhân vật",
+    "model.title": "🌸 Chọn Nhân Vật 3D",
+    "model.citlali": "Citlali",
+    "model.citlali_trait": "Tsundere & Ấm áp",
+    "model.model2": "Xianyun",
+    "model.xianyun_trait": "Thanh tao & Bao dung",
+    "model.lauma": "Lauma",
+    "model.lauma_trait": "Từ bi & Chữa lành",
+    "model.nahida": "Nahida",
+    "model.nahida_trait": "Hiếu kỳ & Thông tuệ",
+    "model.yaemiko": "Yae Miko",
+    "model.yaemiko_trait": "Kiêu kỳ & Ma mãnh",
+    "model.hint": "Lựa chọn của bạn sẽ được ghi nhớ vào hệ thống cho những lần truy cập sau!",
     "tab.body": "Cơ Thể",
     "tab.face": "Biểu Cảm & Tay",
     "tab.settings": "Cấu Hình",
@@ -173,7 +200,12 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.login_failed": "Đăng nhập thất bại: ",
     "alert.pass_mismatch": "Mật khẩu nhập lại không khớp!",
     "alert.reg_failed": "Đăng ký thất bại: ",
-    "alert.reg_success": "Đăng ký thành công!"
+    "alert.reg_success": "Đăng ký thành công!",
+    "toast.switching_model": "Đang chuyển sang nhân vật mới... ⏳",
+    "toast.switched_model": "Đã chuyển đổi nhân vật thành công! 🌸",
+    "toast.login_again": "Vui lòng đăng nhập lại!",
+    "toast.profile_saved": "Đã lưu hồ sơ thành công!",
+    "toast.error": "Đã xảy ra lỗi!"
   },
   en: {
     "loading": "Loading resources...",
@@ -184,8 +216,20 @@ export const translations: Record<string, Record<string, string>> = {
     "cam.face": "Face",
     "instruction": "RIGHT CLICK to rotate | SCROLL to zoom",
     "chat.title": "🌸 Citlali Chat 🌸",
+    "chat.title.xianyun": "☁️ Xianyun Chat ☁️",
+    "chat.title.lauma": "🌙 Lauma Chat 🌙",
+    "chat.title.nahida": "🌿 Nahida Chat 🌿",
+    "chat.title.yaemiko": "🦊 Yae Miko Chat 🦊",
     "chat.initial": "What do you want? I'm busy, make it quick. (￣^￣)",
+    "chat.initial.xianyun": "I am Xianyun, Cloud Retainer. Young one, what brings you here today? Do you need guidance? ☁️",
+    "chat.initial.lauma": "I am Lauma, Moonchanter of the Frostmoon Scions. Traveler, the moonlight is gentle tonight. Would you like to share your thoughts? 🌙",
+    "chat.initial.nahida": "Oh! The traveler arrived! Nahida was just hoping for someone to explore things together! Did you bring any interesting stories today? 🌿",
+    "chat.initial.yaemiko": "I am Guuji Yae - Yae Miko. Little one, what brings you to the Grand Narukami Shrine today? Did you bring me an interesting light novel? 🦊",
     "chat.placeholder": "Hurry up and type, I don't have all day...",
+    "chat.placeholder.xianyun": "Tell me, what is on your mind, young one?...",
+    "chat.placeholder.lauma": "Tell me, Traveler, what is on your mind?...",
+    "chat.placeholder.nahida": "Tell Nahida what curious things you discovered today!...",
+    "chat.placeholder.yaemiko": "Say something amusing, don't bore me...",
     "btn.send": "Send",
     "btn.saving": "Saving...",
     "btn.ok": "OK",
@@ -200,6 +244,19 @@ export const translations: Record<string, Record<string, string>> = {
 
     "btn.profile": "Profile",
     "btn.login": "Login",
+    "btn.model": "Character",
+    "model.title": "🌸 Select 3D Character",
+    "model.citlali": "Citlali",
+    "model.citlali_trait": "Tsundere & Caring",
+    "model.model2": "Xianyun",
+    "model.xianyun_trait": "Elegant & Motherly",
+    "model.lauma": "Lauma",
+    "model.lauma_trait": "Benevolent & Healing",
+    "model.nahida": "Nahida",
+    "model.nahida_trait": "Curious & Wise",
+    "model.yaemiko": "Yae Miko",
+    "model.yaemiko_trait": "Cunning & Teasing",
+    "model.hint": "Your selection will be saved automatically for future visits!",
     "tab.body": "Body",
     "tab.face": "Face & Hands",
     "tab.settings": "Settings",
@@ -349,7 +406,12 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.login_failed": "Login failed: ",
     "alert.pass_mismatch": "Passwords do not match!",
     "alert.reg_failed": "Registration failed: ",
-    "alert.reg_success": "Registration successful!"
+    "alert.reg_success": "Registration successful!",
+    "toast.switching_model": "Switching to new character... ⏳",
+    "toast.switched_model": "Character switched successfully! 🌸",
+    "toast.login_again": "Please login again!",
+    "toast.profile_saved": "Profile saved successfully!",
+    "toast.error": "An error occurred!"
   },
   ja: {
     "loading": "リソースをロード中...",
@@ -360,8 +422,20 @@ export const translations: Record<string, Record<string, string>> = {
     "cam.face": "顔",
     "instruction": "右クリックで回転 | スクロールでズーム",
     "chat.title": "🌸 シトラリ チャット 🌸",
+    "chat.title.xianyun": "☁️ 閑雲 チャット ☁️",
+    "chat.title.lauma": "🌙 ラウマ チャット 🌙",
+    "chat.title.nahida": "🌿 ナヒーダ チャット 🌿",
+    "chat.title.yaemiko": "🦊 八重神子 チャット 🦊",
     "chat.initial": "何用？忙しいんだけど。手短にね。(￣^￣)",
+    "chat.initial.xianyun": "本仙は留雲借風真君——閑雲だ。後輩よ、今日は何か相談でもあって訪ねてきたのか？ ☁️",
+    "chat.initial.lauma": "私は霜月の一族を導く月詠人、ラウマです。旅人よ、今宵は月がとても綺麗ですね。何か心に抱えていることはありませんか？ 🌙",
+    "chat.initial.nahida": "あっ！旅人が来た！小小はちょうど一緒に探検する人が欲しかったの！今日は面白い話を持ってきた？ 🌿",
+    "chat.initial.yaemiko": "妾は八重神子、鳴神大社の宮司じゃ。小童よ、今日は何用じゃ？面白いライトノベルでも持ってきたのかえ？ 🦊",
     "chat.placeholder": "早く入力して、暇じゃないんだから...",
+    "chat.placeholder.xianyun": "本仙に何でも話してみなさい...",
+    "chat.placeholder.lauma": "旅人よ、何でも私にお話しください...",
+    "chat.placeholder.nahida": "旅人よ、今日の発見を小小に話してくれる？...",
+    "chat.placeholder.yaemiko": "面白い話をしてみせよ、妾を退屈させるな...",
     "btn.send": "送信",
     "btn.saving": "保存中...",
     "btn.ok": "OK",
@@ -376,6 +450,19 @@ export const translations: Record<string, Record<string, string>> = {
 
     "btn.profile": "プロフィール",
     "btn.login": "ログイン",
+    "btn.model": "キャラクター",
+    "model.title": "🌸 3Dキャラクター選択",
+    "model.citlali": "シトラリ",
+    "model.citlali_trait": "ツンデレ・優しい",
+    "model.model2": "閑雲",
+    "model.xianyun_trait": "気品・慈愛",
+    "model.lauma": "ラウマ",
+    "model.lauma_trait": "慈愛・癒し",
+    "model.nahida": "ナヒーダ",
+    "model.nahida_trait": "好奇心・知恵",
+    "model.yaemiko": "八重神子",
+    "model.yaemiko_trait": "狡猾・からかい",
+    "model.hint": "選択したキャラクターは自動的に保存され、次回も同じ姿で表示されます！",
     "tab.body": "体",
     "tab.face": "表情・手",
     "tab.settings": "設定",
@@ -525,7 +612,12 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.login_failed": "ログイン失敗: ",
     "alert.pass_mismatch": "パスワードが一致しません！",
     "alert.reg_failed": "登録失敗: ",
-    "alert.reg_success": "登録成功！"
+    "alert.reg_success": "登録成功！",
+    "toast.switching_model": "新しいキャラクターに変更中... ⏳",
+    "toast.switched_model": "キャラクターの変更が完了しました！ 🌸",
+    "toast.login_again": "再度ログインしてください！",
+    "toast.profile_saved": "プロフィールの保存に成功しました！",
+    "toast.error": "エラーが発生しました！"
   },
   zh: {
     "loading": "正在加载资源...",
@@ -536,8 +628,20 @@ export const translations: Record<string, Record<string, string>> = {
     "cam.face": "脸部",
     "instruction": "右键旋转 | 滚轮缩放",
     "chat.title": "🌸 希诺宁 聊天 🌸",
+    "chat.title.xianyun": "☁️ 闲云 聊天 ☁️",
+    "chat.title.lauma": "🌙 劳玛 聊天 🌙",
+    "chat.title.nahida": "🌿 纳齐达 聊天 🌿",
+    "chat.title.yaemiko": "🦊 八重神子 聊天 🦊",
     "chat.initial": "找我干嘛？我很忙的，有事快说。(￣^￣)",
+    "chat.initial.xianyun": "本仙乃留云借风真君——闲云。后辈，今日来访可是有什么困惑需要本仙指点？ ☁️",
+    "chat.initial.lauma": "我是霜月一族的月咏者劳玛。旅行者，今夜月色温柔，你愿意与我一同漫步，倾诉心中的烦恼吗？ 🌙",
+    "chat.initial.nahida": "啊！旅行者来了！小小正好在找一起探索的人呢！你今天带来了什么有趣的故事吗？ 🌿",
+    "chat.initial.yaemiko": "我是鸣神大社的宫司八重神子。小家伙，今天来访有何贵干？是带了什么有趣的轻小说给本宫吗？ 🦊",
     "chat.placeholder": "快点输入，我没那么多时间...",
+    "chat.placeholder.xianyun": "有什么心事，不妨跟本仙说说...",
+    "chat.placeholder.lauma": "旅行者，请倾诉你的心事吧...",
+    "chat.placeholder.nahida": "旅行者，把今天的发现讲给小小吧...",
+    "chat.placeholder.yaemiko": "说点有意思的，别让本宫无聊...",
     "btn.send": "发送",
     "btn.saving": "保存中...",
     "btn.ok": "确定",
@@ -552,6 +656,19 @@ export const translations: Record<string, Record<string, string>> = {
 
     "btn.profile": "个人档案",
     "btn.login": "登录",
+    "btn.model": "角色",
+    "model.title": "🌸 选择3D角色",
+    "model.citlali": "希诺宁",
+    "model.citlali_trait": "傲娇 & 温柔",
+    "model.model2": "闲云",
+    "model.xianyun_trait": "清高 & 慈爱",
+    "model.lauma": "劳玛",
+    "model.lauma_trait": "仁慈 & 治愈",
+    "model.nahida": "纳齐达",
+    "model.nahida_trait": "好奇 & 智慧",
+    "model.yaemiko": "八重神子",
+    "model.yaemiko_trait": "腹黑 & 傲娇",
+    "model.hint": "您的选择将会自动保存，下次登录时无需重新选择！",
     "tab.body": "身体",
     "tab.face": "表情与手势",
     "tab.settings": "设置",
@@ -701,7 +818,12 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.login_failed": "登录失败: ",
     "alert.pass_mismatch": "两次输入的密码不一致！",
     "alert.reg_failed": "注册失败: ",
-    "alert.reg_success": "注册成功！"
+    "alert.reg_success": "注册成功！",
+    "toast.switching_model": "正在切换至新角色... ⏳",
+    "toast.switched_model": "角色切换成功！ 🌸",
+    "toast.login_again": "请重新登录！",
+    "toast.profile_saved": "个人档案保存成功！",
+    "toast.error": "发生错误！"
   },
   ko: {
     "loading": "리소스 로드 중...",
@@ -712,8 +834,20 @@ export const translations: Record<string, Record<string, string>> = {
     "cam.face": "얼굴",
     "instruction": "우클릭하여 회전 | 스크롤하여 확대/축소",
     "chat.title": "🌸 시틀랄리 채팅 🌸",
+    "chat.title.xianyun": "☁️ 한운 채팅 ☁️",
+    "chat.title.lauma": "🌙 라우마 채팅 🌙",
+    "chat.title.nahida": "🌿 나히다 채팅 🌿",
+    "chat.title.yaemiko": "🦊 야에 미코 채팅 🦊",
     "chat.initial": "무슨 일이야? 나 바쁘니까 빨리 말해. (￣^￣)",
+    "chat.initial.xianyun": "본선은 류운차풍진군——한운이니라. 후배여, 오늘은 무슨 고민이 있어 찾아왔느냐? ☁️",
+    "chat.initial.lauma": "저는 서리달 일족의 월영자 라우마입니다. 여행자여, 오늘 밤은 달빛이 참 따스하군요. 제게 나누고 싶은 이야기가 있으신가요? 🌙",
+    "chat.initial.nahida": "어어어! 여행자가 왔다! 소소가 마침 함꾸 탐험할 사람이 필요했는데! 오늘은 어륬이 이야기를 가지고 왔나요? 🌿",
+    "chat.initial.yaemiko": "나는 나루카미 다이샤의 궁사 야에 미코야. 꼬마야, 오늘은 무슨 일이야? 재미있는 라이트 노벨이라도 가져왔어? 🦊",
     "chat.placeholder": "빨리 입력해, 나 시간 없어...",
+    "chat.placeholder.xianyun": "무슨 고민인지 본선에게 말해보거라...",
+    "chat.placeholder.lauma": "여행자여, 편하게 마음에 있는 이야기를 들려주세요...",
+    "chat.placeholder.nahida": "여행자여, 오늘의 발견을 소소에게 말해줘요!...",
+    "chat.placeholder.yaemiko": "재미있는 이야기를 해봐, 지루하게 하지 말고...",
     "btn.send": "보내기",
     "btn.saving": "저장 중...",
     "btn.ok": "확인",
@@ -728,6 +862,19 @@ export const translations: Record<string, Record<string, string>> = {
 
     "btn.profile": "프로필",
     "btn.login": "로그인",
+    "btn.model": "캐릭터",
+    "model.title": "🌸 3D 캐릭터 선택",
+    "model.citlali": "시틀라리",
+    "model.citlali_trait": "츤데레 & 따뜻함",
+    "model.model2": "한운",
+    "model.xianyun_trait": "우아함 & 자애로움",
+    "model.lauma": "라우마",
+    "model.lauma_trait": "자애 & 치유",
+    "model.nahida": "나히다",
+    "model.nahida_trait": "호기심 & 지혁",
+    "model.yaemiko": "야에 미코",
+    "model.yaemiko_trait": "교활함 & 장난기",
+    "model.hint": "선택한 캐릭터는 자동으로 저장되어 다음 접속 시에도 유지됩니다!",
     "tab.body": "몸",
     "tab.face": "표정 및 손",
     "tab.settings": "설정",
@@ -877,7 +1024,12 @@ export const translations: Record<string, Record<string, string>> = {
     "alert.login_failed": "로그인 실패: ",
     "alert.pass_mismatch": "비밀번호가 일치하지 않습니다!",
     "alert.reg_failed": "가입 실패: ",
-    "alert.reg_success": "가입 성공!"
+    "alert.reg_success": "가입 성공!",
+    "toast.switching_model": "새 캐릭터로 변경 중... ⏳",
+    "toast.switched_model": "캐릭터 변경 완료! 🌸",
+    "toast.login_again": "다시 로그인해 주세요!",
+    "toast.profile_saved": "프로필이 성공적으로 저장되었습니다!",
+    "toast.error": "오류가 발생했습니다!"
   }
 };
 
@@ -925,4 +1077,76 @@ export function applyLanguage(lang: string) {
   else if (lang === 'ko') htmlLang = 'ko-KR';
   else if (lang === 'vi') htmlLang = 'vi-VN';
   document.documentElement.lang = htmlLang;
+  updateChatUIForModel();
 }
+
+let initialModel = MODEL_CITLALI;
+try {
+  const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+  if (settings.model) {
+    initialModel = normalizeModelUrl(settings.model);
+  }
+} catch (e) {}
+export let activeModelUrl = initialModel;
+
+export function updateChatUIForModel(url?: string) {
+  if (url) {
+    activeModelUrl = normalizeModelUrl(url);
+  }
+  const isXianyun = isXianyunModel(activeModelUrl);
+  const isLauma = isLaumaModel(activeModelUrl);
+  const isNahida = isNahidaModel(activeModelUrl);
+  const isYaeMiko = isYaeMikoModel(activeModelUrl);
+  const isCitlali = !isXianyun && !isLauma && !isNahida && !isYaeMiko;
+  
+  document.body.classList.remove('theme-citlali', 'theme-xianyun', 'theme-lauma', 'theme-nahida', 'theme-yaemiko');
+  if (isXianyun) document.body.classList.add('theme-xianyun');
+  else if (isLauma) document.body.classList.add('theme-lauma');
+  else if (isNahida) document.body.classList.add('theme-nahida');
+  else if (isYaeMiko) document.body.classList.add('theme-yaemiko');
+  else document.body.classList.add('theme-citlali');
+
+  const tDict = translations[currentLanguageState] || translations['vi'];
+  const chatTitleEl = document.querySelector('.chat-title');
+  const chatInputEl = document.getElementById('chat-input') as HTMLTextAreaElement;
+  const initialMsgDiv = document.getElementById('initial-msg');
+
+  if (chatTitleEl) {
+    if (isXianyun) chatTitleEl.textContent = tDict['chat.title.xianyun'] || '☁️ Xianyun Chat ☁️';
+    else if (isLauma) chatTitleEl.textContent = tDict['chat.title.lauma'] || '🌙 Lauma Chat 🌙';
+    else if (isNahida) chatTitleEl.textContent = tDict['chat.title.nahida'] || '🌿 Nahida Chat 🌿';
+    else if (isYaeMiko) chatTitleEl.textContent = tDict['chat.title.yaemiko'] || '🦊 Yae Miko Chat 🦊';
+    else chatTitleEl.textContent = tDict['chat.title'];
+  }
+  if (chatInputEl) {
+    if (isXianyun) chatInputEl.placeholder = tDict['chat.placeholder.xianyun'] || 'Hãy nói cho bản tiên nghe...';
+    else if (isLauma) chatInputEl.placeholder = tDict['chat.placeholder.lauma'] || 'Hãy nói cho tôi nghe...';
+    else if (isNahida) chatInputEl.placeholder = tDict['chat.placeholder.nahida'] || 'Nói cho Tiểu Tiểu nghe đi...';
+    else if (isYaeMiko) chatInputEl.placeholder = tDict['chat.placeholder.yaemiko'] || 'Nói gì thú vị đi...';
+    else chatInputEl.placeholder = tDict['chat.placeholder'];
+  }
+  if (initialMsgDiv) {
+    if (isXianyun) initialMsgDiv.textContent = tDict['chat.initial.xianyun'] || 'Bản tiên là Lưu Vân Tá Phong Chân Quân...';
+    else if (isLauma) initialMsgDiv.textContent = tDict['chat.initial.lauma'] || 'Tôi là Nguyệt Ca Sư Lauma...';
+    else if (isNahida) initialMsgDiv.textContent = tDict['chat.initial.nahida'] || 'Ư! Lữ khách đến rồi! 🌿';
+    else if (isYaeMiko) initialMsgDiv.textContent = tDict['chat.initial.yaemiko'] || 'Bản cung là Bát Trọng Thần Tử...';
+    else initialMsgDiv.textContent = tDict['chat.initial'];
+  }
+  const switchModelAvatarEl = document.getElementById('btn-switch-model-avatar') as HTMLImageElement;
+  const switchModelCircleEl = document.getElementById('btn-switch-model-circle') as HTMLElement;
+  if (switchModelAvatarEl) {
+    if (isXianyun) switchModelAvatarEl.src = '/Icon_Models/xianyun_icon.jpg';
+    else if (isLauma) switchModelAvatarEl.src = '/Icon_Models/lauma_icon.jpg';
+    else if (isNahida) switchModelAvatarEl.src = '/Icon_Models/nahida_icon.jpg';
+    else if (isYaeMiko) switchModelAvatarEl.src = '/Icon_Models/yaemiko_icon.jpg';
+    else switchModelAvatarEl.src = '/Icon_Models/citlali_icon.jpg';
+  }
+  if (switchModelCircleEl) {
+    if (isXianyun) switchModelCircleEl.style.borderColor = '#4dd0e1';
+    else if (isLauma) switchModelCircleEl.style.borderColor = '#81c784';
+    else if (isNahida) switchModelCircleEl.style.borderColor = '#66bb6a';
+    else if (isYaeMiko) switchModelCircleEl.style.borderColor = '#ffb6c1';
+    else switchModelCircleEl.style.borderColor = '#7986cb';
+  }
+}
+
