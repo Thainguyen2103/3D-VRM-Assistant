@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
-import { cameraState } from '../core/state';
+import { cameraState } from '@/core/state';
 
 export const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);

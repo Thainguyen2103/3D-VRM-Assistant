@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { scene, groundClipPlane, ambientLight, directionalLight, hemiLight } from "./setup";
-import { updateSkyTime } from "./sky";
+import { scene, groundClipPlane, ambientLight, directionalLight, hemiLight } from '@/features/scene/setup';
+import { updateSkyTime } from '@/features/scene/sky';
 
 export const sakuraTrees: THREE.Object3D[] = [];
 export const lanternLights: THREE.PointLight[] = [];

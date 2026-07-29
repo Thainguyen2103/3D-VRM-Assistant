@@ -1,0 +1,274 @@
+body.theme-xianyun #chat-ui {
+  background: rgba(224, 247, 250, 0.85) !important;
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 8px 25px rgba(0, 151, 167, 0.25) !important;
+}
+
+body.theme-xianyun #chat-ui > div:first-child {
+  background: #4dd0e1 !important;
+  box-shadow: 0 3px 8px rgba(0, 151, 167, 0.4) !important;
+}
+
+body.theme-xianyun .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+body.theme-xianyun #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #b2ebf2 !important;
+}
+
+body.theme-xianyun #chat-history::-webkit-scrollbar-thumb {
+  background-color: #80deea !important;
+}
+
+body.theme-xianyun .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #e0f7fa !important;
+  color: #006064 !important;
+  border-color: #4dd0e1 !important;
+}
+
+body.theme-xianyun .chat-msg.user {
+  background: #b2ebf2 !important;
+  color: #004d40 !important;
+}
+
+body.theme-xianyun #chat-input {
+  border-color: #80deea !important;
+}
+
+body.theme-xianyun #chat-input:focus {
+  border-color: #00838f !important;
+  box-shadow: 0 0 8px rgba(0, 131, 143, 0.3) !important;
+}
+
+body.theme-xianyun #btn-send-chat {
+  background: #4dd0e1 !important;
+  box-shadow: 0 2px 6px rgba(0, 151, 167, 0.4) !important;
+}
+
+body.theme-xianyun #btn-send-chat:hover {
+  background: #26c6da !important;
+}
+
+body.theme-xianyun #chat-sidebar {
+  background: rgba(224, 247, 250, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(0, 151, 167, 0.2) !important;
+}
+
+body.theme-xianyun #chat-sidebar h3 {
+  color: #00838f !important;
+}
+
+body.theme-xianyun #btn-new-chat {
+  color: #00838f !important;
+}
+
+body.theme-xianyun .session-item {
+  border-color: #b2ebf2 !important;
+}
+
+body.theme-xianyun .session-item:hover {
+  background: rgba(77, 208, 225, 0.2) !important;
+  border-color: #26c6da !important;
+}
+
+body.theme-xianyun .session-item.active {
+  background: rgba(0, 131, 143, 0.15) !important;
+  border-color: #00838f !important;
+}
+
+body.theme-xianyun .session-item.active .session-title {
+  color: #00838f !important;
+}
+
+body.theme-xianyun {
+  background: linear-gradient(to bottom, #48c6ef 0%, #6f86d6 50%, #e0f7fa 100%) !important;
+}
+
+body.theme-xianyun #btn-switch-model,
+body.theme-xianyun #btn-profile,
+body.theme-xianyun #btn-login-header {
+  background: rgba(224, 247, 250, 0.85) !important;
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 4px 12px rgba(0, 131, 143, 0.15) !important;
+}
+
+body.theme-xianyun #btn-switch-model:hover,
+body.theme-xianyun #btn-profile:hover,
+body.theme-xianyun #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(0, 131, 143, 0.25) !important;
+}
+
+body.theme-xianyun #btn-switch-model span,
+body.theme-xianyun #btn-profile span,
+body.theme-xianyun #btn-login-header span {
+  color: #00838f !important;
+}
+
+body.theme-xianyun #btn-switch-model-circle {
+  border-color: #4dd0e1 !important;
+}
+
+body.theme-xianyun #btn-switch-model svg,
+body.theme-xianyun #btn-profile-icon,
+body.theme-xianyun #btn-login-header svg {
+  stroke: #00838f !important;
+}
+
+body.theme-xianyun #ui,
+body.theme-xianyun #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(0, 131, 143, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 131, 143, 0.1) !important;
+}
+
+body.theme-xianyun h2,
+body.theme-xianyun h3,
+body.theme-xianyun .panel-section h3,
+body.theme-xianyun h4[style*="#ff6b81"] {
+  color: #00838f !important;
+  border-bottom-color: rgba(0, 131, 143, 0.2) !important;
+}
+
+body.theme-xianyun h4[style*="#ff6b81"] svg {
+  stroke: #00838f !important;
+}
+
+body.theme-xianyun .bone-btn {
+  background: #00838f !important;
+  color: white !important;
+}
+
+body.theme-xianyun .bone-btn:hover {
+  background: #006064 !important;
+}
+
+body.theme-xianyun .bone-btn.active {
+  background: #00e676 !important;
+  color: #003300 !important;
+}
+
+body.theme-xianyun .tab-btn:hover {
+  background: rgba(0, 131, 143, 0.1) !important;
+}
+
+body.theme-xianyun .tab-btn.active {
+  color: #00838f !important;
+  background: rgba(0, 131, 143, 0.15) !important;
+}
+
+body.theme-xianyun .control-row input[type="range"] {
+  accent-color: #00838f !important;
+}
+
+body.theme-xianyun .custom-select-display:hover,
+body.theme-xianyun .custom-select-wrapper.open .custom-select-display {
+  border-color: #00838f !important;
+}
+
+body.theme-xianyun .custom-select-arrow svg {
+  color: #00838f !important;
+}
+
+body.theme-xianyun .custom-select-options {
+  border-color: #00838f !important;
+}
+
+body.theme-xianyun .custom-select-options::-webkit-scrollbar-thumb {
+  background: #80deea !important;
+}
+
+body.theme-xianyun .custom-select-option:hover {
+  background: rgba(0, 131, 143, 0.1) !important;
+  color: #00838f !important;
+}
+
+body.theme-xianyun .custom-select-option.selected {
+  background: rgba(0, 131, 143, 0.15) !important;
+  color: #00838f !important;
+}
+
+body.theme-xianyun .floating-icon {
+  border-color: #00838f !important;
+  color: #00838f !important;
+  box-shadow: 0 4px 10px rgba(0, 131, 143, 0.2) !important;
+}
+
+body.theme-xianyun .floating-icon:hover {
+  background: #e0f7fa !important;
+}
+
+body.theme-xianyun .character-modal-content {
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 20px 40px rgba(0, 131, 143, 0.25) !important;
+}
+
+body.theme-xianyun .character-modal-content h3 {
+  color: #00838f !important;
+}
+
+body.theme-xianyun #close-character-modal:hover {
+  color: #00838f !important;
+}
+
+body.theme-xianyun .character-modal-content > div:first-child {
+  border-bottom-color: #e0f7fa !important;
+}
+
+body.theme-xianyun .character-modal-content > div:last-child {
+  background: #e0f7fa !important;
+  border-color: #b2ebf2 !important;
+  color: #006064 !important;
+}
+
+body.theme-xianyun .character-modal-content > div:last-child .model-hint-icon {
+  color: #00838f !important;
+}
+
+body.theme-xianyun .model-card[data-model="/Xianyun.vrm"],
+body.theme-xianyun .model-card[data-model="/model2.vrm"] {
+  background: #e0f7fa !important;
+  border-color: #00838f !important;
+}
+
+body.theme-xianyun .custom-dialog-box {
+  background: rgba(224, 247, 250, 0.95) !important;
+  border-color: #4dd0e1 !important;
+  box-shadow: 0 10px 40px rgba(0, 131, 143, 0.2) !important;
+  color: #006064 !important;
+}
+
+body.theme-xianyun .btn-confirm {
+  background: #00838f !important;
+  box-shadow: 0 4px 15px rgba(0, 131, 143, 0.3) !important;
+}
+
+body.theme-xianyun .btn-confirm:hover {
+  background: #006064 !important;
+  box-shadow: 0 6px 20px rgba(0, 131, 143, 0.4) !important;
+}
+
+body.theme-xianyun .btn-cancel {
+  background: #e0f7fa !important;
+  color: #00838f !important;
+  border-color: #4dd0e1 !important;
+}
+
+body.theme-xianyun .btn-cancel:hover {
+  background: #b2ebf2 !important;
+}
+
+body.theme-xianyun #loading-progress-bar {
+  background: #00838f !important;
+}
+
+body.theme-xianyun #loading-text {
+  color: #00838f !important;
+}
+
+body.theme-xianyun .loading-image {
+  box-shadow: 0 10px 30px rgba(0, 131, 143, 0.3) !important;
+}

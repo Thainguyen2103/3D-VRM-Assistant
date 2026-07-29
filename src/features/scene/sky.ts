@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import { camera } from './setup';
+import { camera } from '@/features/scene/setup';
 
 let sky: Sky;
 let sun: THREE.Vector3;

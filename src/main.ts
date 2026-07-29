@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import { scene, camera, renderer, controls } from './scene/setup';
-import { initEnvironment, updateTimeOfDay } from './scene/environment';
-import { initSky, animateSky } from './scene/sky';
-import { updateWeatherAnimation, updateWeatherSystem } from './scene/weather';
-import { initVRM, updateVRM, checkAFK, resetAFKTimer, stopIdleOnCameraMove } from './vrm/VRMManager';
-import { initUI } from './ui/UIManager';
-import { initCustomSelects } from "./customSelect";
-import { cameraState } from './core/state';
-import { initAuth } from './core/auth';
-import { applyLanguage } from './i18n';
+import { scene, camera, renderer, controls } from '@/features/scene/setup';
+import { initEnvironment, updateTimeOfDay } from '@/features/scene/environment';
+import { initSky, animateSky } from '@/features/scene/sky';
+import { updateWeatherAnimation, updateWeatherSystem } from '@/features/scene/weather';
+import { initVRM, updateVRM, checkAFK, resetAFKTimer, stopIdleOnCameraMove } from '@/features/vrm-viewer/vrm-manager';
+import { initUI } from '@/components/ui-manager';
+import { initCustomSelects } from '@/components/custom-select';
+import { cameraState } from '@/core/state';
+import { initAuth } from '@/core/auth';
+import { applyLanguage } from '@/core/i18n';
 import "./style.css";
 
 // Khởi tạo ngôn ngữ cực sớm cho màn hình tải

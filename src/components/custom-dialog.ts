@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { t } from '@/core/i18n';
 
 export class CustomDialog {
   private static container: HTMLDivElement | null = null;

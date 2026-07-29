@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { setupChatbot, triggerProactiveChat, loadChatHistory } from '../ui/chatbot';
-import { t } from '../i18n';
+import { setupChatbot, triggerProactiveChat, loadChatHistory } from '@/features/chat/chat-ui';
+import { t } from '@/core/i18n';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';

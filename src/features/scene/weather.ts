@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { scene } from './setup';
-import { applyWeatherToTrees } from './environment';
-import { appState } from '../core/state';
+import { scene } from '@/features/scene/setup';
+import { applyWeatherToTrees } from '@/features/scene/environment';
+import { appState } from '@/core/state';
 
 const MAX_PETALS = 300; 
 export let currentPetalCount = 80; 

@@ -1,8 +1,8 @@
-import { currentUser, supabase } from '../core/auth';
-import { getCurrentUserProfile, fetchCurrentUserProfileState } from './profile';
-import { CustomDialog } from './CustomDialog';
-import { t, activeModelUrl, updateChatUIForModel } from '../i18n';
-import { isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '../constants';
+import { currentUser, supabase } from '@/core/auth';
+import { getCurrentUserProfile, fetchCurrentUserProfileState } from '@/features/auth/profile';
+import { CustomDialog } from '@/components/custom-dialog';
+import { t, activeModelUrl, updateChatUIForModel } from '@/core/i18n';
+import { isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '@/core/constants';
 
 
 export let chatHistory: any[] = [];

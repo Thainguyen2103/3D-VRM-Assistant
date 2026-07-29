@@ -1,0 +1,273 @@
+body.theme-nahida #chat-ui {
+  background: rgba(241, 248, 233, 0.85) !important;
+  border-color: #aed581 !important;
+  box-shadow: 0 8px 25px rgba(85, 139, 47, 0.25) !important;
+}
+
+body.theme-nahida #chat-ui > div:first-child {
+  background: #aed581 !important;
+  box-shadow: 0 3px 8px rgba(85, 139, 47, 0.4) !important;
+}
+
+body.theme-nahida .chat-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+body.theme-nahida #chat-history {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #dcedc8 !important;
+}
+
+body.theme-nahida #chat-history::-webkit-scrollbar-thumb {
+  background-color: #c5e1a5 !important;
+}
+
+body.theme-nahida .chat-msg.ai:not(.msg-citlali):not(.msg-xianyun):not(.msg-lauma):not(.msg-nahida):not(.msg-yaemiko) {
+  background: #f1f8e9 !important;
+  color: #33691e !important;
+  border-color: #aed581 !important;
+}
+
+body.theme-nahida .chat-msg.user {
+  background: #dcedc8 !important;
+  color: #33691e !important;
+}
+
+body.theme-nahida #chat-input {
+  border-color: #c5e1a5 !important;
+}
+
+body.theme-nahida #chat-input:focus {
+  border-color: #558b2f !important;
+  box-shadow: 0 0 8px rgba(85, 139, 47, 0.3) !important;
+}
+
+body.theme-nahida #btn-send-chat {
+  background: #aed581 !important;
+  box-shadow: 0 2px 6px rgba(85, 139, 47, 0.4) !important;
+}
+
+body.theme-nahida #btn-send-chat:hover {
+  background: #9ccc65 !important;
+}
+
+body.theme-nahida #chat-sidebar {
+  background: rgba(241, 248, 233, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(85, 139, 47, 0.2) !important;
+}
+
+body.theme-nahida #chat-sidebar h3 {
+  color: #558b2f !important;
+}
+
+body.theme-nahida #btn-new-chat {
+  color: #558b2f !important;
+}
+
+body.theme-nahida .session-item {
+  border-color: #dcedc8 !important;
+}
+
+body.theme-nahida .session-item:hover {
+  background: rgba(174, 213, 129, 0.2) !important;
+  border-color: #9ccc65 !important;
+}
+
+body.theme-nahida .session-item.active {
+  background: rgba(85, 139, 47, 0.15) !important;
+  border-color: #558b2f !important;
+}
+
+body.theme-nahida .session-item.active .session-title {
+  color: #558b2f !important;
+}
+
+body.theme-nahida {
+  background: linear-gradient(to bottom, #558b2f 0%, #9ccc65 50%, #f1f8e9 100%) !important;
+}
+
+body.theme-nahida #btn-switch-model,
+body.theme-nahida #btn-profile,
+body.theme-nahida #btn-login-header {
+  background: rgba(241, 248, 233, 0.85) !important;
+  border-color: #aed581 !important;
+  box-shadow: 0 4px 12px rgba(85, 139, 47, 0.15) !important;
+}
+
+body.theme-nahida #btn-switch-model:hover,
+body.theme-nahida #btn-profile:hover,
+body.theme-nahida #btn-login-header:hover {
+  box-shadow: 0 6px 15px rgba(85, 139, 47, 0.25) !important;
+}
+
+body.theme-nahida #btn-switch-model span,
+body.theme-nahida #btn-profile span,
+body.theme-nahida #btn-login-header span {
+  color: #558b2f !important;
+}
+
+body.theme-nahida #btn-switch-model-circle {
+  border-color: #aed581 !important;
+}
+
+body.theme-nahida #btn-switch-model svg,
+body.theme-nahida #btn-profile-icon,
+body.theme-nahida #btn-login-header svg {
+  stroke: #558b2f !important;
+}
+
+body.theme-nahida #ui,
+body.theme-nahida #control-panel {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(85, 139, 47, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(85, 139, 47, 0.1) !important;
+}
+
+body.theme-nahida h2,
+body.theme-nahida h3,
+body.theme-nahida .panel-section h3,
+body.theme-nahida h4[style*="#ff6b81"] {
+  color: #558b2f !important;
+  border-bottom-color: rgba(85, 139, 47, 0.2) !important;
+}
+
+body.theme-nahida h4[style*="#ff6b81"] svg {
+  stroke: #558b2f !important;
+}
+
+body.theme-nahida .bone-btn {
+  background: #558b2f !important;
+  color: white !important;
+}
+
+body.theme-nahida .bone-btn:hover {
+  background: #33691e !important;
+}
+
+body.theme-nahida .bone-btn.active {
+  background: #76ff03 !important;
+  color: #003300 !important;
+}
+
+body.theme-nahida .tab-btn:hover {
+  background: rgba(85, 139, 47, 0.1) !important;
+}
+
+body.theme-nahida .tab-btn.active {
+  color: #558b2f !important;
+  background: rgba(85, 139, 47, 0.15) !important;
+}
+
+body.theme-nahida .control-row input[type="range"] {
+  accent-color: #558b2f !important;
+}
+
+body.theme-nahida .custom-select-display:hover,
+body.theme-nahida .custom-select-wrapper.open .custom-select-display {
+  border-color: #558b2f !important;
+}
+
+body.theme-nahida .custom-select-arrow svg {
+  color: #558b2f !important;
+}
+
+body.theme-nahida .custom-select-options {
+  border-color: #558b2f !important;
+}
+
+body.theme-nahida .custom-select-options::-webkit-scrollbar-thumb {
+  background: #c5e1a5 !important;
+}
+
+body.theme-nahida .custom-select-option:hover {
+  background: rgba(85, 139, 47, 0.1) !important;
+  color: #558b2f !important;
+}
+
+body.theme-nahida .custom-select-option.selected {
+  background: rgba(85, 139, 47, 0.15) !important;
+  color: #558b2f !important;
+}
+
+body.theme-nahida .floating-icon {
+  border-color: #558b2f !important;
+  color: #558b2f !important;
+  box-shadow: 0 4px 10px rgba(85, 139, 47, 0.2) !important;
+}
+
+body.theme-nahida .floating-icon:hover {
+  background: #f1f8e9 !important;
+}
+
+body.theme-nahida .character-modal-content {
+  border-color: #aed581 !important;
+  box-shadow: 0 20px 40px rgba(85, 139, 47, 0.25) !important;
+}
+
+body.theme-nahida .character-modal-content h3 {
+  color: #558b2f !important;
+}
+
+body.theme-nahida #close-character-modal:hover {
+  color: #558b2f !important;
+}
+
+body.theme-nahida .character-modal-content > div:first-child {
+  border-bottom-color: #f1f8e9 !important;
+}
+
+body.theme-nahida .character-modal-content > div:last-child {
+  background: #f1f8e9 !important;
+  border-color: #dcedc8 !important;
+  color: #33691e !important;
+}
+
+body.theme-nahida .character-modal-content > div:last-child .model-hint-icon {
+  color: #558b2f !important;
+}
+
+body.theme-nahida .model-card[data-model="/Nahida.vrm"] {
+  background: #f1f8e9 !important;
+  border-color: #558b2f !important;
+}
+
+body.theme-nahida .custom-dialog-box {
+  background: rgba(241, 248, 233, 0.95) !important;
+  border-color: #aed581 !important;
+  box-shadow: 0 10px 40px rgba(85, 139, 47, 0.2) !important;
+  color: #33691e !important;
+}
+
+body.theme-nahida .btn-confirm {
+  background: #558b2f !important;
+  box-shadow: 0 4px 15px rgba(85, 139, 47, 0.3) !important;
+}
+
+body.theme-nahida .btn-confirm:hover {
+  background: #33691e !important;
+  box-shadow: 0 6px 20px rgba(85, 139, 47, 0.4) !important;
+}
+
+body.theme-nahida .btn-cancel {
+  background: #f1f8e9 !important;
+  color: #558b2f !important;
+  border-color: #aed581 !important;
+}
+
+body.theme-nahida .btn-cancel:hover {
+  background: #dcedc8 !important;
+}
+
+body.theme-nahida #loading-progress-bar {
+  background: #558b2f !important;
+}
+
+body.theme-nahida #loading-text {
+  color: #558b2f !important;
+}
+
+body.theme-nahida .loading-image {
+  box-shadow: 0 10px 30px rgba(85, 139, 47, 0.3) !important;
+}

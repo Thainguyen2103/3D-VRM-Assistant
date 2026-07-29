@@ -1,0 +1,239 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  /* Tạo nền bầu trời Đêm Chiêm Tinh (Gradient từ xanh đêm -> chàm -> trăng bạc) */
+  background: linear-gradient(to bottom, #1a237e 0%, #3949ab 50%, #e8eaf6 100%);
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, Tahoma, Geneva, Verdana, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft JhengHei', 'Meiryo', 'Malgun Gothic', sans-serif;
+}
+
+/* Tùy chỉnh Font chữ theo từng ngôn ngữ */
+
+body:lang(vi-VN), :lang(vi-VN) {
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+}
+
+body:lang(zh-CN), :lang(zh-CN) {
+  font-family: "LXGW WenKai Lite", 'Microsoft YaHei', sans-serif !important;
+  font-size: 1.05rem; 
+  font-weight: 600;
+}
+
+body:lang(ja-JP), :lang(ja-JP) {
+  font-family: 'Zen Maru Gothic', 'Meiryo', 'Yu Gothic', sans-serif !important;
+  font-weight: 500;
+}
+
+body:lang(ko-KR), :lang(ko-KR) {
+  font-family: 'Gowun Dodum', 'Malgun Gothic', sans-serif !important;
+  font-weight: 600;
+}
+
+body:lang(en), :lang(en) {
+  font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#loading-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('/wallpaper.png') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.loading-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+.loading-progress-container {
+  width: 300px;
+  height: 10px;
+  background: rgba(233, 69, 96, 0.2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#loading-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #e94560;
+  transition: width 0.1s linear;
+}
+
+#loading-text {
+  color: #e94560;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+#loading-detail {
+  color: #888;
+  font-size: 0.9rem;
+  font-style: italic;
+  max-width: 80%;
+  text-align: center;
+  word-wrap: break-word;
+  margin-top: -10px;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Make cropper selection area circular */
+
+#instruction-text {
+  position: absolute;
+  top: 15px;
+  /* Dời lên sát trên cùng màn hình */
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 0.9rem;
+  font-weight: bold;
+  pointer-events: none;
+  /* Chuột xuyên qua để không cản trở OrbitControls */
+  z-index: 10;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Messenger-style Row Layout */
+
+/* Permanent character styles regardless of active theme */
+
+/* Hiệu ứng đang gõ tin nhắn (Typing Indicator - Messenger style) */
+
+/* Tùy chỉnh thanh cuộn cho webkit */
+
+/* --- TABS --- */
+
+/* Class ẩn panel (Animation) */
+
+/* Nút X (Đóng) góc trên bên phải của khung */
+
+/* Nút Icon Nổi khi khung bị ẩn */
+
+/* Custom Select styles */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Auth Modal --- */
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ CITLALI (TONE XANH ĐÊM & CHIÊM TINH / STARRY INDIGO)
+   ========================================================= */
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ XIANYUN (TONE XANH TIÊN NHÂN / JADE GREEN)
+   ========================================================= */
+
+/* Nút Header góc trên bên phải */
+
+/* Khung Chat bên phải */
+
+/* Thanh bên lịch sử Chat (#chat-sidebar) */
+
+/* Bảng điều khiển camera và cài đặt bên trái (#ui, #control-panel) */
+
+/* Các Nút Icon Tròn Nổi (.floating-icon) */
+
+/* Modal Chọn Nhân Vật (#character-modal) */
+
+/* Hộp Thoại CustomDialog (.custom-dialog-box) */
+
+/* Màn Hình Loading */
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ LAUMA (TONE XANH SƯƠNG NGUYỆT / FROSTMOON GREEN)
+   ========================================================= */
+
+/* Nút Header góc trên bên phải */
+
+/* Khung Chat bên phải */
+
+/* Thanh bên lịch sử Chat (#chat-sidebar) */
+
+/* Bảng điều khiển camera và cài đặt bên trái (#ui, #control-panel) */
+
+/* Các Nút Icon Tròn Nổi (.floating-icon) */
+
+/* Modal Chọn Nhân Vật (#character-modal) */
+
+/* Hộp Thoại CustomDialog (.custom-dialog-box) */
+
+/* Màn Hình Loading */
+
+/* =========================================================
+   GIAO DIỆN CHỦ ĐỀ NAHIDA (TONE XANH THẢO THẦN / DENDRO GREEN)
+   ========================================================= */
+
+/* Nút Header góc trên bên phải */
+
+/* Khung Chat bên phải */
+
+/* Thanh bên lịch sử Chat (#chat-sidebar) */
+
+/* Bảng điều khiển camera và cài đặt bên trái (#ui, #control-panel) */
+
+/* Các Nút Icon Tròn Nổi (.floating-icon) */
+
+/* Modal Chọn Nhân Vật (#character-modal) */
+
+/* Hộp Thoại CustomDialog (.custom-dialog-box) */
+
+/* Màn Hình Loading */
+
+/* ==========================================================================
+   THEME 5: YAE MIKO (Màu Hồng Anh Đào & Đỏ Hồng Ngọc / Sakura Pink & Crimson)
+   ========================================================================== */
+
+/* Bổ sung hoàn thiện Giao Diện Yae Miko (header buttons, sidebar, chat, control panel) */

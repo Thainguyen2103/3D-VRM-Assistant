@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRMLoaderPlugin, VRMUtils, VRM } from "@pixiv/three-vrm";
-import { scene, camera, controls } from '../scene/setup';
-import { appState, targetExpressions, targetPoseState, poseState, lerpPose, cameraState } from '../core/state';
-import { loadMixamoAnimation } from '../loadMixamoAnimation';
-import { t, updateChatUIForModel } from '../i18n';
-import { normalizeModelUrl } from '../constants';
-import { currentUser, supabase } from '../core/auth';
+import { scene, camera, controls } from '@/features/scene/setup';
+import { appState, targetExpressions, targetPoseState, poseState, lerpPose, cameraState } from '@/core/state';
+import { loadMixamoAnimation } from '@/utils/mixamo-loader';
+import { t, updateChatUIForModel } from '@/core/i18n';
+import { normalizeModelUrl } from '@/core/constants';
+import { currentUser, supabase } from '@/core/auth';
 
 export let currentVrm: VRM | undefined;
 export const lookAtTarget = new THREE.Object3D();

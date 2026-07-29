@@ -1,7 +1,7 @@
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import { supabase, currentUser } from '../core/auth';
-import { applyLanguage, t } from '../i18n';
+import { supabase, currentUser } from '@/core/auth';
+import { applyLanguage, t } from '@/core/i18n';
 
 let cropper: Cropper | null = null;
 let currentAvatarBlob: Blob | null = null;

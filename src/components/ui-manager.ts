@@ -1,12 +1,12 @@
-import { appState, targetExpressions, poseState, targetPoseState, boneMapping, cameraState, savePoseToHistory, poses } from '../core/state';
-import { loadFBXAnimation, currentVrm, currentMixer, switchVRMModel, currentModelUrl, applyCameraPreset } from '../vrm/VRMManager';
-import { updateTimeOfDay } from '../scene/environment';
-import { updateWeatherSystem, setPetalCount } from '../scene/weather';
-import { renderer, directionalLight, transformControl, controls } from '../scene/setup';
-import { translations, applyLanguage, t } from '../i18n';
-import { initAuth, supabase, currentUser } from '../core/auth';
-import { MODEL_CITLALI, normalizeModelUrl, isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '../constants';
-import { CustomDialog } from './CustomDialog';
+import { appState, targetExpressions, poseState, targetPoseState, boneMapping, cameraState, savePoseToHistory, poses } from '@/core/state';
+import { loadFBXAnimation, currentVrm, currentMixer, switchVRMModel, currentModelUrl, applyCameraPreset } from '@/features/vrm-viewer/vrm-manager';
+import { updateTimeOfDay } from '@/features/scene/environment';
+import { updateWeatherSystem, setPetalCount } from '@/features/scene/weather';
+import { renderer, directionalLight, transformControl, controls } from '@/features/scene/setup';
+import { translations, applyLanguage, t } from '@/core/i18n';
+import { initAuth, supabase, currentUser } from '@/core/auth';
+import { MODEL_CITLALI, normalizeModelUrl, isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '@/core/constants';
+import { CustomDialog } from '@/components/custom-dialog';
 import { createIcons, icons } from 'lucide';
 
 // Hàm hỗ trợ khóa góc (tránh phi vật lý) nhận vào object {x, y, z} theo độ (degrees)

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { mixamoVRMRigMap } from './mixamoVRMRigMap.js';
+import { mixamoVRMRigMap } from '@/utils/mixamo-vrm-rig-map';
 
 /**
  * Load Mixamo animation, convert for three-vrm use, and return it.

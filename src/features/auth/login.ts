@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { translations, applyLanguage, t } from './i18n';
-import { initCustomSelects } from './customSelect';
-import { CustomDialog } from './ui/CustomDialog';
+import { translations, applyLanguage, t } from '@/core/i18n';
+import { initCustomSelects } from '@/components/custom-select';
+import { CustomDialog } from '@/components/custom-dialog';
 import { createIcons, icons } from 'lucide';
 
 // Khởi tạo icons cho lucide
