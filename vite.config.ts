@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
+import htmlInject from 'vite-plugin-html-inject';
 
 export default defineConfig({
+  plugins: [htmlInject()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

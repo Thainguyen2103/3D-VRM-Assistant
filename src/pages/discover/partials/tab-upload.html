@@ -1,0 +1,395 @@
+    <div id="tab-upload" class="tab-content">
+      <div class="upload-container">
+        <!-- Cột Trái: Form Tải lên -->
+        <div class="upload-form-col"
+          style="position: relative; justify-content: flex-start; padding-top: 40px; overflow-y: auto; max-height: calc(100vh - 100px); padding-right: 15px;">
+          <form id="upload-character-form">
+            <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 20px;">
+              <!-- Icon Upload (Left) -->
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <label for="upload-icon" id="icon-preview-container" title="Chọn ảnh đại diện">
+                  <div id="icon-preview-text"
+                    style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-file-image-icon lucide-file-image">
+                      <path
+                        d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                      <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                      <circle cx="10" cy="12" r="2" />
+                      <path d="m20 17-1.296-1.296a2.41 2.41 0 0 0-3.408 0L9 22" />
+                    </svg>
+                    <span style="font-size: 0.85rem; font-weight: 700;" data-i18n="discover.upload.avatar">Ảnh đại diện</span>
+                  </div>
+                  <img id="icon-preview-img" src="" alt="Icon Preview"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none;" />
+                </label>
+                <input type="file" id="upload-icon" accept="image/*" style="display: none;">
+              </div>
+
+              <!-- Name & Trait (Right) -->
+              <div style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div class="form-group">
+                  <label style="display: flex; align-items: center; gap: 6px;"><svg xmlns="http://www.w3.org/2000/svg"
+                      width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-square-pen-icon lucide-square-pen">
+                      <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path
+                        d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+                    </svg> <span data-i18n="discover.upload.name">Tên nhân vật *</span></label>
+                  <input type="text" id="upload-name" data-i18n="discover.upload.name_ph" placeholder="Nhập tên nhân vật">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;"><svg
+                      xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-venus-and-mars-icon lucide-venus-and-mars">
+                      <path d="M10 20h4" />
+                      <path d="M12 16v6" />
+                      <path d="M17 2h4v4" />
+                      <path d="m21 2-5.46 5.46" />
+                      <circle cx="12" cy="11" r="5" />
+                    </svg> <span data-i18n="discover.upload.gender">Giới tính</span></label>
+                  <div style="display: flex; gap: 12px;">
+                    <label class="gender-btn active"
+                      style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                      <input type="radio" name="upload-gender" value="Nữ" checked style="display: none;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-venus-icon lucide-venus">
+                        <path d="M12 15v7" />
+                        <path d="M9 19h6" />
+                        <circle cx="12" cy="9" r="6" />
+                      </svg> <span data-i18n="discover.upload.female">Nữ</span>
+                    </label>
+                    <label class="gender-btn"
+                      style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                      <input type="radio" name="upload-gender" value="Nam" style="display: none;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-mars-icon lucide-mars">
+                        <path d="M16 3h5v5" />
+                        <path d="m21 3-6.75 6.75" />
+                        <circle cx="10" cy="14" r="6" />
+                      </svg> <span data-i18n="discover.upload.male">Nam</span>
+                    </label>
+                    <label class="gender-btn"
+                      style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                      <input type="radio" name="upload-gender" value="Khác" style="display: none;">
+                      <span data-i18n="discover.upload.other">Khác</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label style="display: flex; align-items: center; gap: 6px;"><i data-lucide="shapes"
+                    style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.type">Loại nhân vật</span></label>
+                <select id="upload-type"
+                  style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem; color: #333; transition: all 0.2s; cursor: pointer;">
+                  <option value="Tuổi teen" data-i18n="discover.upload.opt.type.teen">Tuổi teen (Teen)</option>
+                  <option value="Nhỏ nhắn" data-i18n="discover.upload.opt.type.loli">Nhỏ nhắn (Loli)</option>
+                  <option value="Trưởng thành" data-i18n="discover.upload.opt.type.adult">Trưởng thành (Adult)</option>
+                  <option value="Quyến rũ" data-i18n="discover.upload.opt.type.mommy">Quyến rũ (Mommy)</option>
+                  <option value="Chị gái" data-i18n="discover.upload.opt.type.oneesan">Chị gái (Onee-san)</option>
+                  <option value="Đầu to" data-i18n="discover.upload.opt.type.chibi">Đầu to (Chibi)</option>
+                  <option value="Khác" data-i18n="discover.upload.opt.other">Khác...</option>
+                </select>
+                <div id="upload-type-custom-container" style="display: none; position: relative; width: 100%;">
+                  <input type="text" id="upload-type-custom" placeholder="Nhập loại nhân vật..."
+                    style="width: 100%; padding: 12px 16px; padding-right: 36px; border: 2px solid #3f51b5; border-radius: 12px; font-size: 1rem; box-sizing: border-box; outline: none; box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);">
+                  <button type="button" id="btn-cancel-type-custom"
+                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: #888; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label style="display: flex; align-items: center; gap: 6px;"><i data-lucide="sparkles"
+                    style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.trait">Tính cách / Đặc điểm</span></label>
+                <select id="upload-trait-select"
+                  style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem; color: #333; transition: all 0.2s; cursor: pointer;">
+                  <option value="Vui vẻ" data-i18n="discover.upload.opt.trait.happy">Vui vẻ, Năng động</option>
+                  <option value="Tsundere" data-i18n="discover.upload.opt.trait.tsundere">Tsundere (Ngoài lạnh trong nóng)</option>
+                  <option value="Yandere" data-i18n="discover.upload.opt.trait.yandere">Yandere (Chiếm hữu)</option>
+                  <option value="Kuudere" data-i18n="discover.upload.opt.trait.cold">Kuudere (Lạnh lùng, điềm tĩnh)</option>
+                  <option value="Dandere" data-i18n="discover.upload.opt.trait.shy">Dandere (Nhút nhát, ít nói)</option>
+                  <option value="Dịu dàng" data-i18n="discover.upload.opt.trait.gentle">Dịu dàng, Hiền lành</option>
+                  <option value="Khác" data-i18n="discover.upload.opt.other">Khác...</option>
+                </select>
+                <div id="upload-trait-custom-container" style="display: none; position: relative; width: 100%;">
+                  <input type="text" id="upload-trait-custom" placeholder="Nhập tính cách khác..."
+                    style="width: 100%; padding: 12px 16px; padding-right: 36px; border: 2px solid #3f51b5; border-radius: 12px; font-size: 1rem; box-sizing: border-box; outline: none; box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);">
+                  <button type="button" id="btn-cancel-trait-custom"
+                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: #888; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label style="display: flex; align-items: center; gap: 6px;"><i data-lucide="box"
+                    style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.source">Nguồn mô hình</span></label>
+                <select id="upload-source-select"
+                  style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem; color: #333; transition: all 0.2s; cursor: pointer;">
+                  <option value="VRoid Hub">VRoid Hub</option>
+                  <option value="Booth">Booth</option>
+                  <option value="Sketchfab">Sketchfab</option>
+                  <option value="DeviantArt">DeviantArt</option>
+                  <option value="Bilibili">Bilibili</option>
+                  <option value="Tự tạo" data-i18n="discover.upload.opt.source.self">Tự tạo (Self-made)</option>
+                  <option value="Khác" data-i18n="discover.upload.opt.other">Khác...</option>
+                </select>
+                <div id="upload-source-custom-container" style="display: none; position: relative; width: 100%;">
+                  <input type="text" id="upload-source-custom" placeholder="Nhập nguồn mô hình..."
+                    style="width: 100%; padding: 12px 16px; padding-right: 36px; border: 2px solid #3f51b5; border-radius: 12px; font-size: 1rem; box-sizing: border-box; outline: none; box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);">
+                  <button type="button" id="btn-cancel-source-custom"
+                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: #888; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label style="display: flex; align-items: center; gap: 6px;"><i data-lucide="globe"
+                    style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.origin">Nguồn gốc nhân vật</span></label>
+                <select id="upload-origin-select"
+                  style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem; color: #333; transition: all 0.2s; cursor: pointer;">
+                  <option value="Genshin Impact">Genshin Impact</option>
+                  <option value="Honkai Star Rail">Honkai Star Rail</option>
+                  <option value="Zenless Zone Zero">Zenless Zone Zero</option>
+                  <option value="Wuthering Waves">Wuthering Waves</option>
+                  <option value="Fate/Grand Order">Fate/Grand Order (FGO)</option>
+                  <option value="Blue Archive">Blue Archive</option>
+                  <option value="Arknights">Arknights</option>
+                  <option value="Hololive">Hololive (VTuber)</option>
+                  <option value="Nijisanji">Nijisanji (VTuber)</option>
+                  <option value="Anime / Manga">Anime / Manga (Chung)</option>
+                  <option value="Tự sáng tác">Tự sáng tác (Original)</option>
+                  <option value="Khác" data-i18n="discover.upload.opt.other">Khác...</option>
+                </select>
+                <div id="upload-origin-custom-container" style="display: none; position: relative; width: 100%;">
+                  <input type="text" id="upload-origin-custom" placeholder="Nhập nguồn gốc..." data-i18n="discover.upload.ph_origin"
+                    style="width: 100%; padding: 12px 16px; padding-right: 36px; border: 2px solid #3f51b5; border-radius: 12px; font-size: 1rem; box-sizing: border-box; outline: none; box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);">
+                  <button type="button" id="btn-cancel-origin-custom"
+                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; color: #888; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label style="display: flex; align-items: center; gap: 6px;"><i data-lucide="align-left"
+                  style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.desc">Mô tả nhân vật *</span></label>
+              <textarea id="upload-desc" data-i18n="discover.upload.desc_ph" placeholder="Giới thiệu đôi nét về bối cảnh, câu chuyện..."
+                style="width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem; color: #333; transition: all 0.2s; resize: vertical; min-height: 80px; box-sizing: border-box; font-family: inherit;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <i data-lucide="mic" style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.voice">Voice Lồng Tiếng cho nhân vật</span>
+                <button type="button" id="btn-voice-guide" style="background: none; border: none; padding: 0; cursor: pointer; color: #3f51b5; display: flex; align-items: center; margin-left: 4px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Hướng dẫn lấy ID">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+              </label>
+
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="text" id="upload-voice" data-i18n="discover.upload.voice_ph" placeholder="Mã Model ID trên Fish Audio (VD: e4a5b... 32 ký tự)"
+                  style="padding-right: 90px;">
+                <button type="button" id="btn-skip-voice"
+                  style="position: absolute; right: 6px; padding: 6px 12px; background: #f5f5f5; border: none; border-radius: 8px; color: #666; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;"
+                  onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f5f5f5'" data-i18n="discover.upload.skip_voice">Bỏ
+                  qua</button>
+              </div>
+
+              <small id="voice-warning-text"
+                style="color: #666; display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; line-height: 1.5; font-size: 0.9rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="#e94560" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-triangle-alert-icon lucide-triangle-alert"
+                  style="flex-shrink: 0; margin-top: 2px;">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                  <path d="M12 9v4" />
+                  <path d="M12 17h.01" />
+                </svg>
+                <span>
+                  <span data-i18n="discover.upload.voice_warn">Chuỗi <b>32 ký tự</b> ngẫu nhiên (không cần nhập API Key). Vui lòng đảm bảo model giọng nói được đặt ở
+                  chế độ <b style="color: #e94560;">Public</b> trên Fish Audio.</span>
+                </span>
+              </small>
+            </div>
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <i data-lucide="file-box" style="width: 18px; height: 18px;"></i> <span data-i18n="discover.upload.file">File 3D Model (.vrm) *</span>
+                <button type="button" id="btn-vrm-guide" style="background: none; border: none; padding: 0; cursor: pointer; color: #3f51b5; display: flex; align-items: center; margin-left: 4px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Hướng dẫn tải Model VRM">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+              </label>
+
+              <div
+                style="color: #666; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; line-height: 1.5; font-size: 0.95rem; font-weight: 500;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="#e94560" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-triangle-alert-icon lucide-triangle-alert"
+                  style="flex-shrink: 0; margin-top: 2px;">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                  <path d="M12 9v4" />
+                  <path d="M12 17h.01" />
+                </svg>
+                <span>
+                  <span data-i18n="discover.upload.vrm_warn">Hệ thống hiện tại chỉ hỗ trợ định dạng mô hình <b style="color: #e94560; font-size: 1rem;">VRM
+                    1.0</b>.</span>
+                </span>
+              </div>
+
+              <label for="upload-vrm" id="upload-vrm-label"
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 32px 16px; border: 2px dashed #3f51b5; border-radius: 16px; background: #f5f7ff; cursor: pointer; transition: all 0.2s; box-sizing: border-box;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #3f51b5; margin-bottom: 12px;">
+                  <path
+                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+                  <path d="m8 18 4-4" />
+                  <path d="M8 10v8h8" />
+                </svg>
+                <span style="font-size: 1.05rem; font-weight: 700; color: #3f51b5; text-align: center;" data-i18n="discover.upload.drag_drop">Kéo thả file
+                  .vrm hoặc Bấm để chọn</span>
+                <span id="vrm-file-name"
+                  style="font-size: 0.9rem; color: #666; margin-top: 8px; font-weight: 500; text-align: center; word-break: break-all;" data-i18n="discover.upload.no_file">Chưa
+                  chọn file nào</span>
+              </label>
+              <input type="file" id="upload-vrm" accept=".vrm" style="display: none;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share-icon lucide-share"><path d="M12 2v13"/><path d="m16 6-4-4-4 4"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/></svg> 
+                <span data-i18n="discover.upload.privacy">Chế độ hiển thị</span>
+              </label>
+              <div style="display: flex; gap: 12px;">
+                <label class="privacy-btn active" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <input type="radio" name="upload-privacy" value="public" checked style="display: none;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg> <span data-i18n="discover.upload.public">Công khai</span>
+                </label>
+                <label class="privacy-btn" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <input type="radio" name="upload-privacy" value="private" style="display: none;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hat-glasses-icon lucide-hat-glasses"><path d="M14 18a2 2 0 0 0-4 0"/><path d="m19 11-2.11-6.657a2 2 0 0 0-2.752-1.148l-1.276.61A2 2 0 0 1 12 4H8.5a2 2 0 0 0-1.925 1.456L5 11"/><path d="M2 11h20"/><circle cx="17" cy="18" r="3"/><circle cx="7" cy="18" r="3"/></svg> <span data-i18n="discover.upload.private">Riêng tư</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+              <label id="label-term-share" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 12px; padding: 4px; border-radius: 8px; transition: all 0.2s;">
+                <input type="checkbox" id="term-share" style="width: 18px; height: 18px; accent-color: #3f51b5; cursor: pointer;">
+                <span style="font-size: 0.95rem; color: #444; font-weight: 500; user-select: none;"><span data-i18n="discover.upload.term_share">Tôi đồng ý chia sẻ dữ liệu lên hệ thống</span> <span style="color: #e94560;">*</span></span>
+                <button type="button" class="btn-terms-guide" data-type="share" style="background: none; border: none; padding: 0; cursor: pointer; color: #3f51b5; display: flex; align-items: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Chi tiết">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+              </label>
+              <label id="label-term-copyright" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 12px; padding: 4px; border-radius: 8px; transition: all 0.2s;">
+                <input type="checkbox" id="term-copyright" style="width: 18px; height: 18px; accent-color: #3f51b5; cursor: pointer;">
+                <span style="font-size: 0.95rem; color: #444; font-weight: 500; user-select: none;"><span data-i18n="discover.upload.term_copyright">Tôi cam kết chịu trách nhiệm về bản quyền</span> <span style="color: #e94560;">*</span></span>
+                <button type="button" class="btn-terms-guide" data-type="copyright" style="background: none; border: none; padding: 0; cursor: pointer; color: #3f51b5; display: flex; align-items: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Chi tiết">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+              </label>
+              <label id="label-term-guidelines" style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 12px; padding: 4px; border-radius: 8px; transition: all 0.2s;">
+                <input type="checkbox" id="term-guidelines" style="width: 18px; height: 18px; accent-color: #3f51b5; cursor: pointer;">
+                <span style="font-size: 0.95rem; color: #444; font-weight: 500; user-select: none;"><span data-i18n="discover.upload.term_guidelines">Tôi cam kết nội dung không vi phạm tiêu chuẩn cộng đồng</span> <span style="color: #e94560;">*</span></span>
+                <button type="button" class="btn-terms-guide" data-type="guidelines" style="background: none; border: none; padding: 0; cursor: pointer; color: #3f51b5; display: flex; align-items: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Chi tiết">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+              </label>
+              <label id="label-term-commercial" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 8px; transition: all 0.2s;">
+                <input type="checkbox" id="term-commercial" style="width: 18px; height: 18px; accent-color: #3f51b5; cursor: pointer;">
+                <span style="font-size: 0.95rem; color: #444; font-weight: 500; user-select: none;"><span data-i18n="discover.upload.term_commercial">Tôi cam kết không sử dụng cho mục đích thương mại</span> <span style="color: #e94560;">*</span></span>
+                <button type="button" class="btn-terms-guide" data-type="commercial" style="background: none; border: none; padding: 0; cursor: pointer; color: #3f51b5; display: flex; align-items: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Chi tiết">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-question-mark-icon lucide-circle-question-mark"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                </button>
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 15px;">
+              <button type="submit" id="btn-submit-upload" class="btn-submit" style="flex: 1;" data-i18n="discover.upload.submit_char">
+                Tải lên nhân vật
+              </button>
+              <button type="button" id="btn-delete-upload" class="btn-submit" style="display: none; flex: 1; background: #e53935;" onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'" data-i18n="discover.upload.delete_char">
+                Xóa nhân vật
+              </button>
+            </div>
+            <div id="upload-status" style="text-align: center; display: none; margin-top: 15px; font-weight: bold;">
+            </div>
+          </form>
+        </div>
+
+        <!-- Cột Phải: Xem trước 3D -->
+        <div class="upload-preview-col" style="position: relative;">
+          <button id="btn-back-community" class="back-btn"
+            style="position: absolute; top: 20px; right: 20px; z-index: 10; background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0,0,0,0.1); padding: 8px 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); backdrop-filter: blur(5px);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            <span data-i18n="discover.upload.back_chars">Trở về Nhân Vật</span>
+          </button>
+          <!-- Canvas cho Three.js -->
+          <canvas id="vrm-preview-canvas"></canvas>
+          <div id="preview-placeholder"
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #888; pointer-events: none;" data-i18n="discover.upload.preview_placeholder">
+            Chọn file .vrm để xem trước
+          </div>
+
+          <!-- Controls (Bottom Center) -->
+          <div
+            style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); padding: 6px 12px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.8); z-index: 10; width: max-content;">
+
+            <label class="rotation-control"
+              style="margin: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; padding-right: 6px;">
+              <input type="checkbox" id="toggle-rotation">
+              <span style="font-weight: 600; color: #444; font-size: 0.85rem;" data-i18n="discover.upload.auto_rotate">Tự động xoay</span>
+            </label>
+
+            <div style="width: 1px; height: 16px; background: rgba(0,0,0,0.15);"></div>
+
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="cam-btn" data-pos="full"
+                style="padding: 5px 12px; border: none; background: #008B8B; color: white; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem;" data-i18n="discover.upload.cam_full">Toàn
+                Cảnh</button>
+              <button type="button" class="cam-btn" data-pos="hip"
+                style="padding: 5px 12px; border: none; background: #008B8B; color: white; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem;" data-i18n="discover.upload.cam_hip">Cận
+                (Hông)</button>
+              <button type="button" class="cam-btn" data-pos="chest"
+                style="padding: 5px 12px; border: none; background: #008B8B; color: white; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem;" data-i18n="discover.upload.cam_chest">Cận
+                (Ngực)</button>
+              <button type="button" class="cam-btn" data-pos="face"
+                style="padding: 5px 12px; border: none; background: #008B8B; color: white; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.8rem;" data-i18n="discover.upload.cam_face">Cận
+                (Mặt)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

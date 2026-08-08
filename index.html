@@ -43,6 +43,13 @@
 
     <!-- Top Right Header Container -->
     <div id="top-right-header" style="position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; align-items: center; gap: 12px;">
+        <!-- Theme Switcher Button -->
+        <button id="btn-theme-selector" style="display: none; padding: 6px; border-radius: 50%; background: rgba(232, 234, 246, 0.85); border: 2px solid #7986cb; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15); backdrop-filter: blur(8px); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 15px rgba(63, 81, 181, 0.25)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(63, 81, 181, 0.15)';">
+            <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid #7986cb;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3f51b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-palette"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+            </div>
+        </button>
+
         <!-- Character Switcher Button -->
         <button id="btn-switch-model" style="display: flex; padding: 6px 16px 6px 6px; border-radius: 30px; background: rgba(232, 234, 246, 0.85); border: 2px solid #7986cb; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15); backdrop-filter: blur(8px); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 15px rgba(63, 81, 181, 0.25)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(63, 81, 181, 0.15)';">
             <div id="btn-switch-model-circle" style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid #7986cb;">
@@ -50,6 +57,14 @@
             </div>
             <span style="color: #3f51b5; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;" data-i18n="btn.model">Nhân vật</span>
         </button>
+
+        <!-- Discover Button -->
+        <a href="/discover.html" id="btn-discover" style="display: flex; padding: 6px 16px 6px 6px; border-radius: 30px; background: rgba(232, 234, 246, 0.85); border: 2px solid #7986cb; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15); backdrop-filter: blur(8px); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 15px rgba(63, 81, 181, 0.25)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(63, 81, 181, 0.15)';">
+            <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid #7986cb;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3f51b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-earth"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/><path d="M7 3.34V5a3 3 0 0 0 3 3v0a2 2 0 0 1 2 2v0c0 1.1.9 2 2 2v0a2 2 0 0 0 2-2v0c0-1.1.9-2 2-2h3.17"/><path d="M11 21.95V18a2 2 0 0 0-2-2v0a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <span style="color: #3f51b5; font-weight: 700; font-size: 0.95rem; font-family: system-ui, -apple-system, sans-serif; letter-spacing: 0.5px;" data-i18n="btn.discover">Khám Phá</span>
+        </a>
 
         <!-- Profile Menu -->
         <button id="btn-profile" style="display: none; padding: 6px 16px 6px 6px; border-radius: 30px; background: rgba(232, 234, 246, 0.85); border: 2px solid #7986cb; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(63, 81, 181, 0.15); backdrop-filter: blur(8px); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 15px rgba(63, 81, 181, 0.25)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(63, 81, 181, 0.15)';">
@@ -70,6 +85,77 @@
     </div>
     
     <!-- Profile Modals were moved to profile.html -->
+
+    <!-- Theme Modal -->
+    <div id="theme-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px);">
+        <div style="background: white; border-radius: 20px; padding: 24px; width: 400px; max-width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative;">
+            <button id="close-theme-modal" style="position: absolute; top: 16px; right: 16px; background: none; border: none; cursor: pointer; color: #888;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+            <h2 style="margin: 0 0 8px; color: #333; font-size: 1.4rem; text-align: center;" data-i18n="ui.theme.title">Chọn Nguyên Tố</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 0.95rem;" data-i18n="ui.theme.desc">Giao diện sẽ được lưu vĩnh viễn cho nhân vật này.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+                <!-- Hỏa (Pyro) -->
+                <button class="theme-btn" data-theme="pyro" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #ffebee; border: 2px solid #e53935; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #e53935;" data-i18n="ui.theme.pyro">Hỏa</span>
+                </button>
+                <!-- Thủy (Hydro) -->
+                <button class="theme-btn" data-theme="hydro" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #e3f2fd; border: 2px solid #1e88e5; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e88e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #1e88e5;" data-i18n="ui.theme.hydro">Thủy</span>
+                </button>
+                <!-- Phong (Anemo) -->
+                <button class="theme-btn" data-theme="anemo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #e0f2f1; border: 2px solid #26a69a; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#26a69a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #26a69a;" data-i18n="ui.theme.anemo">Phong</span>
+                </button>
+                <!-- Lôi (Electro) -->
+                <button class="theme-btn" data-theme="electro" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #f3e5f5; border: 2px solid #8e24aa; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8e24aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #8e24aa;" data-i18n="ui.theme.electro">Lôi</span>
+                </button>
+                <!-- Thảo (Dendro) -->
+                <button class="theme-btn" data-theme="dendro" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #f1f8e9; border: 2px solid #7cb342; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7cb342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #7cb342;" data-i18n="ui.theme.dendro">Thảo</span>
+                </button>
+                <!-- Băng (Cryo) -->
+                <button class="theme-btn" data-theme="cryo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #e0f7fa; border: 2px solid #4dd0e1; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4dd0e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 20-3-3 3-3"/><path d="M2 12h20"/><path d="m14 20 3-3-3-3"/><path d="m10 4-3 3 3 3"/><path d="m14 4 3 3-3 3"/><path d="m12 22v-4"/><path d="m12 6V2"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #4dd0e1;" data-i18n="ui.theme.cryo">Băng</span>
+                </button>
+                <!-- Nham (Geo) -->
+                <button class="theme-btn" data-theme="geo" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #fffde7; border: 2px solid #fbc02d; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbc02d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14.5 12 8l4 6.5"/><path d="M10 22 12 18l2 4"/><path d="M15 15.5 22 12l-7-3.5"/><path d="M9 15.5 2 12l7-3.5"/><path d="M10 2 12 6l2-4"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #fbc02d;" data-i18n="ui.theme.geo">Nham</span>
+                </button>
+                
+                <!-- Mặc định (Citlali fallback) -->
+                <button class="theme-btn" data-theme="citlali" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: none; border: 2px solid transparent; border-radius: 12px; padding: 10px; cursor: pointer; transition: 0.2s;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #e8eaf6; border: 2px solid #7986cb; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7986cb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <span style="font-size: 0.85rem; font-weight: bold; color: #5c6bc0;" data-i18n="ui.theme.normal">Thường</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <button class="floating-icon" id="open-ui" style="display: none; top: 20px; left: 20px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-switch-camera-icon lucide-switch-camera"><path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/><path d="M13 5h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/><circle cx="12" cy="12" r="3"/><path d="m18 22-3-3 3-3"/><path d="m6 2 3 3-3 3"/></svg>
@@ -161,7 +247,7 @@
                 
                 <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px; display: flex; align-items: center; gap: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move"><path d="M12 2v20"/><path d="m15 19-3 3-3-3"/><path d="m19 9 3 3-3 3"/><path d="M2 12h20"/><path d="m5 9-3 3 3 3"/><path d="m9 5 3-3 3 3"/></svg>
-                    <span data-i18n="action.basic">Cơ bản & Di chuyển</span>
+                    <span data-i18n="action.basic" data-category="Cơ bản & Di chuyển">Cơ bản & Di chuyển</span>
                 </h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
                     <button class="anim-btn bone-btn" data-anim="idle.fbx" data-i18n="action.idle">Đứng chờ</button>
@@ -174,7 +260,7 @@
 
                 <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px; display: flex; align-items: center; gap: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
-                    <span data-i18n="action.comm">Giao tiếp & Tương tác</span>
+                    <span data-i18n="action.comm" data-category="Giao tiếp & Tương tác">Giao tiếp & Tương tác</span>
                 </h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
                     <button class="anim-btn bone-btn" data-anim="talk.fbx" data-i18n="action.talk">Trò chuyện</button>
@@ -187,7 +273,7 @@
 
                 <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px; display: flex; align-items: center; gap: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
-                    <span data-i18n="action.emo">Biểu cảm & Cảm xúc</span>
+                    <span data-i18n="action.emo" data-category="Biểu cảm & Cảm xúc">Biểu cảm & Cảm xúc</span>
                 </h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
                     <button class="anim-btn bone-btn" data-anim="laugh.fbx" data-i18n="action.laugh">Cười lớn</button>
@@ -201,7 +287,7 @@
 
                 <h4 style="margin: 5px 0; font-size: 0.85rem; color: #ff6b81; border-bottom: 1px solid #ff6b8133; padding-bottom: 4px; display: flex; align-items: center; gap: 5px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-music"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                    <span data-i18n="action.music">Chơi nhạc</span>
+                    <span data-i18n="action.music" data-category="Chơi nhạc">Chơi nhạc</span>
                 </h4>
                 <div class="bone-grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
                     <button class="anim-btn bone-btn" data-anim="Playing The Violin.fbx" style="display: flex; align-items: center; justify-content: center; gap: 5px;">
@@ -213,6 +299,9 @@
                         <span data-i18n="action.play_piano">Chơi Piano</span>
                     </button>
                 </div>
+
+                <!-- Container for community-uploaded animations (dynamically populated) -->
+                <div id="community-actions-container"></div>
 
                 <button class="anim-btn bone-btn" style="background: #e94560; width: 100%; margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 5px;" data-anim="">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pause"><rect x="14" y="3" width="5" height="18" rx="1"/><rect x="5" y="3" width="5" height="18" rx="1"/></svg>
@@ -514,6 +603,7 @@
             </div>
         </div>
     </div>
+
     
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -270,3 +270,34 @@ body.theme-yaemiko .custom-select-options {
 body.theme-yaemiko .custom-select-options::-webkit-scrollbar-thumb {
   background: #ffb6c1 !important;
 }
+body.theme-yaemiko #btn-switch-model,
+body.theme-yaemiko #btn-discover,
+body.theme-yaemiko #btn-theme-selector,
+body.theme-yaemiko #btn-profile,
+body.theme-yaemiko #btn-login-header {
+  border-color: #ffb6c1 !important;
+}
+
+body.theme-yaemiko #btn-switch-model span,
+body.theme-yaemiko #btn-discover span,
+body.theme-yaemiko #btn-theme-selector span,
+body.theme-yaemiko #btn-profile span,
+body.theme-yaemiko #btn-login-header span {
+  color: #e94560 !important;
+}
+
+body.theme-yaemiko #btn-switch-model-circle,
+body.theme-yaemiko #btn-discover > div,
+body.theme-yaemiko #btn-theme-selector > div,
+body.theme-yaemiko #btn-profile > div,
+body.theme-yaemiko #btn-login-header > div {
+  border-color: #ffb6c1 !important;
+}
+
+body.theme-yaemiko #btn-switch-model svg,
+body.theme-yaemiko #btn-discover svg,
+body.theme-yaemiko #btn-theme-selector svg,
+body.theme-yaemiko #btn-profile-icon,
+body.theme-yaemiko #btn-login-header svg {
+  stroke: #e94560 !important;
+}

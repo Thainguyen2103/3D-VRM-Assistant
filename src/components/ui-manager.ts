@@ -8,6 +8,7 @@ import { initAuth, supabase, currentUser } from '@/core/auth';
 import { MODEL_CITLALI, normalizeModelUrl, isXianyunModel, isLaumaModel, isNahidaModel, isYaeMikoModel } from '@/core/constants';
 import { CustomDialog } from '@/components/custom-dialog';
 import { createIcons, icons } from 'lucide';
+import { loadChatHistory, triggerProactiveChat } from '@/features/chat/chat-ui';
 
 // Hàm hỗ trợ khóa góc (tránh phi vật lý) nhận vào object {x, y, z} theo độ (degrees)
 const clampBoneDegrees = (
@@ -96,6 +97,72 @@ export function initUI() {
       const target = e.currentTarget as HTMLButtonElement;
       const animName = target.getAttribute("data-anim") || "";
       loadFBXAnimation(animName);
+    });
+  });
+
+  document.getElementById("close-ui")?.addEventListener("click", () => {
+    const ui = document.getElementById("ui");
+    const openBtn = document.getElementById("open-ui");
+    if (ui) ui.style.display = "none";
+    if (openBtn) openBtn.style.display = "flex";
+  });
+
+  // --- Theme Modal Logic ---
+  const btnThemeSelector = document.getElementById("btn-theme-selector");
+  const themeModal = document.getElementById("theme-modal");
+  const closeThemeModal = document.getElementById("close-theme-modal");
+  
+  if (btnThemeSelector && themeModal) {
+    btnThemeSelector.addEventListener("click", () => {
+      themeModal.style.display = "flex";
+    });
+  }
+  
+  if (closeThemeModal && themeModal) {
+    closeThemeModal.addEventListener("click", () => {
+      themeModal.style.display = "none";
+    });
+  }
+  
+  document.querySelectorAll(".theme-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const target = e.currentTarget as HTMLElement;
+      const themeName = target.getAttribute("data-theme");
+      if (!themeName) return;
+      
+      // Update local storage
+      let settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+      if (settings.customModelMeta) {
+          settings.customModelMeta.theme = themeName;
+          if (!settings.theme_mapping) settings.theme_mapping = {};
+          settings.theme_mapping[settings.customModelMeta.url] = themeName;
+          
+          localStorage.setItem('app_settings', JSON.stringify(settings));
+          
+          // Apply to UI instantly
+          import('@/core/i18n').then(({ updateChatUIForModel }) => {
+              updateChatUIForModel();
+          });
+          
+          // Save to supabase if logged in
+          import('@/core/auth').then(async ({ currentUser, supabase }) => {
+              if (currentUser && supabase) {
+                  try {
+                      const { data } = await supabase.from('user_profiles').select('settings').eq('id', currentUser.id).single();
+                      const updatedSettings = { 
+                          ...(data?.settings || {}), 
+                          customModelMeta: settings.customModelMeta,
+                          theme_mapping: settings.theme_mapping 
+                      };
+                      await supabase.from('user_profiles').update({ settings: updatedSettings }).eq('id', currentUser.id);
+                  } catch (err) {
+                      console.error("Lỗi lưu theme lên mây:", err);
+                  }
+              }
+          });
+      }
+      
+      if (themeModal) themeModal.style.display = "none";
     });
   });
 
@@ -508,12 +575,15 @@ export function initUI() {
   if (btnSaveSettings) {
     btnSaveSettings.addEventListener('click', async () => {
       let existingModel = currentModelUrl || '/model.vrm';
+      let existingSettings: any = {};
       try {
         const local = JSON.parse(localStorage.getItem('app_settings') || '{}');
+        existingSettings = local;
         if (local.model) existingModel = local.model;
       } catch (e) {}
 
       const settings = {
+        ...existingSettings,
         model: existingModel,
         language: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
         voice: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh',
@@ -748,6 +818,10 @@ function initCharacterSwitcher() {
 
       switchVRMModel(selectedModelUrl, false, () => {
         showToast(t("toast.switched_model"), toastColor);
+        // Reset chat history so the new character starts fresh
+        loadChatHistory(null).then(() => {
+          triggerProactiveChat('initial_greeting');
+        });
       });
 
       try {

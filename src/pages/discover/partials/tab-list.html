@@ -1,0 +1,13 @@
+    <div id="tab-list" class="tab-content">
+      <!-- Search Bar -->
+      <div style="margin-bottom: 24px; display: flex; justify-content: center;">
+        <div style="position: relative; width: 100%; max-width: 600px;">
+          <input type="text" id="search-character" data-i18n="discover.list.search_char" placeholder="Tìm kiếm nhân vật..." style="width: 100%; padding: 14px 20px 14px 48px; border-radius: 30px; border: 2px solid #e0e0e0; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); outline: none; transition: all 0.3s; font-family: inherit; box-sizing: border-box;" onfocus="this.style.borderColor='#3f51b5'; this.style.boxShadow='0 4px 16px rgba(63,81,181,0.2)'" onblur="this.style.borderColor='#e0e0e0'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.05)'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+      </div>
+
+      <div id="discover-list-container" class="discover-grid">
+        <div style="text-align: center; grid-column: 1 / -1; color: #888; padding: 40px; font-size: 1.1rem;" data-i18n="discover.list.loading_chars">Đang tải danh sách nhân vật...</div>
+      </div>
+    </div>

@@ -89,6 +89,8 @@ body.theme-citlali {
 }
 
 body.theme-citlali #btn-switch-model,
+body.theme-citlali #btn-discover,
+body.theme-citlali #btn-theme-selector,
 body.theme-citlali #btn-profile,
 body.theme-citlali #btn-login-header {
   background: rgba(232, 234, 246, 0.85) !important;
@@ -97,22 +99,32 @@ body.theme-citlali #btn-login-header {
 }
 
 body.theme-citlali #btn-switch-model:hover,
+body.theme-citlali #btn-discover:hover,
+body.theme-citlali #btn-theme-selector:hover,
 body.theme-citlali #btn-profile:hover,
 body.theme-citlali #btn-login-header:hover {
   box-shadow: 0 6px 15px rgba(63, 81, 181, 0.25) !important;
 }
 
 body.theme-citlali #btn-switch-model span,
+body.theme-citlali #btn-discover span,
+body.theme-citlali #btn-theme-selector span,
 body.theme-citlali #btn-profile span,
 body.theme-citlali #btn-login-header span {
   color: #3f51b5 !important;
 }
 
-body.theme-citlali #btn-switch-model-circle {
+body.theme-citlali #btn-switch-model-circle,
+body.theme-citlali #btn-discover > div,
+body.theme-citlali #btn-theme-selector > div,
+body.theme-citlali #btn-profile > div,
+body.theme-citlali #btn-login-header > div {
   border-color: #5c6bc0 !important;
 }
 
 body.theme-citlali #btn-switch-model svg,
+body.theme-citlali #btn-discover svg,
+body.theme-citlali #btn-theme-selector svg,
 body.theme-citlali #btn-profile-icon,
 body.theme-citlali #btn-login-header svg {
   stroke: #3f51b5 !important;
@@ -122,7 +134,6 @@ body.theme-citlali #btn-send {
   background: linear-gradient(135deg, #3949ab, #5c6bc0) !important;
   box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3) !important;
 }
-
 body.theme-citlali #btn-send:hover {
   background: linear-gradient(135deg, #283593, #3949ab) !important;
   box-shadow: 0 6px 20px rgba(63, 81, 181, 0.4) !important;

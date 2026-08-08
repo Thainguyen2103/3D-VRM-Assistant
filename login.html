@@ -14,7 +14,6 @@
       body {
         margin: 0;
         font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-        background: url('/wallpaper.png') no-repeat center center;
         background-size: cover;
         min-height: 100vh;
         display: flex;
@@ -364,6 +363,16 @@
       <button id="btn-guest" class="bone-btn guest-btn" data-i18n="auth.guest">Chế độ Khách (Không lưu dữ liệu)</button>
     </div>
 
+    <script>
+      (function() {
+        var wallpapers = ['/wallpaper.png', '/wallpaper1.png', '/wallpaper2.png', '/wallpaper3.png', '/wallpaper4.png'];
+        var chosen = wallpapers[Math.floor(Math.random() * wallpapers.length)];
+        document.body.style.backgroundImage = "url('" + chosen + "')";
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+      })();
+    </script>
     <script type="module" src="/src/features/auth/login.ts"></script>
   </body>
 </html>

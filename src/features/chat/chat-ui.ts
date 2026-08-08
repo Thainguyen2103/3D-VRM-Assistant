@@ -9,6 +9,26 @@ export let chatHistory: any[] = [];
 export let currentSessionId: string | null = null;
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
+// Fetch the user's saved community animations to pass to the AI system prompt
+async function fetchSavedAnimationsForChat(): Promise<{ name: string; file_url: string; description: string; category: string }[]> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user?.id) return [];
+    const res = await fetch(`${BACKEND_URL}/api/animations/my-saved?creator_id=${session.user.id}`);
+    if (!res.ok) return [];
+    const anims: any[] = await res.json();
+    return (anims || []).map(a => ({
+      name: a.name || '',
+      file_url: a.file_url || '',
+      description: a.description || '',
+      category: a.category || ''
+    }));
+  } catch (_) {
+    return [];
+  }
+}
+
+
 let idleTimer: any = null;
 const IDLE_TIME_MS = 60000; // 1 phút (60000ms) nhàn rỗi sẽ gọi proactive chat
 
@@ -19,10 +39,15 @@ export function resetIdleTimer() {
   }, IDLE_TIME_MS);
 }
 
-// Bắt sự kiện để reset timer
-window.addEventListener('mousemove', resetIdleTimer);
-window.addEventListener('keydown', resetIdleTimer);
-window.addEventListener('click', resetIdleTimer);
+let isIdleEventSetup = false;
+
+export function setupIdleEvents() {
+  if (isIdleEventSetup) return;
+  window.addEventListener('mousemove', resetIdleTimer);
+  window.addEventListener('keydown', resetIdleTimer);
+  window.addEventListener('click', resetIdleTimer);
+  isIdleEventSetup = true;
+}
 
 const appendMsg = (text: string, isUser: boolean, modelUrl?: string): HTMLElement | null => {
   const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
@@ -33,15 +58,29 @@ const appendMsg = (text: string, isUser: boolean, modelUrl?: string): HTMLElemen
   
   if (!isUser) {
     const model = modelUrl || activeModelUrl;
+    let customMeta: any = null;
+    try {
+      const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+      if (settings.customModelMeta && settings.customModelMeta.url === model) {
+        customMeta = settings.customModelMeta;
+      }
+    } catch (e) {}
+
     const isXianyun = isXianyunModel(model);
     const isLauma = isLaumaModel(model);
     const isNahida = isNahidaModel(model);
     const isYaeMiko = isYaeMikoModel(model);
     rowDiv.classList.add(isXianyun ? 'row-xianyun' : (isLauma ? 'row-lauma' : (isNahida ? 'row-nahida' : (isYaeMiko ? 'row-yaemiko' : 'row-citlali'))));
     
-    const avatarImgSrc = isXianyun ? '/Icon_Models/xianyun_icon.jpg' : (isLauma ? '/Icon_Models/lauma_icon.jpg' : (isNahida ? '/Icon_Models/nahida_icon.jpg' : (isYaeMiko ? '/Icon_Models/yaemiko_icon.jpg' : '/Icon_Models/citlali_icon.jpg')));
-    const avatarName = isXianyun ? 'Xianyun' : (isLauma ? 'Lauma' : (isNahida ? 'Nahida' : (isYaeMiko ? 'Yae Miko' : 'Citlali')));
-    const avatarTitle = isXianyun ? 'Xianyun (Lưu Vân)' : (isLauma ? 'Lauma (Nguyệt Ca Sư)' : (isNahida ? 'Nahida (Tiểu Thảo Thần)' : (isYaeMiko ? 'Yae Miko (Bát Trọng Thần Tử)' : 'Citlali')));
+    let avatarImgSrc = isXianyun ? '/Icon_Models/xianyun_icon.jpg' : (isLauma ? '/Icon_Models/lauma_icon.jpg' : (isNahida ? '/Icon_Models/nahida_icon.jpg' : (isYaeMiko ? '/Icon_Models/yaemiko_icon.jpg' : '/Icon_Models/citlali_icon.jpg')));
+    let avatarName = isXianyun ? 'Xianyun' : (isLauma ? 'Lauma' : (isNahida ? 'Nahida' : (isYaeMiko ? 'Yae Miko' : 'Citlali')));
+    let avatarTitle = isXianyun ? 'Xianyun (Lưu Vân)' : (isLauma ? 'Lauma (Nguyệt Ca Sư)' : (isNahida ? 'Nahida (Tiểu Thảo Thần)' : (isYaeMiko ? 'Yae Miko (Bát Trọng Thần Tử)' : 'Citlali')));
+    
+    if (customMeta && !isXianyun && !isLauma && !isNahida && !isYaeMiko) {
+      avatarImgSrc = customMeta.icon_url || avatarImgSrc;
+      avatarName = customMeta.name || avatarName;
+      avatarTitle = customMeta.name || avatarTitle;
+    }
     
     const avatarDiv = document.createElement("div");
     avatarDiv.className = "msg-avatar-wrapper";
@@ -87,15 +126,29 @@ export function showTypingIndicator(modelUrl?: string): HTMLElement | null {
   rowDiv.className = "chat-msg-row ai";
   
   const model = modelUrl || activeModelUrl;
+  let customMeta: any = null;
+  try {
+    const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+    if (settings.customModelMeta && settings.customModelMeta.url === model) {
+      customMeta = settings.customModelMeta;
+    }
+  } catch (e) {}
+
   const isXianyun = isXianyunModel(model);
   const isLauma = isLaumaModel(model);
   const isNahida = isNahidaModel(model);
   const isYaeMiko = isYaeMikoModel(model);
   rowDiv.classList.add(isXianyun ? 'row-xianyun' : (isLauma ? 'row-lauma' : (isNahida ? 'row-nahida' : (isYaeMiko ? 'row-yaemiko' : 'row-citlali'))));
   
-  const avatarImgSrc = isXianyun ? '/Icon_Models/xianyun_icon.jpg' : (isLauma ? '/Icon_Models/lauma_icon.jpg' : (isNahida ? '/Icon_Models/nahida_icon.jpg' : (isYaeMiko ? '/Icon_Models/yaemiko_icon.jpg' : '/Icon_Models/citlali_icon.jpg')));
-  const avatarName = isXianyun ? 'Xianyun' : (isLauma ? 'Lauma' : (isNahida ? 'Nahida' : (isYaeMiko ? 'Yae Miko' : 'Citlali')));
-  const avatarTitle = isXianyun ? 'Xianyun (Lưu Vân)' : (isLauma ? 'Lauma (Nguyệt Ca Sư)' : (isNahida ? 'Nahida (Tiểu Thảo Thần)' : (isYaeMiko ? 'Yae Miko (Bát Trọng Thần Tử)' : 'Citlali')));
+  let avatarImgSrc = isXianyun ? '/Icon_Models/xianyun_icon.jpg' : (isLauma ? '/Icon_Models/lauma_icon.jpg' : (isNahida ? '/Icon_Models/nahida_icon.jpg' : (isYaeMiko ? '/Icon_Models/yaemiko_icon.jpg' : '/Icon_Models/citlali_icon.jpg')));
+  let avatarName = isXianyun ? 'Xianyun' : (isLauma ? 'Lauma' : (isNahida ? 'Nahida' : (isYaeMiko ? 'Yae Miko' : 'Citlali')));
+  let avatarTitle = isXianyun ? 'Xianyun (Lưu Vân)' : (isLauma ? 'Lauma (Nguyệt Ca Sư)' : (isNahida ? 'Nahida (Tiểu Thảo Thần)' : (isYaeMiko ? 'Yae Miko (Bát Trọng Thần Tử)' : 'Citlali')));
+  
+  if (customMeta && !isXianyun && !isLauma && !isNahida && !isYaeMiko) {
+    avatarImgSrc = customMeta.icon_url || avatarImgSrc;
+    avatarName = customMeta.name || avatarName;
+    avatarTitle = customMeta.name || avatarTitle;
+  }
   
   const avatarDiv = document.createElement("div");
   avatarDiv.className = "msg-avatar-wrapper";
@@ -140,10 +193,33 @@ export async function loadChatHistory(sessionId: string | null) {
       const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
       if (historyDiv) {
           historyDiv.innerHTML = ''; // clear
+          
           if (chatHistory.length === 0) {
-              historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg"></div>`;
-              updateChatUIForModel();
+              let customMeta: any = null;
+              try {
+                const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+                if (settings.customModelMeta && settings.customModelMeta.url === activeModelUrl) {
+                  customMeta = settings.customModelMeta;
+                }
+              } catch (e) {}
+
+              if (customMeta) {
+                  // Gọi API tự động tạo câu chào
+                  triggerProactiveChat('initial_greeting').then(success => {
+                      if (!success) {
+                          const historyDiv = document.getElementById("chat-history") as HTMLDivElement;
+                          if (historyDiv && historyDiv.innerHTML === '') {
+                              historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg"></div>`;
+                              updateChatUIForModel();
+                          }
+                      }
+                  });
+              } else {
+                  historyDiv.innerHTML = `<div class="chat-msg ai" id="initial-msg"></div>`;
+              }
           }
+
+          updateChatUIForModel();
           chatHistory.forEach(msg => {
               let text = msg.parts && msg.parts[0] ? msg.parts[0].text : "";
               const regex = /\[ANIM:\s*([^\]]+)\]/g;
@@ -317,7 +393,7 @@ async function handleAIResponseData(data: any) {
     }
 }
 
-export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
+export async function triggerProactiveChat(contextType: 'welcome' | 'idle' | 'initial_greeting'): Promise<boolean> {
     if (contextType === 'welcome') {
         const now = Date.now();
         if (currentUser && supabase) {
@@ -356,19 +432,38 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
             }
             localStorage.setItem('lastWelcomeTime', now.toString());
         }
+    } else if (contextType === 'initial_greeting') {
+        const now = Date.now();
+        const lastGreetingStr = localStorage.getItem('lastInitialGreetingTime');
+        if (lastGreetingStr) {
+            const lastTime = parseInt(lastGreetingStr, 10);
+            if (now - lastTime < 1 * 60 * 1000) { // 1 phút cooldown cho mỗi lần spam New Chat
+                return false; 
+            }
+        }
+        localStorage.setItem('lastInitialGreetingTime', now.toString());
     }
 
     // Không proactive nếu ai đang nói hoặc đang nhập văn bản
-    if ((window as any).isChatbotTalking) return;
+    if ((window as any).isChatbotTalking) return false;
     
     try {
         showTypingIndicator();
+        let customMeta: any = null;
+        try {
+          const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+          if (settings.customModelMeta && settings.customModelMeta.url === activeModelUrl) {
+            customMeta = settings.customModelMeta;
+          }
+        } catch (e) {}
+
         const payload = {
             chatHistory: chatHistory,
             sessionId: currentSessionId,
             contextType: contextType,
             userProfile: getCurrentUserProfile(),
             modelUrl: activeModelUrl,
+            customMeta: customMeta,
             uiLanguage: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
             voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh'
         };
@@ -383,9 +478,11 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle') {
         removeTypingIndicator();
         chatHistory.push({ role: "model", modelUrl: activeModelUrl, parts: [{ text: data.aiResponse }] });
         handleAIResponseData(data);
+        return true;
     } catch (err) {
         removeTypingIndicator();
         console.error("Proactive chat error:", err);
+        return false;
     }
 }
 
@@ -522,14 +619,24 @@ export async function setupChatbot() {
     } catch (e) {}
 
     try {
+      let customMeta: any = null;
+      try {
+        const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+        if (settings.customModelMeta && settings.customModelMeta.url === activeModelUrl) {
+          customMeta = settings.customModelMeta;
+        }
+      } catch (e) {}
+
       const payload = {
         chatHistory: chatHistory,
         userText: userText,
         sessionId: currentSessionId,
         userProfile: getCurrentUserProfile(),
         modelUrl: activeModelUrl,
+        customMeta: customMeta,
         uiLanguage: (document.getElementById('setting-language') as HTMLSelectElement)?.value || 'vi',
-        voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh'
+        voiceLanguage: (document.getElementById('setting-voice') as HTMLSelectElement)?.value || 'zh',
+        savedAnimations: await fetchSavedAnimationsForChat()
       };
 
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
@@ -574,6 +681,7 @@ export async function setupChatbot() {
     }
   });
 
+  setupIdleEvents();
   resetIdleTimer();
 }
 

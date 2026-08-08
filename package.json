@@ -10,7 +10,8 @@
   },
   "devDependencies": {
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vite-plugin-html-inject": "^1.1.2"
   },
   "dependencies": {
     "@pixiv/three-vrm": "^3.5.4",
@@ -19,6 +20,7 @@
     "@types/cropperjs": "^1.1.5",
     "@types/three": "^0.185.0",
     "cropperjs": "^1.6.2",
+    "fast-average-color": "^9.5.2",
     "lil-gui": "^0.21.0",
     "lucide": "^1.24.0",
     "three": "^0.185.1"

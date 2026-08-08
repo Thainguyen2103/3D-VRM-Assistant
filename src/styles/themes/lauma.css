@@ -271,3 +271,34 @@ body.theme-lauma #loading-text {
 body.theme-lauma .loading-image {
   box-shadow: 0 10px 30px rgba(46, 125, 50, 0.3) !important;
 }
+body.theme-lauma #btn-switch-model,
+body.theme-lauma #btn-discover,
+body.theme-lauma #btn-theme-selector,
+body.theme-lauma #btn-profile,
+body.theme-lauma #btn-login-header {
+  border-color: #81c784 !important;
+}
+
+body.theme-lauma #btn-switch-model span,
+body.theme-lauma #btn-discover span,
+body.theme-lauma #btn-theme-selector span,
+body.theme-lauma #btn-profile span,
+body.theme-lauma #btn-login-header span {
+  color: #2e7d32 !important;
+}
+
+body.theme-lauma #btn-switch-model-circle,
+body.theme-lauma #btn-discover > div,
+body.theme-lauma #btn-theme-selector > div,
+body.theme-lauma #btn-profile > div,
+body.theme-lauma #btn-login-header > div {
+  border-color: #81c784 !important;
+}
+
+body.theme-lauma #btn-switch-model svg,
+body.theme-lauma #btn-discover svg,
+body.theme-lauma #btn-theme-selector svg,
+body.theme-lauma #btn-profile-icon,
+body.theme-lauma #btn-login-header svg {
+  stroke: #2e7d32 !important;
+}

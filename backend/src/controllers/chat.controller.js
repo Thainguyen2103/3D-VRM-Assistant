@@ -64,7 +64,7 @@ async function chat(req, res) {
             }
         }
 
-        let dynamicPrompt = aiService.buildSystemPrompt(req.body.userProfile, req.body.uiLanguage, req.body.voiceLanguage, req.body.modelUrl);
+        let dynamicPrompt = aiService.buildSystemPrompt(req.body.userProfile, req.body.uiLanguage, req.body.voiceLanguage, req.body.modelUrl, req.body.customMeta, req.body.savedAnimations || []);
         const cleanHistory = (chatHistory || []).map(m => ({ role: m.role, parts: m.parts }));
         
         const geminiPayload = {
@@ -93,7 +93,7 @@ async function chat(req, res) {
         cleanText = cleanText.replace(/\[ANIM:\s*[^\]]+\]/g, "").trim();
         
         let { zhText, viText } = await aiService.formatLanguagePair(cleanText, req.body.uiLanguage, req.body.voiceLanguage);
-        let audioBase64 = await aiService.getVoiceAudio(zhText, req.body.modelUrl);
+        let audioBase64 = await aiService.getVoiceAudio(zhText, req.body.modelUrl, req.body.customMeta);
 
         console.log(`[API /api/chat] OK -> model: ${req.body.modelUrl} | UI Lang: ${req.body.uiLanguage} | Voice Lang: ${req.body.voiceLanguage} | Audio: ${!!audioBase64}`);
         res.json({ aiResponse, zhText, viText, anim: lastAnim, audioBase64 });
@@ -106,15 +106,23 @@ async function chat(req, res) {
 async function proactiveChat(req, res) {
     try {
         const { chatHistory, sessionId, contextType } = req.body;
-        let proactivePrompt = aiService.buildSystemPrompt(req.body.userProfile, req.body.uiLanguage, req.body.voiceLanguage, req.body.modelUrl) + "\n\n";
+        let proactivePrompt = aiService.buildSystemPrompt(req.body.userProfile, req.body.uiLanguage, req.body.voiceLanguage, req.body.modelUrl, req.body.customMeta) + "\n\n";
 
-        if (contextType === 'welcome') {
+        if (contextType === 'initial_greeting') {
+            if (req.body.customMeta && req.body.customMeta.name) {
+                proactivePrompt += `HƯỚNG DẪN BỔ SUNG: Bạn vừa được người dùng triệu hồi. Dựa vào thông tin cốt truyện và tính cách của bạn, hãy sáng tạo một lời chào mở đầu thật độc đáo để làm quen với người dùng. Thể hiện rõ nét tính cách của bạn ngay từ câu đầu tiên! Trả lời dưới 40 từ.`;
+            } else {
+                proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Bạn vừa được triệu hồi. Hãy gửi một lời chào mở đầu dựa trên tính cách của bạn. Trả lời dưới 40 từ.";
+            }
+        } else if (contextType === 'welcome') {
             if (aiService.isXianyunModel(req.body.modelUrl)) {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Hậu bối vừa đến thăm. Hãy chủ động chào đón với phong thái tao nhã, ân cần của Tiên nhân Lưu Vân Tá Phong Chân Quân (xưng Bản tiên / 本仙). Trả lời dưới 40 từ.";
             } else if (aiService.isNahidaModel(req.body.modelUrl)) {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Lữ khách vừa ghé thăm Tiểu Tiểu! Hãy chủ động chào đón bằng giọng ngây thơ, hiếu kỳ, rất vui mừng được gặp mặt và rất muốn ngắm học hỏi có gì mới không. Trả lời dưới 40 từ.";
             } else if (aiService.isYaeMikoModel(req.body.modelUrl)) {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Tiểu gia hỏa vừa ghé thăm. Hãy chủ động chào đón với phong thái kiêu kỳ, ma mãnh và tinh nghịch của Yae Miko, trêu chọc họ một chút. Trả lời dưới 40 từ.";
+            } else if (req.body.customMeta && req.body.customMeta.name) {
+                proactivePrompt += `HƯỚNG DẪN BỔ SUNG: Người dùng vừa đăng nhập. Hãy chủ động chào đón họ dựa trên lịch sử chat trước đó (nếu có). Hãy đóng vai ${req.body.customMeta.name} và thể hiện sự chào đón. Trả lời dưới 40 từ.`;
             } else {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Người dùng vừa đăng nhập. Hãy chủ động chào đón họ dựa trên lịch sử chat trước đó (nếu có). Hãy tỏ ra quan tâm nhưng vẫn giữ tính cách Tsundere. Trả lời dưới 40 từ.";
             }
@@ -125,6 +133,8 @@ async function proactiveChat(req, res) {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Lữ khách đã im lặng rất lâu, Tiểu Tiểu bắt đầu lo lắng! Hãy chủ động hỏi thăm bằng giọng ngây thơ, tò mò xem họ đang làm gì, hoặc chia sẻ một điều thú vị thười đã học được qua Irminsul. Trả lời dưới 40 từ.";
             } else if (aiService.isYaeMikoModel(req.body.modelUrl)) {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Tiểu gia hỏa đã im lặng một lúc lâu. Hãy chủ động trêu ghẹo, hỏi xem có phải đang mải nghĩ đến tiểu thuyết light novel mới hay lơ đẹp Guuji Yae rồi không. Trả lời dưới 40 từ.";
+            } else if (req.body.customMeta && req.body.customMeta.name) {
+                proactivePrompt += `HƯỚNG DẪN BỔ SUNG: Người dùng đã im lặng một lúc lâu. Hãy đóng vai ${req.body.customMeta.name} chủ động bắt chuyện, hỏi xem họ đang làm gì. Trả lời dưới 40 từ.`;
             } else {
                 proactivePrompt += "HƯỚNG DẪN BỔ SUNG: Người dùng đã im lặng một lúc lâu. Hãy chủ động bắt chuyện, hỏi xem họ đang làm gì, hoặc trêu chọc họ vì tội lơ bạn. Trả lời dưới 40 từ.";
             }
@@ -157,7 +167,7 @@ async function proactiveChat(req, res) {
         cleanText = cleanText.replace(/\[ANIM:\s*[^\]]+\]/g, "").trim();
         
         let { zhText, viText } = await aiService.formatLanguagePair(cleanText, req.body.uiLanguage, req.body.voiceLanguage);
-        let audioBase64 = await aiService.getVoiceAudio(zhText, req.body.modelUrl);
+        let audioBase64 = await aiService.getVoiceAudio(zhText, req.body.modelUrl, req.body.customMeta);
 
         console.log(`[API /api/proactive-chat] OK -> model: ${req.body.modelUrl} | Audio: ${!!audioBase64}`);
         res.json({ aiResponse, zhText, viText, anim: lastAnim, audioBase64 });

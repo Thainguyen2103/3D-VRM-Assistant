@@ -8,6 +8,29 @@ import { t, updateChatUIForModel } from '@/core/i18n';
 import { normalizeModelUrl } from '@/core/constants';
 import { currentUser, supabase } from '@/core/auth';
 
+// --- Random wallpaper on every page load ---
+(function applyRandomWallpaper() {
+  const wallpapers = ['/wallpaper.png', '/wallpaper1.png', '/wallpaper2.png', '/wallpaper3.png', '/wallpaper4.png'];
+  const chosen = wallpapers[Math.floor(Math.random() * wallpapers.length)];
+  const bgValue = `url('${chosen}') no-repeat center center / cover`;
+
+  const applyTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.style.background = bgValue;
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTo('loading-screen');
+      applyTo('auth-modal');
+    });
+  } else {
+    applyTo('loading-screen');
+    applyTo('auth-modal');
+  }
+})();
+
+
 export let currentVrm: VRM | undefined;
 export const lookAtTarget = new THREE.Object3D();
 scene.add(lookAtTarget);
@@ -303,9 +326,66 @@ export function switchVRMModel(url: string, isInitial: boolean = false, onComple
     currentVrm = undefined;
   }
 
+  // --- Helper to show/update/hide a loading indicator for model switching ---
+  const loadingOverlayId = 'vrm-switch-loading-overlay';
+  let existingOverlay = document.getElementById(loadingOverlayId);
+
+  function showSwitchOverlay(text: string, progress: number) {
+    let overlay = document.getElementById(loadingOverlayId);
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = loadingOverlayId;
+      overlay.style.cssText = `
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+        transition: opacity 0.35s ease;
+      `;
+      overlay.innerHTML = `
+        <div style="
+          background: white; border-radius: 20px; padding: 32px 40px;
+          text-align: center; min-width: 300px; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+          font-family: 'Quicksand', 'Nunito', sans-serif;
+        ">
+          <div id="vrm-overlay-icon" style="font-size: 2.5rem; margin-bottom: 12px;">🌟</div>
+          <div id="vrm-overlay-text" style="font-weight: 700; font-size: 1.1rem; color: #3f51b5; margin-bottom: 16px;">Đang tải nhân vật...</div>
+          <div style="
+            background: #eef0ff; border-radius: 99px; height: 10px; overflow: hidden; width: 100%;
+          ">
+            <div id="vrm-overlay-bar" style="
+              height: 100%; width: 0%; border-radius: 99px;
+              background: linear-gradient(90deg, #7986cb, #3f51b5);
+              transition: width 0.25s ease;
+            "></div>
+          </div>
+          <div id="vrm-overlay-pct" style="font-size: 0.85rem; color: #888; margin-top: 8px;">0%</div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+    const bar = document.getElementById('vrm-overlay-bar');
+    const pct = document.getElementById('vrm-overlay-pct');
+    const txt = document.getElementById('vrm-overlay-text');
+    if (bar) bar.style.width = progress + '%';
+    if (pct) pct.textContent = progress + '%';
+    if (txt) txt.textContent = text;
+  }
+
+  function hideSwitchOverlay() {
+    const overlay = document.getElementById(loadingOverlayId);
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 400);
+    }
+  }
+
+  if (!isInitial) showSwitchOverlay('Đang tải nhân vật...', 0);
+
   loader.load(
     url,
     (gltf) => {
+      if (!isInitial) showSwitchOverlay('Đang xử lý mô hình...', 95);
+
       const vrm = gltf.userData.vrm;
       VRMUtils.removeUnnecessaryVertices(gltf.scene);
       VRMUtils.combineSkeletons(gltf.scene);
@@ -350,14 +430,24 @@ export function switchVRMModel(url: string, isInitial: boolean = false, onComple
       applyCameraPreset(currentCameraMode, isInitial);
 
       if (!isInitial) {
+        showSwitchOverlay('Hoàn tất! ✨', 100);
         loadFBXAnimation("idle.fbx", true);
+        setTimeout(() => hideSwitchOverlay(), 600);
       }
       if (onComplete) onComplete();
     },
     (progress) => {
-      // Xử lý tiến độ nếu cần
+      if (!isInitial && progress.total > 0) {
+        const pct = Math.min(Math.round((progress.loaded / progress.total) * 90), 90);
+        const mb = (progress.loaded / 1048576).toFixed(1);
+        const totalMb = (progress.total / 1048576).toFixed(1);
+        showSwitchOverlay(`Đang tải... ${mb}MB / ${totalMb}MB`, pct);
+      }
     },
-    (error) => console.error("Lỗi tải VRM:", error)
+    (error) => {
+      hideSwitchOverlay();
+      console.error("Lỗi tải VRM:", error);
+    }
   );
 }
 
@@ -498,7 +588,8 @@ export function loadFBXAnimation(url: string, isAfkCall: boolean = false) {
     // Không ẩn ngay lập tức, để updateVRM lo việc mờ dần
   }
 
-  loadMixamoAnimation("/animations/" + url, currentVrm).then((clip) => {
+  const finalUrl = url.startsWith('http') ? url : "/animations/" + url;
+  loadMixamoAnimation(finalUrl, currentVrm).then((clip) => {
     if (!clip) return;
     if (!currentMixer) {
       currentMixer = new THREE.AnimationMixer(currentVrm!.scene);

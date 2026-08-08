@@ -272,3 +272,34 @@ body.theme-xianyun #loading-text {
 body.theme-xianyun .loading-image {
   box-shadow: 0 10px 30px rgba(0, 131, 143, 0.3) !important;
 }
+body.theme-xianyun #btn-switch-model,
+body.theme-xianyun #btn-discover,
+body.theme-xianyun #btn-theme-selector,
+body.theme-xianyun #btn-profile,
+body.theme-xianyun #btn-login-header {
+  border-color: #4db6ac !important;
+}
+
+body.theme-xianyun #btn-switch-model span,
+body.theme-xianyun #btn-discover span,
+body.theme-xianyun #btn-theme-selector span,
+body.theme-xianyun #btn-profile span,
+body.theme-xianyun #btn-login-header span {
+  color: #00838f !important;
+}
+
+body.theme-xianyun #btn-switch-model-circle,
+body.theme-xianyun #btn-discover > div,
+body.theme-xianyun #btn-theme-selector > div,
+body.theme-xianyun #btn-profile > div,
+body.theme-xianyun #btn-login-header > div {
+  border-color: #4db6ac !important;
+}
+
+body.theme-xianyun #btn-switch-model svg,
+body.theme-xianyun #btn-discover svg,
+body.theme-xianyun #btn-theme-selector svg,
+body.theme-xianyun #btn-profile-icon,
+body.theme-xianyun #btn-login-header svg {
+  stroke: #00838f !important;
+}

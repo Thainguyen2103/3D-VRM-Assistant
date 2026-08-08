@@ -1,0 +1,47 @@
+  <header style="display: flex; align-items: center; justify-content: space-between;">
+    <!-- BÊN TRÁI: Nút Back + Cộng Đồng -->
+    <div style="display: flex; align-items: center; gap: 20px; flex: 1;">
+      <a href="/" class="back-btn" id="main-back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        <span id="main-back-text" data-i18n="discover.back_to_assistant">Trở về Trợ Lý 3D</span>
+      </a>
+      <a href="#" style="display: flex; align-items: center; gap: 8px; color: #3f51b5; font-weight: 700; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.2s;" onmouseover="this.style.background='rgba(63, 81, 181, 0.08)'" onmouseout="this.style.background='transparent'">
+        <i data-lucide="globe" style="width: 20px; height: 20px;"></i>
+        <span data-i18n="discover.community">Cộng Đồng</span>
+      </a>
+    </div>
+
+    <!-- Ở GIỮA: Logo -->
+    <div style="display: flex; align-items: center; justify-content: center;">
+      <button id="hidden-home-btn" class="tab-btn active" data-tab="tab-home" style="display: none;"></button>
+      <h2 onclick="document.getElementById('hidden-home-btn').click()" style="margin: 0; color: #3f51b5; display: flex; align-items: center; gap: 10px; font-size: 1.7rem; font-family: 'Baloo 2', cursive; font-weight: 800; text-shadow: 1px 2px 0px #e0e6ff; letter-spacing: 0.5px; cursor: pointer; white-space: nowrap; background: rgba(63, 81, 181, 0.05); padding: 6px 24px; border-radius: 50px; border: 2px solid rgba(63, 81, 181, 0.1); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(63, 81, 181, 0.1)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='rgba(63, 81, 181, 0.05)'; this.style.transform='none';">
+        <i data-lucide="sparkles" style="width: 24px; height: 24px; color: #ffca28; filter: drop-shadow(0 0 2px rgba(255, 202, 40, 0.4));"></i> <span data-i18n="discover.title">Thế Giới Mộng Ảo</span>
+      </h2>
+    </div>
+
+    <!-- BÊN PHẢI: Các nút chức năng -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; flex: 1;">
+      <!-- Chuông thông báo -->
+      <button style="background: rgba(63, 81, 181, 0.05); border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #3f51b5; transition: background 0.2s;" onmouseover="this.style.background='rgba(63, 81, 181, 0.15)'" onmouseout="this.style.background='rgba(63, 81, 181, 0.05)'">
+        <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
+      </button>
+
+      <!-- Button Đăng Tải -->
+      <button class="btn btn-primary tab-btn" data-tab="tab-upload-options" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-family: 'Baloo 2', cursive; background: #e8eaf6; color: #3f51b5; border: none; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#c5cae9'" onmouseout="this.style.background='#e8eaf6'">
+        <i data-lucide="upload-cloud" style="width: 20px; height: 20px;"></i>
+        <span data-i18n="discover.upload">Đăng Tải</span>
+      </button>
+
+      <!-- User Profile Widget -->
+      <div id="header-profile-widget" style="width: 200px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; cursor: pointer; padding: 6px 12px; border-radius: 20px; transition: background 0.2s;" onmouseover="this.style.background='#e3eafc'" onmouseout="this.style.background='transparent'">
+        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+          <span id="header-profile-name" style="font-size: 0.95rem; font-weight: 700; color: #333;" data-i18n="discover.header.loading">Đang tải...</span>
+          <span style="font-size: 0.75rem; color: #666;" data-i18n="discover.storage">Kho lưu trữ</span>
+        </div>
+        <img id="header-profile-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" alt="Avatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #3f51b5;">
+      </div>
+    </div>
+  </header>

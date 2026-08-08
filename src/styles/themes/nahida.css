@@ -271,3 +271,34 @@ body.theme-nahida #loading-text {
 body.theme-nahida .loading-image {
   box-shadow: 0 10px 30px rgba(85, 139, 47, 0.3) !important;
 }
+body.theme-nahida #btn-switch-model,
+body.theme-nahida #btn-discover,
+body.theme-nahida #btn-theme-selector,
+body.theme-nahida #btn-profile,
+body.theme-nahida #btn-login-header {
+  border-color: #aed581 !important;
+}
+
+body.theme-nahida #btn-switch-model span,
+body.theme-nahida #btn-discover span,
+body.theme-nahida #btn-theme-selector span,
+body.theme-nahida #btn-profile span,
+body.theme-nahida #btn-login-header span {
+  color: #558b2f !important;
+}
+
+body.theme-nahida #btn-switch-model-circle,
+body.theme-nahida #btn-discover > div,
+body.theme-nahida #btn-theme-selector > div,
+body.theme-nahida #btn-profile > div,
+body.theme-nahida #btn-login-header > div {
+  border-color: #aed581 !important;
+}
+
+body.theme-nahida #btn-switch-model svg,
+body.theme-nahida #btn-discover svg,
+body.theme-nahida #btn-theme-selector svg,
+body.theme-nahida #btn-profile-icon,
+body.theme-nahida #btn-login-header svg {
+  stroke: #558b2f !important;
+}

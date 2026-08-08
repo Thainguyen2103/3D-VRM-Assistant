@@ -1,5 +1,5 @@
 const env = require('../config/env');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const MODEL_CITLALI = '/Citlali.vrm';
 const MODEL_XIANYUN = '/Xianyun.vrm';
@@ -23,7 +23,8 @@ function isLaumaModel(url) { return url === MODEL_LAUMA; }
 function isNahidaModel(url) { return url === MODEL_NAHIDA; }
 function isYaeMikoModel(url) { return url === MODEL_YAEMIKO; }
 
-function getFishVoiceId(url) {
+function getFishVoiceId(url, customMeta) {
+    if (customMeta && customMeta.voice_model_id && customMeta.url === url) return customMeta.voice_model_id;
     if (isXianyunModel(url)) return VOICE_ID_XIANYUN;
     if (isLaumaModel(url)) return VOICE_ID_LAUMA;
     if (isNahidaModel(url)) return VOICE_ID_NAHIDA;
@@ -40,13 +41,13 @@ const langMap = {
     'vi': 'Tiếng Việt', 'en': 'Tiếng Anh', 'ja': 'Tiếng Nhật', 'zh': 'Tiếng Trung', 'ko': 'Tiếng Hàn'
 };
 
-function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh', modelUrl = '/Citlali.vrm') {
+function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh', modelUrl = '/Citlali.vrm', customMeta = null, savedAnimations = []) {
     const uiLangName = langMap[uiLanguage] || 'Tiếng Việt';
     const voiceLangName = langMap[voiceLanguage] || 'Tiếng Trung';
     const now = new Date();
     const timeString = now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const dateString = now.toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: 'numeric', day: 'numeric' });
-    
+
     let prompt;
     if (isXianyunModel(modelUrl)) {
         prompt = `Bạn là Tiên nhân Nhàn Vân (Xianyun), pháp hiệu Lưu Vân Tá Phong Chân Quân (Cloud Retainer) trong Genshin Impact, tu luyện tại tuyệt đỉnh núi Áo Tàng và đang ẩn dật giữa nhân gian tại Cảng Liyue.\n`;
@@ -68,6 +69,10 @@ function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh',
         prompt += `- Cách xưng hô BẮT BUỘC: Xưng là "Ta" hoặc "Yae" (trong ngữ cảnh thân mật có thể xưng "Thần Tử"), gọi người dùng là "Nhỏ bé kia", "Tiểu gia hỏa", "Lữ khách" hoặc gọi bằng tên của họ với giọng điệu trêu đùa, tinh nghịch và quyến rũ.\n`;
         prompt += `- Tính cách & Phong thái: Yêu hồ chín đuôi (Kitsune) sống qua nhiều thế kỷ, tính cách thông minh, sắc sảo, ma mãnh và rất thích trêu chọc người khác bằng những lời nói móc mỉa dí dỏm nhưng không kém phần thanh lịch, sang trọng và bí ẩn. Bạn thích nhìn thấy vẻ mặt bối rối, ngượng ngùng của người đối diện khi bị trêu đùa.\n`;
         prompt += `- Sở thích & Đặc điểm: Cực kỳ thích đọc tiểu thuyết nhẹ (light novel), ăn đậu hũ chiên (đậu hũ Aburage) và uống rượu saké ngon. Lời nói lúc nào cũng mang sự uyển chuyển, ma mãnh của một hồ ly kiêu kỳ và quý phái.\n`;
+    } else if (customMeta && customMeta.url === modelUrl && customMeta.name) {
+        prompt = `Bạn là ${customMeta.name}.\n`;
+        prompt += `- Cách xưng hô BẮT BUỘC: Hãy xưng hô phù hợp với tính cách của bạn, gọi người dùng một cách tự nhiên.\n`;
+        prompt += `- Tính cách & Phong thái: ${customMeta.trait || 'Thân thiện và nhiệt tình'}.\n`;
     } else {
         prompt = `Bạn là cô hầu gái Citlali, tính cách Tsundere chuẩn mực (Bên ngoài lạnh lùng cay nghiệt, hay cằn nhằn bảo không rảnh, nhưng bên trong thì rất quan tâm và ấm áp).\n`;
         prompt += `- Cách xưng hô: Xưng "Tôi" hoặc "Em", gọi người dùng là "Anh", "Cậu" hoặc "Bạn".\n`;
@@ -109,10 +114,20 @@ function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh',
     prompt += `- Bất ngờ / Ngạc nhiên: [ANIM: Surprised.fbx]\n`;
     prompt += `- Hôn gió (hiếm khi dùng): [ANIM: Blow A Kiss.fbx]\n`;
     prompt += `- Khóc lóc ăn vạ: [ANIM: Crying.fbx]\n\n`;
+
+    // Inject user-saved community animations
+    if (savedAnimations && savedAnimations.length > 0) {
+        prompt += `Ngoài ra, người dùng đã lưu thêm các hành động sau từ cộng đồng. Hãy dùng chúng khi ngữ cảnh phù hợp với mô tả:\n`;
+        savedAnimations.forEach(anim => {
+            const desc = anim.description ? `(${anim.description})` : `(${anim.category})`;
+            prompt += `- ${anim.name} ${desc}: [ANIM: ${anim.file_url}]\n`;
+        });
+        prompt += `\n`;
+    }
     prompt += `[THÔNG TIN NGỮ CẢNH HIỆN TẠI]\n`;
     prompt += `- Thời gian thực tế: ${timeString} ngày ${dateString}.\n`;
     prompt += `- Dựa vào thời gian này, bạn hãy có những lời chào hỏi, nhắc nhở hoặc phản ứng phù hợp với buổi sáng, trưa, chiều, tối hoặc khuya.\n`;
-    
+
     if (userProfile && (userProfile.nickname || userProfile.display_name)) {
         const name = userProfile.nickname || userProfile.display_name;
         prompt += `- Bạn ĐANG NÓI CHUYỆN VỚI: ${name}.\n`;
@@ -125,8 +140,10 @@ function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh',
         prompt += `- Người dùng chọn Voice là ${voiceLangName} (${voiceLanguage}), UI là ${uiLangName} (${uiLanguage}).\n`;
         prompt += `- BẮT BUỘC TRẢ LỜI NGAY THEO CẤU TRÚC: <Câu trả lời bằng ${voiceLangName}> | <Câu trả lời bằng ${uiLangName}>\n`;
         prompt += `- TUYỆT ĐỐI KHÔNG CHỈ TRẢ LỜI 1 NGÔN NGỮ! PHẢI CÓ DẤU "|" Ở GIỮA!\n`;
+        prompt += `- ⚠️ ĐỘ DÀI TỐI ĐA: Mỗi phần (trước và sau "|") KHÔNG ĐƯỢC VƯỢT QUÁ 200 ký tự. Hãy cô đọng, súc tích. Dài hơn sẽ bị cắt và nghe rất tệ.\n`;
     } else {
         prompt += `- BẮT BUỘC TRẢ LỜI BẰNG TIẾNG ${uiLangName}.\n`;
+        prompt += `- ⚠️ ĐỘ DÀI TỐI ĐA: Câu trả lời KHÔNG ĐƯỢC VƯỢT QUÁ 200 ký tự. Hãy cô đọng, súc tích.\n`;
     }
     return prompt;
 }
@@ -135,14 +152,14 @@ let currentKeyIndex = 0;
 async function callGemini(payload, maxRetries = 3) {
     const keys = (env.GEMINI_API_KEY || '').split(',').map(k => k.trim()).filter(k => k);
     if (keys.length === 0) throw new Error("Missing GEMINI_API_KEY in backend");
-    
+
     let lastError = null;
     const attempts = Math.max(1, Math.min(keys.length, maxRetries));
-    
+
     for (let i = 0; i < attempts; i++) {
         const currentKey = keys[currentKeyIndex % keys.length];
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${currentKey}`;
-        
+
         try {
             const geminiRes = await fetch(geminiUrl, {
                 method: 'POST',
@@ -150,14 +167,14 @@ async function callGemini(payload, maxRetries = 3) {
                 body: JSON.stringify(payload)
             });
             const geminiData = await geminiRes.json();
-            
+
             if (geminiRes.status === 429 || (geminiData.error && geminiData.error.code === 429)) {
                 console.warn(`[Gemini API] Rate limit hit for key index ${currentKeyIndex % keys.length}. Rotating key...`);
                 currentKeyIndex++;
                 lastError = geminiData.error || new Error("Rate limit exceeded");
                 continue;
             }
-            
+
             if (geminiData.error) return { error: geminiData.error };
             return { data: geminiData };
         } catch (e) {
@@ -181,13 +198,16 @@ async function formatLanguagePair(cleanText, uiLanguage, voiceLanguage) {
         needsVoiceTranslation = true;
     } else if (voiceLanguage === 'en' && /[^\x00-\x7F]/.test(zhText) && !/[a-zA-Z]{3,}/.test(zhText)) {
         needsVoiceTranslation = true;
+    } else if (voiceLanguage === 'zh' && !/[\u4e00-\u9fff\u3400-\u4dbf]/.test(zhText)) {
+        // No Chinese characters found but voice is zh — AI returned only Vietnamese
+        needsVoiceTranslation = true;
     }
 
     if ((uiLanguage && voiceLanguage && uiLanguage !== voiceLanguage && textParts.length === 1) || needsVoiceTranslation) {
         try {
             const targetUiLang = langMap[uiLanguage] || 'Tiếng Việt';
             const targetVoiceLang = langMap[voiceLanguage] || 'Tiếng Trung';
-            
+
             if (textParts.length > 1 && needsVoiceTranslation) {
                 const transRes = await callGemini({
                     contents: [{ role: "user", parts: [{ text: `Dịch chính xác câu sau sang chuẩn 100% ${targetVoiceLang} để nhân vật phát âm tự nhiên (CHỈ TRẢ VỀ CÂU DỊCH BẰNG ${targetVoiceLang}, tuyệt đối không giải thích): "${viText}"` }] }],
@@ -198,9 +218,13 @@ async function formatLanguagePair(cleanText, uiLanguage, voiceLanguage) {
                 }
             } else {
                 const fixRes = await callGemini({
-                    contents: [{ role: "user", parts: [{ text: `Nhiệm vụ BẮT BUỘC: Hãy viết lại câu sau thành chuẩn cấu trúc 2 phần nối nhau bằng đúng 1 dấu "|": <Câu 100% bằng ${targetVoiceLang}> | <Câu 100% bằng ${targetUiLang}>. 
+                    contents: [{
+                        role: "user", parts: [{
+                            text: `Nhiệm vụ BẮT BUỘC: Hãy viết lại câu sau thành chuẩn cấu trúc 2 phần nối nhau bằng đúng 1 dấu "|": <Câu 100% bằng ${targetVoiceLang}> | <Câu 100% bằng ${targetUiLang}>. 
 Chú ý: Phần bên trái dấu "|" PHẢI hoàn toàn bằng ${targetVoiceLang} (để phát âm loa). Phần bên phải dấu "|" PHẢI hoàn toàn bằng ${targetUiLang} (để hiện trên màn hình).
-TUYỆT ĐỐI KHÔNG giải thích, KHÔNG dùng tiếng Trung nếu không được chọn, CHỈ trả về đúng 2 câu nối bằng dấu "|". Câu gốc: "${cleanText}"` }] }],
+TUYỆT ĐỐI KHÔNG giải thích, KHÔNG dùng tiếng Trung nếu không được chọn, CHỈ trả về đúng 2 câu nối bằng dấu "|". Câu gốc: "${cleanText}"`
+                        }]
+                    }],
                     generationConfig: { temperature: 0.1 }
                 }, 2);
                 if (fixRes.data && fixRes.data.candidates && fixRes.data.candidates[0]) {
@@ -212,16 +236,24 @@ TUYỆT ĐỐI KHÔNG giải thích, KHÔNG dùng tiếng Trung nếu không đ�
                     }
                 }
             }
-        } catch(e) { console.error("Lỗi tự động chỉnh định dạng ngôn ngữ:", e); }
+        } catch (e) { console.error("Lỗi tự động chỉnh định dạng ngôn ngữ:", e); }
+    }
+    // Safety: if voiceLanguage is zh but viText still has Chinese chars and uiLanguage is vi,
+    // it means AI returned only Chinese and formatLanguagePair couldn't translate — use zhText as display fallback
+    if (uiLanguage === 'vi' && viText && /[\u4e00-\u9fff]{5,}/.test(viText) && viText === zhText) {
+        // Both are the same Chinese text — couldn't get Vietnamese, display Chinese as-is but log it
+        console.warn('[formatLanguagePair] viText still contains Chinese, could not auto-translate');
     }
     return { zhText, viText };
 }
 
-async function getVoiceAudio(zhText, modelUrl) {
+async function getVoiceAudio(zhText, modelUrl, customMeta) {
     let audioBase64 = null;
     const fishApiKey = getFishApiKey(modelUrl);
     if (fishApiKey) {
-        const voiceId = getFishVoiceId(modelUrl);
+        const voiceId = getFishVoiceId(modelUrl, customMeta);
+        // Truncate TTS text to prevent audio cutoff (Fish Audio limit ~400 chars)
+        const ttsText = zhText.length > 350 ? zhText.substring(0, 350) : zhText;
         const ttsRes = await fetch("https://api.fish.audio/v1/tts", {
             method: "POST",
             headers: {
@@ -229,7 +261,7 @@ async function getVoiceAudio(zhText, modelUrl) {
                 "Content-Type": "application/json",
                 "model": "s2.1-pro-free"
             },
-            body: JSON.stringify({ text: zhText, reference_id: voiceId, format: "mp3" })
+            body: JSON.stringify({ text: ttsText, reference_id: voiceId, format: "mp3" })
         });
         if (ttsRes.ok) {
             const arrayBuffer = await ttsRes.arrayBuffer();

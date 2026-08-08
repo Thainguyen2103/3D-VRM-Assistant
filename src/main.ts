@@ -9,9 +9,11 @@ import { initCustomSelects } from '@/components/custom-select';
 import { cameraState } from '@/core/state';
 import { initAuth } from '@/core/auth';
 import { applyLanguage } from '@/core/i18n';
+import { initDiscover } from '@/discover';
 import "./style.css";
 
 // Khởi tạo ngôn ngữ cực sớm cho màn hình tải
+
 let savedLang = 'vi';
 try {
     const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
@@ -29,6 +31,7 @@ await initAuth();
 
 // Gọi tạo UI, Gán các sự kiện
 initUI();
+initDiscover();
 
 // Khởi tạo VRM (Mô hình 3D nhân vật)
 initVRM();

@@ -36,7 +36,7 @@ export function applyLanguage(lang: string) {
       if (el.tagName.toLowerCase() === 'textarea' || el.tagName.toLowerCase() === 'input') {
         (el as HTMLInputElement).placeholder = tDict[key];
       } else {
-        el.textContent = tDict[key];
+        el.innerHTML = tDict[key];
       }
     }
   });
@@ -59,6 +59,10 @@ export function applyLanguage(lang: string) {
   else if (lang === 'ko') htmlLang = 'ko-KR';
   else if (lang === 'vi') htmlLang = 'vi-VN';
   document.documentElement.lang = htmlLang;
+
+  // Cập nhật class trên body để CSS áp dụng đúng font
+  document.body.classList.remove('lang-vi', 'lang-en', 'lang-zh', 'lang-ja', 'lang-ko');
+  document.body.classList.add(`lang-${lang}`);
   updateChatUIForModel();
 }
 
@@ -75,18 +79,32 @@ export function updateChatUIForModel(url?: string) {
   if (url) {
     activeModelUrl = normalizeModelUrl(url);
   }
+  let customMeta: any = null;
+  try {
+    const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+    if (settings.customModelMeta && settings.customModelMeta.url === activeModelUrl) {
+      customMeta = settings.customModelMeta;
+    }
+  } catch (e) {}
+
   const isXianyun = isXianyunModel(activeModelUrl);
   const isLauma = isLaumaModel(activeModelUrl);
   const isNahida = isNahidaModel(activeModelUrl);
   const isYaeMiko = isYaeMikoModel(activeModelUrl);
-  const isCitlali = !isXianyun && !isLauma && !isNahida && !isYaeMiko;
+  const isCitlali = !isXianyun && !isLauma && !isNahida && !isYaeMiko && !customMeta;
   
-  document.body.classList.remove('theme-citlali', 'theme-xianyun', 'theme-lauma', 'theme-nahida', 'theme-yaemiko');
+  document.body.classList.remove('theme-citlali', 'theme-xianyun', 'theme-lauma', 'theme-nahida', 'theme-yaemiko', 'theme-pyro', 'theme-hydro', 'theme-anemo', 'theme-electro', 'theme-dendro', 'theme-cryo', 'theme-geo');
   if (isXianyun) document.body.classList.add('theme-xianyun');
   else if (isLauma) document.body.classList.add('theme-lauma');
   else if (isNahida) document.body.classList.add('theme-nahida');
   else if (isYaeMiko) document.body.classList.add('theme-yaemiko');
-  else document.body.classList.add('theme-citlali');
+  else {
+      if (customMeta && customMeta.theme) {
+          document.body.classList.add(`theme-${customMeta.theme}`);
+      } else {
+          document.body.classList.add('theme-citlali'); // Fallback theme for custom models
+      }
+  }
 
   const tDict = translations[currentLanguageState] || translations['vi'];
   const chatTitleEl = document.querySelector('.chat-title');
@@ -98,6 +116,7 @@ export function updateChatUIForModel(url?: string) {
     else if (isLauma) chatTitleEl.textContent = tDict['chat.title.lauma'] || '🌙 Lauma Chat 🌙';
     else if (isNahida) chatTitleEl.textContent = tDict['chat.title.nahida'] || '🌿 Nahida Chat 🌿';
     else if (isYaeMiko) chatTitleEl.textContent = tDict['chat.title.yaemiko'] || '🦊 Yae Miko Chat 🦊';
+    else if (customMeta) chatTitleEl.textContent = `🌸 ${customMeta.name} Chat 🌸`;
     else chatTitleEl.textContent = tDict['chat.title'];
   }
   if (chatInputEl) {
@@ -105,6 +124,7 @@ export function updateChatUIForModel(url?: string) {
     else if (isLauma) chatInputEl.placeholder = tDict['chat.placeholder.lauma'] || 'Hãy nói cho tôi nghe...';
     else if (isNahida) chatInputEl.placeholder = tDict['chat.placeholder.nahida'] || 'Nói cho Tiểu Tiểu nghe đi...';
     else if (isYaeMiko) chatInputEl.placeholder = tDict['chat.placeholder.yaemiko'] || 'Nói gì thú vị đi...';
+    else if (customMeta) chatInputEl.placeholder = `Nói gì đó với ${customMeta.name}...`;
     else chatInputEl.placeholder = tDict['chat.placeholder'];
   }
   if (initialMsgDiv) {
@@ -112,6 +132,7 @@ export function updateChatUIForModel(url?: string) {
     else if (isLauma) initialMsgDiv.textContent = tDict['chat.initial.lauma'] || 'Tôi là Nguyệt Ca Sư Lauma...';
     else if (isNahida) initialMsgDiv.textContent = tDict['chat.initial.nahida'] || 'Ư! Lữ khách đến rồi! 🌿';
     else if (isYaeMiko) initialMsgDiv.textContent = tDict['chat.initial.yaemiko'] || 'Bản cung là Bát Trọng Thần Tử...';
+    else if (customMeta) initialMsgDiv.textContent = `Xin chào, tôi là ${customMeta.name}.`;
     else initialMsgDiv.textContent = tDict['chat.initial'];
   }
   const switchModelAvatarEl = document.getElementById('btn-switch-model-avatar') as HTMLImageElement;
@@ -121,6 +142,7 @@ export function updateChatUIForModel(url?: string) {
     else if (isLauma) switchModelAvatarEl.src = '/Icon_Models/lauma_icon.jpg';
     else if (isNahida) switchModelAvatarEl.src = '/Icon_Models/nahida_icon.jpg';
     else if (isYaeMiko) switchModelAvatarEl.src = '/Icon_Models/yaemiko_icon.jpg';
+    else if (customMeta && customMeta.icon_url) switchModelAvatarEl.src = customMeta.icon_url;
     else switchModelAvatarEl.src = '/Icon_Models/citlali_icon.jpg';
   }
   if (switchModelCircleEl) {
@@ -128,7 +150,17 @@ export function updateChatUIForModel(url?: string) {
     else if (isLauma) switchModelCircleEl.style.borderColor = '#81c784';
     else if (isNahida) switchModelCircleEl.style.borderColor = '#66bb6a';
     else if (isYaeMiko) switchModelCircleEl.style.borderColor = '#ffb6c1';
+    else if (customMeta && customMeta.theme) {
+      const colors: any = { pyro: '#e53935', hydro: '#1e88e5', anemo: '#26a69a', electro: '#8e24aa', dendro: '#7cb342', cryo: '#4dd0e1', geo: '#fbc02d', citlali: '#7986cb' };
+      switchModelCircleEl.style.borderColor = colors[customMeta.theme] || '#9e9e9e';
+    }
+    else if (customMeta) switchModelCircleEl.style.borderColor = '#9e9e9e';
     else switchModelCircleEl.style.borderColor = '#7986cb';
+  }
+
+  const themeBtn = document.getElementById('btn-theme-selector');
+  if (themeBtn) {
+      themeBtn.style.display = customMeta ? 'flex' : 'none';
   }
 }
 
