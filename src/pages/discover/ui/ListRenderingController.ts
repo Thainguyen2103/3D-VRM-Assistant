@@ -60,7 +60,7 @@ export class ListRenderingController {
                     if (char.user_profiles.avatar_url.startsWith('http')) {
                         uploaderAvatar = char.user_profiles.avatar_url;
                     } else {
-                        const { data: avatarData } = supabase.storage.from('avatars').getPublicUrl(char.user_profiles.avatar_url);
+                        const { data: avatarData } = supabase!.storage.from('avatars').getPublicUrl(char.user_profiles.avatar_url);
                         uploaderAvatar = avatarData.publicUrl;
                     }
                 }
@@ -90,7 +90,7 @@ export class ListRenderingController {
                     } catch(e) {}
 
                     try {
-                        const { data: { session } } = await supabase.auth.getSession();
+                        const { data: { session } } = await supabase!.auth.getSession();
 
                         if (isSaved) {
                             try {
@@ -175,7 +175,7 @@ export class ListRenderingController {
                     if (char.user_profiles.avatar_url.startsWith('http')) {
                         uploaderAvatar = char.user_profiles.avatar_url;
                     } else {
-                        const { data: avatarData } = supabase.storage.from('avatars').getPublicUrl(char.user_profiles.avatar_url);
+                        const { data: avatarData } = supabase!.storage.from('avatars').getPublicUrl(char.user_profiles.avatar_url);
                         uploaderAvatar = avatarData.publicUrl;
                     }
                 }

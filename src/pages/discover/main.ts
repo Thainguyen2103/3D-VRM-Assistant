@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- User Session & Profile ---
     let currentUser: any = null;
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase!.auth.getSession();
         if (session && session.user) {
             currentUser = session.user;
             ListRenderingController.init(currentUser, AnimationHoverController.setup());
@@ -64,14 +64,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             let displayName = currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'User';
             let avatarUrl = currentUser.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=User';
             
-            const { data: profile } = await supabase.from('user_profiles').select('display_name, avatar_url').eq('id', currentUser.id).single();
+            const { data: profile } = await supabase!.from('user_profiles').select('display_name, avatar_url').eq('id', currentUser.id).single();
             if (profile) {
                 if (profile.display_name) displayName = profile.display_name;
                 if (profile.avatar_url) {
                     if (profile.avatar_url.startsWith('http')) {
                         avatarUrl = profile.avatar_url;
                     } else {
-                        const { data } = supabase.storage.from('avatars').getPublicUrl(profile.avatar_url);
+                        const { data } = supabase!.storage.from('avatars').getPublicUrl(profile.avatar_url);
                         avatarUrl = data.publicUrl;
                     }
                 }

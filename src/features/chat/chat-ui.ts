@@ -12,7 +12,7 @@ export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost
 // Fetch the user's saved community animations to pass to the AI system prompt
 async function fetchSavedAnimationsForChat(): Promise<{ name: string; file_url: string; description: string; category: string }[]> {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabase?.auth.getSession() || { data: { session: null } };
     if (!session?.user?.id) return [];
     const res = await fetch(`${BACKEND_URL}/api/animations/my-saved?creator_id=${session.user.id}`);
     if (!res.ok) return [];
@@ -407,7 +407,7 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle' | 'in
                 if (userRecord && userRecord.last_welcome_time) {
                     const lastWelcomeTime = new Date(userRecord.last_welcome_time).getTime();
                     if (now - lastWelcomeTime < 10 * 60 * 1000) {
-                        return; // Cooldown
+                        return false; // Cooldown
                     }
                 }
                 
@@ -427,7 +427,7 @@ export async function triggerProactiveChat(contextType: 'welcome' | 'idle' | 'in
             if (lastWelcomeStr) {
                 const lastWelcomeTime = parseInt(lastWelcomeStr, 10);
                 if (now - lastWelcomeTime < 10 * 60 * 1000) {
-                    return; 
+                    return false; 
                 }
             }
             localStorage.setItem('lastWelcomeTime', now.toString());

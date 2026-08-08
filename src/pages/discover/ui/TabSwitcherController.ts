@@ -80,7 +80,7 @@ export class TabSwitcherController {
                             form.reset();
                             form.removeAttribute('data-edit-id');
                             const submitBtn = document.getElementById('btn-upload-anim');
-                            if (submitBtn) submitBtn.setAttribute('data-i18n', 'discover.upload.submit_anim'); try { const settings = JSON.parse(localStorage.getItem('app_settings') || '{}'); if (settings.language) { import('../../../core/i18n').then(({ t }) => { submitBtn.innerHTML = t('discover.upload.submit_anim'); }); } else submitBtn.textContent = 'Tải lên Animation'; } catch(e) { submitBtn.textContent = 'Tải lên Animation'; }
+                            if (submitBtn) { submitBtn.setAttribute('data-i18n', 'discover.upload.submit_anim'); try { const settings = JSON.parse(localStorage.getItem('app_settings') || '{}'); if (settings.language) { import('../../../core/i18n').then(({ t }) => { submitBtn.innerHTML = t('discover.upload.submit_anim'); }); } else submitBtn.textContent = 'Tải lên Animation'; } catch(e) { submitBtn.textContent = 'Tải lên Animation'; } }
                             const deleteBtn = document.getElementById('btn-delete-anim');
                             if (deleteBtn) deleteBtn.style.display = 'none';
                             

@@ -257,7 +257,7 @@ export class UploadFormsController {
             const vrmFile = (document.getElementById('upload-vrm') as HTMLInputElement).files?.[0];
             if (vrmFile) formData.append('vrm', vrmFile);
 
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabase!.auth.getSession();
             if (session && session.user) {
                 formData.append('creator_id', session.user.id);
             }
@@ -285,7 +285,7 @@ export class UploadFormsController {
                     // Reset edit mode
                     uploadForm.removeAttribute('data-edit-id');
                     const submitBtn = document.getElementById('btn-submit-upload');
-                    if (submitBtn) submitBtn.setAttribute('data-i18n', 'discover.upload.submit_char'); try { const settings = JSON.parse(localStorage.getItem('app_settings') || '{}'); if (settings.language) { import('../../../core/i18n').then(({ t }) => { submitBtn.innerHTML = t('discover.upload.submit_char'); }); } else submitBtn.textContent = 'Tải lên nhân vật'; } catch(e) { submitBtn.textContent = 'Tải lên nhân vật'; };
+                    if (submitBtn) { submitBtn.setAttribute('data-i18n', 'discover.upload.submit_char'); try { const settings = JSON.parse(localStorage.getItem('app_settings') || '{}'); if (settings.language) { import('../../../core/i18n').then(({ t }) => { submitBtn.innerHTML = t('discover.upload.submit_char'); }); } else submitBtn.textContent = 'Tải lên nhân vật'; } catch(e) { submitBtn.textContent = 'Tải lên nhân vật'; } }
                     const deleteBtn = document.getElementById('btn-delete-upload');
                     if (deleteBtn) deleteBtn.style.display = 'none';
 
@@ -468,7 +468,7 @@ export class UploadFormsController {
             }
 
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabase!.auth.getSession();
                 if (session?.user) {
                     formData.append('creator_id', session.user.id);
                 }

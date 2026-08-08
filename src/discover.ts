@@ -58,7 +58,7 @@ export async function loadCommunityAnimationsToPanel() {
         // Only show animations the user has explicitly saved
         let userId = '';
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabase!.auth.getSession();
             if (session?.user?.id) userId = session.user.id;
         } catch (_) {}
 
@@ -172,7 +172,7 @@ export async function loadCommunityAnimationsToPanel() {
                 if (!confirm(`Bỏ lưu "${name}" khỏi danh sách?`)) return;
 
                 try {
-                    const { data: { session } } = await supabase.auth.getSession();
+                    const { data: { session } } = await supabase!.auth.getSession();
                     const res = await fetch(`http://localhost:3000/api/animations/save/${animId}`, {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
@@ -436,7 +436,7 @@ export async function loadSavedCharactersToModal() {
         // Get current user session to pass creator_id
         let userId = '';
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabase!.auth.getSession();
             if (session?.user?.id) userId = session.user.id;
         } catch (e) {}
 
