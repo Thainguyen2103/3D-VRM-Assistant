@@ -1,6 +1,8 @@
 import { initAuth } from '@/core/auth';
 import { setupProfileUI } from '@/features/auth/profile';
-import '@/style.css'; // or create a specific profile.css if needed
+import 'cropperjs/dist/cropper.css';
+import '/src/styles/profile.css';
+
 
 async function initProfilePage() {
     await initAuth();

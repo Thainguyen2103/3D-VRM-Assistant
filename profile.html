@@ -4,87 +4,463 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hồ sơ của bạn</title>
+    <title>Hồ sơ của bạn — 3D VRM Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
   </head>
-  <body style="background: #fff0f5; margin: 0; font-family: system-ui, -apple-system, sans-serif;">
-    <div id="profile-page" style="min-height: 100vh; display: flex; flex-direction: column; background: #fff;">
-        <div style="width: 100%; display: flex; flex-direction: column;" id="profile-content">
-            <!-- Header -->
-            <div style="background: #e94560; padding: 20px 30px; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                <button id="btn-back-home" style="position: absolute; left: 20px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'" title="Quay lại Trang Chủ">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-                </button>
-                <h2 style="margin: 0; color: white; font-size: 1.8rem; font-weight: 700;" data-i18n="profile.title">Hồ sơ Cá nhân</h2>
+  <body>
+    <!-- Nút quay về floating -->
+    <button id="btn-back-home" class="btn-back-float" title="Quay lại Trang Chủ">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+
+    <main class="profile-page">
+      <aside>
+        <!-- Tiêu đề trang -->
+        <div class="page-title-row">
+          <h1 class="page-title" data-i18n="profile.title">Hồ sơ Cá nhân</h1>
+        </div>
+        <div class="avatar-wrapper">
+          <img id="profile-avatar-preview" src="" class="avatar-img" onerror="this.style.display='none'; document.getElementById('profile-avatar-fallback').style.display='flex';" />
+          <div id="profile-avatar-fallback" class="avatar-fallback">
+            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#9fa8da" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <label for="avatar-upload" class="avatar-upload-btn" title="Đổi ảnh đại diện">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+          </label>
+          <input type="file" id="avatar-upload" accept="image/*" style="display:none;" />
+        </div>
+        <p class="avatar-name" id="avatar-display-name">---</p>
+        <div class="avatar-email">
+          <i data-lucide="mail"></i>
+          <span id="avatar-email-display">---</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-char-posted">0</span>
+            <span class="stat-label">Nhân vật<br>đã đăng</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-char-saved">0</span>
+            <span class="stat-label">Nhân vật<br>đã thêm</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-anim-posted">0</span>
+            <span class="stat-label">Animation<br>đã đăng</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-anim-saved">0</span>
+            <span class="stat-label">Animation<br>đã thêm</span>
+          </div>
+        </div>
+        <p class="join-date"><i data-lucide="calendar-check"></i> Tham gia: <span id="profile-join-date">---</span></p>
+        <button id="btn-logout" class="btn-logout sidebar-logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+          <span data-i18n="profile.logout">Đăng xuất</span>
+        </button>
+      </aside>
+      <div class="profile-right">
+
+        <!-- Card: Thông tin cá nhân -->
+        <div class="profile-card">
+          <div class="profile-card-body">
+
+            <!-- Hàng 1: Tên + Biệt danh -->
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="profile-display-name">
+                  <i data-lucide="user"></i>
+                  <span data-i18n="profile.display_name">Tên hiển thị</span>
+                </label>
+                <input type="text" id="profile-display-name" class="form-input" placeholder="Tên của bạn..." />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-nickname">
+                  <i data-lucide="tag"></i>
+                  Biệt danh
+                  <span class="form-badge">AI sẽ gọi</span>
+                </label>
+                <input type="text" id="profile-nickname" class="form-input" placeholder="Biệt danh..." />
+              </div>
+            </div>
+
+            <!-- Hàng 2: Danh xưng + Nghề nghiệp -->
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="profile-title">
+                  <i data-lucide="award"></i>
+                  Danh xưng / Vai trò
+                  <i data-lucide="help-circle" class="help-icon" onclick="showHelp('title')"></i>
+                </label>
+                <div class="smart-select-container" data-target="profile-title">
+                  <div id="profile-title-custom" class="custom-select form-input">
+                    <div class="custom-select-trigger">
+                      <span class="custom-select-value">Chọn danh xưng...</span>
+                      <i data-lucide="chevron-down" class="custom-select-icon"></i>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <div class="custom-option" data-value="V-Tuber">V-Tuber</div>
+                      <div class="custom-option" data-value="3D Creator">3D Creator</div>
+                      <div class="custom-option" data-value="Animator">Animator</div>
+                      <div class="custom-option" data-value="Developer">Developer (Lập trình viên)</div>
+                      <div class="custom-option" data-value="Người chơi hệ Anime">Người chơi hệ Anime</div>
+                      <div class="custom-option" data-value="other">Khác (Tự nhập...)</div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="profile-title-value" value="" />
+                  <div class="smart-input-wrapper" style="display: none; position: relative;">
+                    <input type="text" id="profile-title" class="form-input" placeholder="Nhập danh xưng..." style="padding-right: 36px;" />
+                    <button type="button" class="btn-revert-select" title="Quay lại chọn danh sách" data-custom="profile-title-custom"><i data-lucide="x"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-profession">
+                  <i data-lucide="briefcase"></i>
+                  Nghề nghiệp / Lĩnh vực
+                  <i data-lucide="help-circle" class="help-icon" onclick="showHelp('profession')"></i>
+                </label>
+                <div class="smart-select-container" data-target="profile-profession">
+                  <div id="profile-profession-custom" class="custom-select form-input">
+                    <div class="custom-select-trigger">
+                      <span class="custom-select-value">Chọn nghề nghiệp...</span>
+                      <i data-lucide="chevron-down" class="custom-select-icon"></i>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <div class="custom-option" data-value="Học sinh / Sinh viên">Học sinh / Sinh viên</div>
+                      <div class="custom-option" data-value="IT / Phần mềm">IT / Phần mềm</div>
+                      <div class="custom-option" data-value="Thiết kế / Nghệ thuật">Thiết kế / Nghệ thuật</div>
+                      <div class="custom-option" data-value="Marketing / Sáng tạo nội dung">Marketing / Sáng tạo nội dung</div>
+                      <div class="custom-option" data-value="Y tế / Sức khoẻ">Y tế / Sức khoẻ</div>
+                      <div class="custom-option" data-value="Giáo dục">Giáo dục</div>
+                      <div class="custom-option" data-value="Tự do (Freelancer)">Tự do (Freelancer)</div>
+                      <div class="custom-option" data-value="other">Khác (Tự nhập...)</div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="profile-profession-value" value="" />
+                  <div class="smart-input-wrapper" style="display: none; position: relative;">
+                    <input type="text" id="profile-profession" class="form-input" placeholder="Nhập nghề nghiệp..." style="padding-right: 36px;" />
+                    <button type="button" class="btn-revert-select" title="Quay lại chọn danh sách" data-custom="profile-profession-custom"><i data-lucide="x"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hàng 3: Giới tính + Ngày sinh + Quốc gia -->
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8fa0cf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M10 20h4"/><path d="M12 16v6"/><path d="M17 2h4v4"/><path d="m21 2-5.46 5.46"/><circle cx="12" cy="11" r="5"/></svg>
+                  Giới tính
+                </label>
+                <div class="gender-toggle">
+                  <label>
+                    <input type="radio" name="profile_gender" value="male">
+                    <span><b class="gender-kanji">男</b> Nam</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="profile_gender" value="female">
+                    <span><b class="gender-kanji">女</b> Nữ</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="profile_gender" value="other">
+                    <span><b class="gender-kanji">他</b> Khác</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-birthday">
+                  <i data-lucide="calendar"></i>
+                  Ngày sinh
+                </label>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <div id="birthday-mask-hint" style="position: absolute; left: 14px; color: #bbb; pointer-events: none; user-select: none; font-family: inherit; font-size: 0.95rem; font-weight: 600;">dd/mm/yyyy</div>
+                  <input type="text" id="profile-birthday" class="form-input" style="background: transparent; position: relative; z-index: 2;" maxlength="10" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-location">
+                  <i data-lucide="map-pin"></i>
+                  Quốc gia / Khu vực
+                </label>
+                <div class="smart-select-container" data-target="profile-location">
+                  <div id="profile-location-custom" class="custom-select form-input">
+                    <div class="custom-select-trigger">
+                      <span class="custom-select-value">Chọn quốc gia...</span>
+                      <i data-lucide="chevron-down" class="custom-select-icon"></i>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <div class="custom-option" data-value="Việt Nam"><img src="https://flagcdn.com/w20/vn.png" alt="VN"> Việt Nam</div>
+                      <div class="custom-option" data-value="United States"><img src="https://flagcdn.com/w20/us.png" alt="US"> United States (Mỹ)</div>
+                      <div class="custom-option" data-value="Japan"><img src="https://flagcdn.com/w20/jp.png" alt="JP"> Japan (Nhật Bản)</div>
+                      <div class="custom-option" data-value="South Korea"><img src="https://flagcdn.com/w20/kr.png" alt="KR"> South Korea (Hàn Quốc)</div>
+                      <div class="custom-option" data-value="China"><img src="https://flagcdn.com/w20/cn.png" alt="CN"> China (Trung Quốc)</div>
+                      <div class="custom-option" data-value="United Kingdom"><img src="https://flagcdn.com/w20/gb.png" alt="GB"> United Kingdom (Anh)</div>
+                      <div class="custom-option" data-value="Australia"><img src="https://flagcdn.com/w20/au.png" alt="AU"> Australia (Úc)</div>
+                      <div class="custom-option" data-value="France"><img src="https://flagcdn.com/w20/fr.png" alt="FR"> France (Pháp)</div>
+                      <div class="custom-option" data-value="Germany"><img src="https://flagcdn.com/w20/de.png" alt="DE"> Germany (Đức)</div>
+                      <div class="custom-option" data-value="other">Khác (Tự nhập...)</div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="profile-location-value" value="" />
+                  <div class="smart-input-wrapper" style="display: none; position: relative;">
+                    <input type="text" id="profile-location" class="form-input" placeholder="Nhập quốc gia..." style="padding-right: 36px;" />
+                    <button type="button" class="btn-revert-select" title="Quay lại chọn danh sách" data-custom="profile-location-custom"><i data-lucide="x"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hàng 4: Sở thích + Sở ghét -->
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="profile-hobbies">
+                  <i data-lucide="heart"></i>
+                  Sở thích
+                  <i data-lucide="help-circle" class="help-icon" onclick="showHelp('hobbies')"></i>
+                </label>
+                <div class="smart-select-container" data-target="profile-hobbies">
+                  <div id="profile-hobbies-custom" class="custom-select form-input">
+                    <div class="custom-select-trigger">
+                      <span class="custom-select-value">Chọn sở thích...</span>
+                      <i data-lucide="chevron-down" class="custom-select-icon"></i>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <div class="custom-option" data-value="Anime / Manga">Anime / Manga</div>
+                      <div class="custom-option" data-value="Chơi game (Gaming)">Chơi game (Gaming)</div>
+                      <div class="custom-option" data-value="Nghe nhạc / Ca hát">Nghe nhạc / Ca hát</div>
+                      <div class="custom-option" data-value="Vẽ tranh / Nghệ thuật">Vẽ tranh / Nghệ thuật</div>
+                      <div class="custom-option" data-value="Lập trình / Công nghệ">Lập trình / Công nghệ</div>
+                      <div class="custom-option" data-value="Đọc sách / Truyện">Đọc sách / Truyện</div>
+                      <div class="custom-option" data-value="Xem phim / Youtube">Xem phim / Youtube</div>
+                      <div class="custom-option" data-value="other">Khác (Tự nhập...)</div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="profile-hobbies-value" value="" />
+                  <div class="smart-input-wrapper" style="display: none; position: relative;">
+                    <input type="text" id="profile-hobbies" class="form-input" placeholder="Nhập sở thích..." style="padding-right: 36px;" />
+                    <button type="button" class="btn-revert-select" title="Quay lại chọn danh sách" data-custom="profile-hobbies-custom"><i data-lucide="x"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-dislikes">
+                  <i data-lucide="frown"></i>
+                  Sở ghét / Lưu ý
+                  <i data-lucide="help-circle" class="help-icon" onclick="showHelp('dislikes')"></i>
+                </label>
+                <div class="smart-select-container" data-target="profile-dislikes">
+                  <div id="profile-dislikes-custom" class="custom-select form-input">
+                    <div class="custom-select-trigger">
+                      <span class="custom-select-value">Chọn sở ghét...</span>
+                      <i data-lucide="chevron-down" class="custom-select-icon"></i>
+                    </div>
+                    <div class="custom-select-dropdown">
+                      <div class="custom-option" data-value="Hét to, ồn ào">Hét to, ồn ào</div>
+                      <div class="custom-option" data-value="Chờ đợi lâu">Chờ đợi lâu</div>
+                      <div class="custom-option" data-value="Sợ côn trùng / Nhện">Sợ côn trùng / Nhện</div>
+                      <div class="custom-option" data-value="Dùng từ ngữ thô tục">Dùng từ ngữ thô tục</div>
+                      <div class="custom-option" data-value="other">Khác (Tự nhập...)</div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="profile-dislikes-value" value="" />
+                  <div class="smart-input-wrapper" style="display: none; position: relative;">
+                    <input type="text" id="profile-dislikes" class="form-input" placeholder="Nhập sở ghét..." style="padding-right: 36px;" />
+                    <button type="button" class="btn-revert-select" title="Quay lại chọn danh sách" data-custom="profile-dislikes-custom"><i data-lucide="x"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="profile-bio">
+                <i data-lucide="book-open"></i>
+                <span data-i18n="profile.bio">Giới thiệu bản thân</span>
+              </label>
+              <textarea id="profile-bio" class="form-input form-textarea" placeholder="Kể một chút về bạn..."></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Card: Mạng xã hội -->
+        <div class="profile-card">
+          <div class="profile-card-header">
+            <h2 class="profile-card-title">
+              <i data-lucide="link"></i>
+              Liên kết mạng xã hội
+            </h2>
+          </div>
+          <div class="profile-card-body">
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="profile-social-facebook">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  Facebook
+                </label>
+                <input type="url" id="profile-social-facebook" class="form-input" placeholder="https://facebook.com/username" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-social-youtube">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="red"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  YouTube
+                </label>
+                <input type="url" id="profile-social-youtube" class="form-input" placeholder="https://youtube.com/@channel" />
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="profile-social-tiktok">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.91a8.16 8.16 0 0 0 4.78 1.52V7.0a4.85 4.85 0 0 1-1.01-.31z"/></svg>
+                  TikTok
+                </label>
+                <input type="url" id="profile-social-tiktok" class="form-input" placeholder="https://tiktok.com/@username" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-website">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  Website
+                </label>
+                <input type="url" id="profile-website" class="form-input" placeholder="https://yoursite.com" />
+              </div>
             </div>
             
-            <div style="padding: 60px 40px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 60px; justify-content: center; align-items: flex-start; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
-                <!-- Avatar Area (Cột Trái) -->
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; flex: 1; min-width: 250px;">
-                    <div style="position: relative; width: 200px; height: 200px;">
-                        <img id="profile-avatar-preview" src="" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 5px solid #ffb6c1; background: #fff; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                        <div id="profile-avatar-fallback" style="width: 200px; height: 200px; border-radius: 50%; background: #fff0f5; border: 5px solid #ffb6c1; display: none; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#e94560" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </div>
-                        <!-- Upload Button Overlay -->
-                        <label for="avatar-upload" style="position: absolute; bottom: 10px; right: 10px; background: #e94560; color: white; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(233,69,96,0.4); transition: transform 0.2s, background 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.background='#d13d56';" onmouseout="this.style.transform='scale(1)'; this.style.background='#e94560';" title="Đổi ảnh đại diện">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                        </label>
-                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;" />
-                    </div>
-                    <div style="font-size: 0.9rem; color: #777; text-align: center; max-width: 250px; line-height: 1.4;" data-i18n="profile.upload_hint">Tải lên bức ảnh đẹp nhất của bạn. Khuyên dùng ảnh vuông, kích thước &lt; 2MB.</div>
-                </div>
-
-                <!-- Info Form (Cột Phải) -->
-                <div style="flex: 2; min-width: 300px; display: flex; flex-direction: column; gap: 25px;">
-                    <div style="background: #fdfdfd; padding: 30px; border-radius: 15px; border: 1px solid #eaeaea; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 20px;">
-                        
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <label style="font-weight: 600; font-size: 1rem; color: #444;" data-i18n="profile.display_name">Tên hiển thị</label>
-                            <input type="text" id="profile-display-name" placeholder="Tên của bạn..." data-i18n="profile.display_name_placeholder" style="padding: 14px 18px; border-radius: 12px; border: 1.5px solid #ddd; outline: none; font-size: 1.05rem; transition: border-color 0.2s, box-shadow 0.2s;" onfocus="this.style.borderColor='#e94560'; this.style.boxShadow='0 0 0 3px rgba(233,69,96,0.1)';" onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';" />
-                        </div>
-                        
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <label style="font-weight: 600; font-size: 1rem; color: #444;" data-i18n="profile.nickname">Biệt danh (AI sẽ gọi bạn bằng tên này)</label>
-                            <input type="text" id="profile-nickname" placeholder="Biệt danh..." data-i18n="profile.nickname_placeholder" style="padding: 14px 18px; border-radius: 12px; border: 1.5px solid #ddd; outline: none; font-size: 1.05rem; transition: border-color 0.2s, box-shadow 0.2s;" onfocus="this.style.borderColor='#e94560'; this.style.boxShadow='0 0 0 3px rgba(233,69,96,0.1)';" onblur="this.style.borderColor='#ddd'; this.style.boxShadow='none';" />
-                        </div>
-
-                        <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1.5px dashed #eee; padding-top: 20px; margin-top: 5px;">
-                            <div style="font-size: 1rem; color: #555; display: flex; align-items: center; gap: 10px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                                <span style="font-weight: 600;" data-i18n="profile.email">Email:</span> <span id="profile-email">--</span>
-                            </div>
-                            <div style="font-size: 1rem; color: #555; display: flex; align-items: center; gap: 10px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                                <span style="font-weight: 600;" data-i18n="profile.join_date">Ngày tham gia:</span> <span id="profile-created">--</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 15px; margin-top: auto;">
-                        <button id="btn-save-profile" style="flex: 2; background: #4CAF50; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 10px rgba(76,175,80,0.3);" onmouseover="this.style.background='#45a049'" onmouseout="this.style.background='#4CAF50'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" data-i18n="profile.save">Lưu thay đổi</button>
-                        <button id="btn-logout" style="flex: 1; background: #f44336; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: transform 0.1s, background 0.2s; box-shadow: 0 4px 10px rgba(244,67,54,0.3);" onmouseover="this.style.background='#da190b'" onmouseout="this.style.background='#f44336'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                            <span data-i18n="profile.logout">Đăng xuất</span>
-                        </button>
-                    </div>
-                </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="profile-social-x">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  X (Twitter)
+                </label>
+                <input type="url" id="profile-social-x" class="form-input" placeholder="https://x.com/username" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-social-discord">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.182 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                  Discord
+                </label>
+                <input type="text" id="profile-social-discord" class="form-input" placeholder="Username (VD: abcd#1234)" />
+              </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Avatar Cropper Modal (chỉ hiện khi đang cắt ảnh) -->
-    <div id="cropper-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.9); z-index: 3000; justify-content: center; align-items: center; flex-direction: column;">
-        <div style="width: 90%; max-width: 600px; height: 60vh; background: #fff; border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
-            <img id="cropper-image" src="" style="max-width: 100%; display: block;" />
+          </div>
         </div>
-        <div style="display: flex; gap: 15px;">
-            <button id="btn-cancel-crop" style="background: #666; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 1rem; cursor: pointer;">Hủy</button>
-            <button id="btn-apply-crop" style="background: #e94560; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: bold;">Cắt & Áp dụng</button>
+        <div class="profile-card">
+          <div class="profile-card-body">
+            <div class="profile-actions">
+              <button id="btn-save-profile" class="btn-save" data-i18n="profile.save" style="width: 100%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Lưu thay đổi
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+    </main>
+    <span id="profile-email" style="display:none;"></span>
+    <span id="profile-created" style="display:none;"></span>
+    <div id="cropper-modal">
+      <div class="cropper-box">
+        <img id="cropper-image" src="" style="max-width:100%; display:block;" />
+      </div>
+      <div class="cropper-actions">
+        <button id="btn-cancel-crop" class="btn-crop-cancel">Hủy</button>
+        <button id="btn-apply-crop" class="btn-crop-apply">✂ Cắt &amp; Áp dụng</button>
+      </div>
     </div>
+    <div id="toast-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const birthdayInput = document.getElementById('profile-birthday');
+        const maskHint = document.getElementById('birthday-mask-hint');
+        
+        function updateMaskHint(val) {
+          if (!maskHint) return;
+          const template = "dd/mm/yyyy";
+          // Tạo một chuỗi tàng hình (cùng độ dài với chữ đã gõ) + phần còn lại của template
+          let hiddenPart = '<span style="opacity: 0;">' + val + '</span>';
+          let visiblePart = template.substring(val.length);
+          maskHint.innerHTML = hiddenPart + visiblePart;
+        }
 
-    <!-- Toast Notification -->
-    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999;"></div>
+        if (birthdayInput) {
+          // 1. Ép định dạng khi gõ
+          birthdayInput.addEventListener('input', function(e) {
+            let v = this.value.replace(/\D/g, '');
+            if (v.length >= 5) {
+              this.value = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4, 8);
+            } else if (v.length >= 3) {
+              this.value = v.substring(0, 2) + '/' + v.substring(2, 4);
+            } else {
+              this.value = v;
+            }
+            updateMaskHint(this.value);
+          });
+          
+          // Cập nhật khi load
+          setTimeout(() => updateMaskHint(birthdayInput.value), 100);
+
+          // Khởi tạo Flatpickr
+          flatpickr("#profile-birthday", {
+            dateFormat: "d/m/Y",
+            allowInput: true,
+            disableMobile: true,
+            onChange: function(selectedDates, dateStr) {
+              updateMaskHint(dateStr);
+            }
+          });
+
+          // Khởi tạo Lucide icons
+          lucide.createIcons();
+        }
+      });
+      
+      // Hàm hiển thị Help Modal
+      window.showHelp = function(field) {
+        const titleEl = document.getElementById('help-modal-title');
+        const textEl = document.getElementById('help-modal-text');
+        
+        let title = '';
+        let text = '';
+        
+        switch(field) {
+          case 'title':
+            title = 'Danh xưng / Vai trò';
+            text = 'Chức danh hoặc vai trò chính của bạn. AI sẽ dùng thông tin này để hiểu rõ hơn về vị trí của bạn (VD: Bạn là V-Tuber, Developer hay 3D Creator) và có cách trò chuyện phù hợp.';
+            break;
+          case 'profession':
+            title = 'Nghề nghiệp / Lĩnh vực';
+            text = 'Lĩnh vực công việc hoặc học tập hiện tại của bạn. Giúp AI có thể đưa ra các câu trả lời chuyên môn hơn hoặc gợi ý những nội dung sát với sự quan tâm của bạn.';
+            break;
+          case 'hobbies':
+            title = 'Sở thích';
+            text = 'Những việc bạn thích làm lúc rảnh rỗi. AI có thể dùng thông tin này để chủ động gợi mở các chủ đề trò chuyện thú vị mà bạn quan tâm.';
+            break;
+          case 'dislikes':
+            title = 'Sở ghét / Lưu ý';
+            text = 'Những điều bạn không thích (VD: Sợ nhện, Ghét chờ đợi...). AI sẽ ghi nhớ để tránh đề cập hoặc làm những hành động khiến bạn không thoải mái.';
+            break;
+        }
+        
+        titleEl.innerText = title;
+        textEl.innerText = text;
+        document.getElementById('help-modal').style.display = 'flex';
+      };
+    </script>
+    <!-- Help Modal -->
+    <div id="help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 4000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+      <div style="background: white; padding: 24px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; animation: fadeUp 0.3s ease;">
+        <h3 id="help-modal-title" style="margin-top: 0; font-family: 'Baloo 2', cursive; color: #3f51b5; font-size: 1.3rem; display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="info" style="color: #3f51b5;"></i> Giải thích
+        </h3>
+        <p id="help-modal-text" style="line-height: 1.6; color: #444; font-size: 0.95rem; font-weight: 500;"></p>
+        <button onclick="document.getElementById('help-modal').style.display = 'none';" class="btn-save" style="width: 100%; margin-top: 24px;">Đã hiểu</button>
+      </div>
+    </div>
 
     <script type="module" src="/src/features/auth/profile-main.ts"></script>
   </body>

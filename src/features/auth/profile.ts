@@ -30,6 +30,19 @@ export async function setupProfileUI() {
     const profileCreated = document.getElementById('profile-created');
     const inputDisplayName = document.getElementById('profile-display-name') as HTMLInputElement;
     const inputNickname = document.getElementById('profile-nickname') as HTMLInputElement;
+    const inputBio = document.getElementById('profile-bio') as HTMLTextAreaElement;
+    const inputBirthday = document.getElementById('profile-birthday') as HTMLInputElement;
+    const inputHobbies = document.getElementById('profile-hobbies') as HTMLInputElement;
+    const inputFacebook = document.getElementById('profile-social-facebook') as HTMLInputElement;
+    const inputYoutube = document.getElementById('profile-social-youtube') as HTMLInputElement;
+    const inputTiktok = document.getElementById('profile-social-tiktok') as HTMLInputElement;
+    const inputWebsite = document.getElementById('profile-website') as HTMLInputElement;
+    const inputX = document.getElementById('profile-social-x') as HTMLInputElement;
+    const inputDiscord = document.getElementById('profile-social-discord') as HTMLInputElement;
+    const inputTitle = document.getElementById('profile-title') as HTMLInputElement;
+    const inputProfession = document.getElementById('profile-profession') as HTMLInputElement;
+    const inputLocation = document.getElementById('profile-location') as HTMLInputElement;
+    const inputDislikes = document.getElementById('profile-dislikes') as HTMLInputElement;
     const avatarPreview = document.getElementById('profile-avatar-preview') as HTMLImageElement;
     const avatarFallback = document.getElementById('profile-avatar-fallback');
     const btnSaveProfile = document.getElementById('btn-save-profile') as HTMLButtonElement;
@@ -45,38 +58,175 @@ export async function setupProfileUI() {
         if (!container) return;
     
         const toast = document.createElement('div');
-        toast.style.background = type === 'success' ? '#4CAF50' : '#f44336';
-        toast.style.color = 'white';
-        toast.style.padding = '12px 24px';
-        toast.style.borderRadius = '8px';
-        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        toast.style.fontSize = '1rem';
-        toast.style.fontWeight = '500';
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'opacity 0.3s, transform 0.3s';
+        toast.className = `toast toast-${type}`;
         toast.innerText = message;
-    
         container.appendChild(toast);
     
         // Animate in
-        setTimeout(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateY(0)';
-        }, 10);
+        setTimeout(() => { toast.classList.add('show'); }, 10);
     
         // Remove after 3 seconds
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(20px)';
-            setTimeout(() => toast.remove(), 300);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 320);
         }, 3000);
+    }
+
+    // --- Smart Select Logic ---
+    function setupSmartSelects() {
+        const targets = ['profile-title', 'profile-profession', 'profile-location', 'profile-dislikes', 'profile-hobbies'];
+
+        targets.forEach(targetId => {
+            const customSelect = document.getElementById(targetId + '-custom');
+            const customSelectValue = document.getElementById(targetId + '-value') as HTMLInputElement;
+            if (customSelect && customSelectValue) {
+                const trigger = customSelect.querySelector('.custom-select-trigger') as HTMLElement;
+                const triggerSpan = trigger.querySelector('.custom-select-value') as HTMLElement;
+                const options = customSelect.querySelectorAll('.custom-option');
+                const defaultText = triggerSpan.innerHTML;
+                
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    customSelect.classList.toggle('open');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!customSelect.contains(e.target as Node)) {
+                        customSelect.classList.remove('open');
+                    }
+                });
+
+                options.forEach(opt => {
+                    opt.addEventListener('click', () => {
+                        const val = opt.getAttribute('data-value');
+                        customSelectValue.value = val || '';
+                        triggerSpan.innerHTML = opt.innerHTML;
+                        customSelect.classList.remove('open');
+
+                        if (val === 'other') {
+                            customSelect.style.display = 'none';
+                            const wrapper = customSelect.parentElement?.querySelector('.smart-input-wrapper') as HTMLElement;
+                            const inputEl = document.getElementById(targetId) as HTMLInputElement;
+                            if (wrapper) wrapper.style.display = 'block';
+                            if (inputEl) inputEl.focus();
+                        }
+                    });
+                });
+
+                const revertBtn = customSelect.parentElement?.querySelector('.btn-revert-select');
+                if (revertBtn) {
+                    revertBtn.addEventListener('click', () => {
+                        const wrapper = customSelect.parentElement?.querySelector('.smart-input-wrapper') as HTMLElement;
+                        const inputEl = document.getElementById(targetId) as HTMLInputElement;
+                        if (wrapper) wrapper.style.display = 'none';
+                        customSelect.style.display = 'block';
+                        customSelectValue.value = '';
+                        triggerSpan.innerHTML = defaultText;
+                        if (inputEl) inputEl.value = '';
+                    });
+                }
+            }
+        });
+    }
+
+    function setSmartSelectValue(targetId: string, value: string) {
+        if (!value) return;
+
+        const customSelect = document.getElementById(targetId + '-custom');
+        const customSelectValue = document.getElementById(targetId + '-value') as HTMLInputElement;
+        const inputEl = document.getElementById(targetId) as HTMLInputElement;
+        if (!customSelect || !customSelectValue || !inputEl) return;
+        
+        const wrapper = inputEl.parentElement;
+        const options = customSelect.querySelectorAll('.custom-option');
+        let optionExists = false;
+        let matchingOpt = null;
+        options.forEach(opt => {
+            if (opt.getAttribute('data-value') === value) {
+                optionExists = true;
+                matchingOpt = opt;
+            }
+        });
+
+        if (optionExists && value !== 'other') {
+            customSelectValue.value = value;
+            const triggerSpan = customSelect.querySelector('.custom-select-value') as HTMLElement;
+            if (triggerSpan && matchingOpt) triggerSpan.innerHTML = (matchingOpt as HTMLElement).innerHTML;
+            customSelect.style.display = 'block';
+            if (wrapper) wrapper.style.display = 'none';
+        } else {
+            customSelectValue.value = 'other';
+            customSelect.style.display = 'none';
+            if (wrapper) wrapper.style.display = 'block';
+            inputEl.value = value;
+        }
+    }
+
+    function getSmartSelectValue(targetId: string): string {
+        const customSelectValue = document.getElementById(targetId + '-value') as HTMLInputElement;
+        const inputEl = document.getElementById(targetId) as HTMLInputElement;
+        if (!customSelectValue || !inputEl) return '';
+        
+        const customSelect = document.getElementById(targetId + '-custom');
+        if (customSelectValue.value === 'other' || (customSelect && customSelect.style.display === 'none')) {
+            return inputEl.value;
+        }
+        return customSelectValue.value;
+    }
+    
+    setupSmartSelects();
+
+    async function loadProfileStats() {
+        if (!currentUser || !supabase) return;
+        const userId = currentUser.id;
+
+        const statCharPosted = document.getElementById('stat-char-posted');
+        const statCharSaved = document.getElementById('stat-char-saved');
+        const statAnimPosted = document.getElementById('stat-anim-posted');
+        const statAnimSaved = document.getElementById('stat-anim-saved');
+        const joinDate = document.getElementById('profile-join-date');
+
+        if (joinDate && currentUser.created_at) {
+            const d = new Date(currentUser.created_at);
+            joinDate.textContent = d.toLocaleDateString('vi-VN');
+        }
+
+        try {
+            const [savedCharsRes, savedAnimsRes, uploadsRes] = await Promise.all([
+                supabase.from('user_saved_characters').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+                supabase.from('user_saved_animations').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+                supabase.from('public_characters').select('id', { count: 'exact', head: true }).eq('creator_id', userId)
+            ]);
+
+            let postedAnimsCount = 0;
+            try {
+                const animsResponse = await fetch(`http://localhost:3000/api/animations/my-uploads?creator_id=${userId}`);
+                if (animsResponse.ok) {
+                    const animsData = await animsResponse.json();
+                    postedAnimsCount = Array.isArray(animsData) ? animsData.length : 0;
+                }
+            } catch(e) {}
+
+            if (statCharSaved) statCharSaved.textContent = String(savedCharsRes.count ?? 0);
+            if (statAnimSaved) statAnimSaved.textContent = String(savedAnimsRes.count ?? 0);
+            if (statCharPosted) statCharPosted.textContent = String(uploadsRes.count ?? 0);
+            if (statAnimPosted) statAnimPosted.textContent = String(postedAnimsCount);
+        } catch (err) {
+            if (statCharSaved) statCharSaved.textContent = '–';
+            if (statAnimSaved) statAnimSaved.textContent = '–';
+            if (statCharPosted) statCharPosted.textContent = '–';
+            if (statAnimPosted) statAnimPosted.textContent = '–';
+        }
     }
 
     async function loadUserProfile() {
         if (!currentUser || !supabase) return;
 
-        if (profileEmail) profileEmail.innerText = currentUser.email;
+        // Sidebar: email + tên hiển thị nhanh
+        const sideEmail = document.getElementById('avatar-email-display');
+        const sideName = document.getElementById('avatar-display-name');
+        if (sideEmail) sideEmail.textContent = currentUser.email || '—';
+        if (profileEmail) profileEmail.innerText = currentUser.email || '—';
         if (profileCreated && currentUser.created_at) {
             profileCreated.innerText = new Date(currentUser.created_at).toLocaleDateString('vi-VN');
         }
@@ -96,6 +246,31 @@ export async function setupProfileUI() {
             currentUserProfileState = data;
             if (inputDisplayName) inputDisplayName.value = data.display_name || '';
             if (inputNickname) inputNickname.value = data.nickname || '';
+            if (inputBio) inputBio.value = data.bio || '';
+            if (data.gender) {
+                const radio = document.querySelector(`input[name="profile_gender"][value="${data.gender}"]`) as HTMLInputElement;
+                if (radio) radio.checked = true;
+            }
+            if (inputBirthday) {
+                inputBirthday.value = data.birthday || '';
+                inputBirthday.dispatchEvent(new Event('input'));
+            }
+            setSmartSelectValue('profile-hobbies', data.hobbies);
+            setSmartSelectValue('profile-title', data.title);
+            setSmartSelectValue('profile-profession', data.profession);
+            setSmartSelectValue('profile-location', data.location);
+            setSmartSelectValue('profile-dislikes', data.dislikes);
+            // Social links (stored in data.social_links object)
+            const social = data.social_links || {};
+            if (inputFacebook) inputFacebook.value = social.facebook || '';
+            if (inputYoutube) inputYoutube.value = social.youtube || '';
+            if (inputTiktok) inputTiktok.value = social.tiktok || '';
+            if (inputWebsite) inputWebsite.value = social.website || '';
+            if (inputX) inputX.value = social.x || '';
+            if (inputDiscord) inputDiscord.value = social.discord || '';
+            // Sidebar name
+            if (sideName) sideName.textContent = data.display_name || currentUser.email?.split('@')[0] || '—';
+
             if (data.avatar_url) {
                 const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(data.avatar_url);
                 const url = publicUrlData.publicUrl + '?t=' + new Date().getTime();
@@ -106,7 +281,7 @@ export async function setupProfileUI() {
                     avatarFallback.style.display = 'none';
                 }
 
-                // Update small floating icon
+                // Update small floating icon (if on other pages)
                 const smallAvatar = document.getElementById('btn-profile-avatar') as HTMLImageElement;
                 const smallIcon = document.getElementById('btn-profile-icon');
                 if (smallAvatar && smallIcon) {
@@ -121,6 +296,9 @@ export async function setupProfileUI() {
                     avatarFallback.style.display = 'flex';
                 }
             }
+        } else {
+            // No profile yet — show email as fallback name
+            if (sideName) sideName.textContent = currentUser.email?.split('@')[0] || '—';
         }
     }
 
@@ -149,6 +327,9 @@ export async function setupProfileUI() {
         }
     }
     applyLanguage(currentLang);
+
+    // Load stats in background
+    loadProfileStats();
 
     loadProfilePage();
 
@@ -236,8 +417,8 @@ export async function setupProfileUI() {
             }
 
             btnSaveProfile.disabled = true;
-            const originalText = btnSaveProfile.innerText;
-            btnSaveProfile.innerText = t('btn.saving');
+            const originalHTML = btnSaveProfile.innerHTML;
+            btnSaveProfile.innerHTML = `<svg class="spin-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ` + t('btn.saving');
 
             try {
                 let avatarUrlPath = null;
@@ -259,13 +440,36 @@ export async function setupProfileUI() {
                     currentAvatarBlob = null; // Clear sau khi upload thành công
                 }
 
+                    const selectedGender = document.querySelector('input[name="profile_gender"]:checked') as HTMLInputElement;
+                    const genderVal = selectedGender ? selectedGender.value : '';
+
                 // 2. Cập nhật user_profiles (Upsert)
                 const updateData: any = {
                     id: currentUser.id,
                     display_name: inputDisplayName.value.trim(),
                     nickname: inputNickname.value.trim(),
+                    bio: inputBio ? inputBio.value.trim().slice(0, 200) : '',
+                    gender: genderVal,
+                    birthday: inputBirthday ? inputBirthday.value : '',
+                    hobbies: getSmartSelectValue('profile-hobbies').trim(),
+                    title: getSmartSelectValue('profile-title').trim(),
+                    profession: getSmartSelectValue('profile-profession').trim(),
+                    location: getSmartSelectValue('profile-location').trim(),
+                    dislikes: getSmartSelectValue('profile-dislikes').trim(),
+                    social_links: {
+                        facebook: inputFacebook ? inputFacebook.value.trim() : '',
+                        youtube: inputYoutube ? inputYoutube.value.trim() : '',
+                        tiktok: inputTiktok ? inputTiktok.value.trim() : '',
+                        website: inputWebsite ? inputWebsite.value.trim() : '',
+                        x: inputX ? inputX.value.trim() : '',
+                        discord: inputDiscord ? inputDiscord.value.trim() : ''
+                    },
                     updated_at: new Date().toISOString()
                 };
+
+                // Update sidebar name live
+                const sideName = document.getElementById('avatar-display-name');
+                if (sideName && updateData.display_name) sideName.textContent = updateData.display_name;
 
                 if (avatarUrlPath) {
                     updateData.avatar_url = avatarUrlPath;
@@ -287,7 +491,7 @@ export async function setupProfileUI() {
                 showToast(err.message || t("toast.error"), "error");
             } finally {
                 btnSaveProfile.disabled = false;
-                btnSaveProfile.innerText = originalText;
+                btnSaveProfile.innerHTML = originalHTML;
             }
         });
     }

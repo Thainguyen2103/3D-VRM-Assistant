@@ -135,6 +135,20 @@ function buildSystemPrompt(userProfile, uiLanguage = 'vi', voiceLanguage = 'zh',
     } else {
         prompt += `- Người dùng hiện tại CHƯA CUNG CẤP TÊN. Nếu họ hỏi "tôi là ai", hãy bảo họ vào mục Hồ sơ để điền tên.\n`;
     }
+    
+    if (userProfile) {
+        prompt += `[THÔNG TIN CÁ NHÂN CỦA NGƯỜI DÙNG]\n`;
+        let hasExtraInfo = false;
+        if (userProfile.title) { prompt += `- Danh xưng / Vai trò: ${userProfile.title}\n`; hasExtraInfo = true; }
+        if (userProfile.profession) { prompt += `- Nghề nghiệp / Lĩnh vực: ${userProfile.profession}\n`; hasExtraInfo = true; }
+        if (userProfile.location) { prompt += `- Khu vực / Quốc gia: ${userProfile.location}\n`; hasExtraInfo = true; }
+        if (userProfile.hobbies) { prompt += `- Sở thích: ${userProfile.hobbies}\n`; hasExtraInfo = true; }
+        if (userProfile.dislikes) { prompt += `- Điều không thích / Lưu ý đặc biệt (TUYỆT ĐỐI TRÁNH ĐỂ KHÔNG LÀM PHẬT Ý): ${userProfile.dislikes}\n`; hasExtraInfo = true; }
+        
+        if (hasExtraInfo) {
+            prompt += `-> LƯU Ý QUAN TRỌNG: Bạn CHỈ NÊN sử dụng những thông tin cá nhân này một cách thật sự tự nhiên và có chừng mực khi nội dung cuộc trò chuyện có liên quan. TUYỆT ĐỐI KHÔNG lạm dụng, không đào sâu hoặc cố tình nhắc đi nhắc lại hồ sơ của người dùng một cách gượng ép.\n`;
+        }
+    }
     prompt += `\n=== LƯU Ý TỐI QUAN TRỌNG VỀ NGÔN NGỮ ĐẦU RA ===\n`;
     if (uiLanguage !== voiceLanguage) {
         prompt += `- Người dùng chọn Voice là ${voiceLangName} (${voiceLanguage}), UI là ${uiLangName} (${uiLanguage}).\n`;
